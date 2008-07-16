@@ -17,7 +17,7 @@ from shutil import *
 import wsgiref.handlers
 from pyxer.app import make_app
 
-from pyxer.utils import find_root
+from pyxer.utils import find_root, call_script
 
 _app_yaml = """
 application: %s
@@ -105,6 +105,10 @@ def setup(opt):
             os.path.dirname(html5lib.__file__), 
             os.path.join(os.getcwd(), "lib", "html5lib"))
 
+def fix():
+    print "Fix paths"
+    call_script(["python","-m","pyxer.gae.monkey.pth_relpath_fixup"])
+    
 def serve(opt):
     global pyxer
     
@@ -116,6 +120,8 @@ def serve(opt):
     options = []
     if opt.debug:
         options.append("-d")
+    
+    fix()
     
     if sys.platform=="win32":
         

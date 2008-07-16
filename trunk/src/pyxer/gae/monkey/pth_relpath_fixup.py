@@ -4,8 +4,8 @@ Changes any absolute paths in .pth files to be relative.  Also changes .egg-link
 import sys
 import os
 
-def main():
-    for path in sys.path:
+def main(path_list=sys.path):
+    for path in path_list:
         if not path:
             path = '.'
         if not os.path.isdir(path):
