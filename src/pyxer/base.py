@@ -4,7 +4,7 @@
 ## All rights reserved                     ##
 #############################################
 
-import pyxer.helpers as h
+# import pyxer.helpers as h
 # import pyxer.model as model
 
 from webob import Request, Response
@@ -42,13 +42,15 @@ def url(url):
 def redirect(location, code=301):   
     raise exc.HTTPMovedPermanently(location=url(location))
 
-
-from genshi.template import TemplateLoader
-
-genshi_loader = TemplateLoader(
-    os.path.join(os.getcwd(), 'public'),
-    auto_reload=True)
-
+try:
+    from genshi.template import TemplateLoader
+    
+    genshi_loader = TemplateLoader(
+        os.path.join(os.getcwd(), 'public'),
+        auto_reload=True)
+except:
+    log.exception("Failed loading Genshi")
+    
 def render(template):
     tmpl = genshi_loader.load(template)
     return tmpl.generate(c=c).render('xhtml', doctype='xhtml')
