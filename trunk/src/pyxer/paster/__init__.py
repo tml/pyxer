@@ -25,7 +25,7 @@ import sys
 from shutil import * 
 import wsgiref.handlers
 from pyxer.app import make_app
-from pyxer.utils import call_virtual, find_name, find_root
+from pyxer.utils import call_virtual, find_name, find_root, call_script
 
 _paster_ini = """
 [app:main]
@@ -122,9 +122,8 @@ def serve(opt, options=[], daemon=""):
         options.append("-v")       
     if opt.reload:
         options.append("--reload")   
-    ini = os.path.join(root, "src", find_name(root), "development.ini")
-    paster = os.path.join(root, "Scripts", "paster.exe")
-    call_virtual([paster, command] + options + [ini, daemon])    
+    ini = os.path.join(root, "development.ini")    
+    call_script(["paster", command] + options + [ini, daemon])    
 
 def start(opt):
     serve(opt, options=["--daemon"])
