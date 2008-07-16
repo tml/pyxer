@@ -1,0 +1,48 @@
+CHANGELOG
+=========
+
+Version 0.5
+
+- Initial version of Pyxer framework
+
+*** BREAK ***
+
+    SWITCHED TO FRAMEWORK DEVELOPMENT INSTEAD OF 
+    PYTHON TO JAVASCRIPT CONVERSION. 
+
+*** BREAK ***
+
+Version 0.4, 2008-05-xx
+
+- NEW: Samples for usage with CherryPy
+- NEW: Sample for usage with Pylons
+- NEW: Write Python code on the server side and use on client side
+- NEW: Javascript helpers "pylib" can now be served as own file
+- NEW: Created a first Unit test based on prototype.js
+- UPD: Cleanup of resulting Javascript code
+- BUG: Too many Python objects where exported with callbacks
+- BUG: Error if no Python script section was defined
+
+Version 0.3, 2008-03-23
+
+- NEW: Switched to WSGI and implemented a PyxerMiddleware
+- NEW: No additional packages are needed any more.
+  WSGI part only works with Python 2.5 for the moment
+- NEW: Support for EGG
+- UPD: Moved the demo files in a subdirectory "demo"
+- BUG: In the demo the window.onload function was called "onload"
+  and therefore just worked in Firefox
+
+Version 0.2, 2008-03-07
+
+- Switched from simplejson to json (integrated into package)
+- Wrapped result of callback in a dictionary
+- Added exception handling for callback, returns { pyxer_error: "xyz" }
+  if failed to complete request
+- Added interface and example for TurboGears
+- Python logging added, named "ho.pyxer" and "ho.lib.py2js"
+- Started documentation
+
+Version 0.1, 2008-03-05
+
+- Initial release

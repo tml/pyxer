@@ -1,0 +1,93 @@
+# -*- coding: UTF-8 -*-
+#############################################
+## (C)opyright by Dirk Holtwick, 2008      ##
+## All rights reserved                     ##
+#############################################
+
+import pyxer.helpers as h
+# import pyxer.model as model
+
+from webob import Request, Response
+from webob import exc
+
+import sys
+import logging
+import string
+import mimetypes
+import imp
+import os
+import os.path
+import types
+
+from paste.registry import StackedObjectProxy
+
+c = StackedObjectProxy(name="C")
+g = StackedObjectProxy(name="G")
+
+# cache = StackedObjectProxy(name="Cache")
+request = req = StackedObjectProxy(name="Request")
+response = resp = StackedObjectProxy(name="Response")
+session = StackedObjectProxy(name="Session")
+
+import logging
+log = logging.getLogger(__file__)
+
+def abort(code=404):
+    raise exc.HTTPNotFound()
+
+def url(url):
+    return req.relative_url(url)
+
+# Redirect to other page
+def redirect(location, code=301):   
+    raise exc.HTTPMovedPermanently(location=url(location))
+
+
+from genshi.template import TemplateLoader
+
+genshi_loader = TemplateLoader(
+    os.path.join(os.getcwd(), 'public'),
+    auto_reload=True)
+
+def render(template):
+    tmpl = genshi_loader.load(template)
+    return tmpl.generate(c=c).render('xhtml', doctype='xhtml')
+
+# Decorator for controllers
+def controller(func):
+    func.controller = True
+    return func
+
+'''
+    def replacement(environ, start_response):
+        req = Request(environ)
+
+        # Execute function
+        try:
+            resp = func(req, **req.urlvars)
+            # resp = func(req, **dict(req.params))
+        except exc.HTTPException, e:
+            resp = e
+
+        # Handle template
+        if  isinstance(resp, dict):
+            log.debug("apply template on %r", resp)
+            filename = os.path.join(
+                environ["pyxer.root"],
+                os.path.dirname(req.path_info).strip("/"),
+                func.__name__) + ".html"
+
+            try:
+                resp = render(filename, resp)
+            except:
+                log.exception("render")
+
+        # Prepare response
+        if isinstance(resp, basestring):
+            log.debug("create a response of %r", resp[:24])
+            resp = Response(body=resp)
+        return resp(environ, start_response)
+    return replacement
+'''
+
+expose = controller
