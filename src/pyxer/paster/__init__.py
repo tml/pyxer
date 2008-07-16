@@ -134,5 +134,3 @@ def stop(opt):
 
 def status(opt):
     serve(opt, options=["--status"])
-    
-    

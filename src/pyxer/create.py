@@ -34,6 +34,7 @@ def create(opt):
     # Change to AppEngine module replacements
     # os.chdir(os.path.join(os.path.dirname(monkey.__file__), "monkey"))
     
+    name = "."
     # Start appengine-boot.py
     sys.argv = ["XXX", 
         "--paste-deploy", 
@@ -47,8 +48,10 @@ def create(opt):
     
     root = os.getcwd(name)
     
-    # Update development.ini
-    open(os.path.join(root, "gae.ini"), "w").write(GAE_INI)
+    # Create gae.ini
+    path = os.path.join(root, "gae.ini")
+    if not os.path.exists(path): 
+        open(path, "w").write(GAE_INI)
     
     # Create Pylons project    
     #os.chdir(os.path.join(root, "src"))
@@ -56,6 +59,6 @@ def create(opt):
     #call_subprocess(["paster", "create", "-t", "pylons", name], extra_env=env)
     
     # Setup.py develop
-    os.chdir(os.path.join(root, "src", name))
-    env = {"VIRTUAL_ENV": root}    
-    call_subprocess(["python", "setup.py", "develop"], extra_env=env)
+    #os.chdir(os.path.join(root, "src", name))
+    #env = {"VIRTUAL_ENV": root}    
+    #call_subprocess(["python", "setup.py", "develop"], extra_env=env)

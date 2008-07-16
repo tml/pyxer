@@ -156,3 +156,11 @@ def call_virtual(cmd, root=None):
             "VIRTUAL_ENV": root,
             "PATH": os.path.join(root, "Scripts") + ";" + os.environ.get("PATH"),
             })    
+
+def call_script(cmd, root=None):
+    if not root:
+        root = find_root()
+    if iswin:        
+        cmd[0] = os.path.join(root, "Scripts", cmd[0] + ".exe")
+    call_virtual(cmd, root)
+    
