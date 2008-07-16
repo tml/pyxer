@@ -12,10 +12,14 @@ except ImportError:
     use_setuptools()
     from setuptools import setup, find_packages
 
+long_description = """
+Pyxer is a simple Python Framework for Paste and Google AppEngine.
+""".strip()
+
 setup(
     name           = "Pyxer",
     version        = "0.5.1",
-    description    = "Python X Framework",
+    description    = "Simple Python Framework for Paste and Google AppEngine",
     license        = "MIT",
     author         = "Dirk Holtwick",
     author_email   = "holtwick@web.de",
@@ -24,9 +28,11 @@ setup(
     keywords       = "HTML, AJAX, Javascript, Server, Turbogears, Cherrypy",
 
     requires       = [
-        "jsonlib", 
-        "webob", 
+        "jsonlib",
+        "webob",
         "paste",
+        "html5lib",
+        # "virtualenv",
         ],
 
     package_dir = {
@@ -48,16 +54,7 @@ setup(
     #    'console_scripts': ['pyxer = pyxer.command:command',]
     #    },
 
-    long_description = """
-Pyxer is a Python AJAX Server/ Framework similar to the
-Jaxer project of Aptana. Instead of writing client side
-code in Javascript you can  use Python. The Python code
-will be translated to Javascript before send to the client.
-You may also have server side code defined in the
-HTML file that can asynchronously be called form the
-client with seamless use of AJAX in the background.
-Example for use in Turbogears included.
-        """.strip(),
+    long_description = long_description,
 
     #classifiers = [x.strip() for x in """
     #    """.strip().splitlines()],

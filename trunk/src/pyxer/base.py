@@ -42,18 +42,26 @@ def url(url):
 def redirect(location, code=301):   
     raise exc.HTTPMovedPermanently(location=url(location))
 
-try:
-    from genshi.template import TemplateLoader
+from pyxer.template import Template
     
-    genshi_loader = TemplateLoader(
-        os.path.join(os.getcwd(), 'public'),
-        auto_reload=True)
-except:
-    log.exception("Failed loading Genshi")
+#try:
+#    from genshi.template import TemplateLoader
+#    
+#    genshi_loader = TemplateLoader(
+#        os.path.join(os.getcwd(), 'public'),
+#        auto_reload=True)
+#except:
+#    log.exception("Failed loading Genshi")
     
-def render(template):
-    tmpl = genshi_loader.load(template)
-    return tmpl.generate(c=c).render('xhtml', doctype='xhtml')
+def render(path):
+    path = os.path.join(os.getcwd(), 'public', path)
+    log.debug("Loading template %r", path)
+    template = Template(file(path, "r").read(), html=True)
+    # print template.source.encode("latin1","ignore")
+    return template.render(dict(c=c), encoding="utf8")
+
+    #tmpl = genshi_loader.load(template)
+    #return tmpl.generate(c=c).render('xhtml', doctype='xhtml')
 
 # Decorator for controllers
 def controller(func):
