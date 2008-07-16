@@ -37,26 +37,26 @@ def showlog(debug):
         logging.basicConfig()
 
 class OptParser(OptionParser):
-    
+
     def print_help(self):
         OptionParser.print_help(self)
         # parser.print_usage()
         # print parser.format_option_help()
         print
         print """
-Commands:  
+Commands:
   serve              Serves the project
   setup, create      Create a new project
   upload, deploy     Upload project (only gae)
   open, activate     Activate context for installs etc.
-             
+
 Daemon commands (just for paster):
   start              Start
-  stop               Stop 
-  status             Status 
-  reload, restart    Restart  
-""".strip()    
-   
+  stop               Stop
+  status             Status
+  reload, restart    Restart
+""".strip()
+
     #def error(self, msg):
     #    OptionParser.error(self, msg)
     #    print "Use option --help for complete help"
@@ -72,57 +72,57 @@ def command(engine=None):
         version = "pyxer 1.0 (c) Dirk Holtwick <dirk.holtwick@gmail.com>, 2008",
         # epilog="Neu\n\r\n" + 20*"hallo ",
         )
-    
+
     parser.add_option(
-        "-q", 
+        "-q",
         "--quiet",
-        action="store_false", 
-        dest="verbose", 
+        action="store_false",
+        dest="verbose",
         default=True,
         help="don't print status messages to stdout")
     #parser.add_option(
-    #    "-f", 
+    #    "-f",
     #    "--force",
-    #    action="store_false", 
-    #    dest="force", 
+    #    action="store_false",
+    #    dest="force",
     #    default=True,
     #    help="don't print status messages to stdout")
     parser.add_option(
-        "-d", 
+        "-d",
         "--debug",
-        action="store_true", 
-        dest="debug", 
+        action="store_true",
+        dest="debug",
         default=False,
         help="activate debug logging")
     if not engine:
         parser.add_option(
             "--engine",
-            dest="engine", 
+            dest="engine",
             default="",
             help="engine that will be used (wsgi, gae, paster)")
     parser.add_option(
         "--port",
-        dest="port", 
+        dest="port",
         default="8080",
         help="serving on port")
     parser.add_option(
         "--host",
-        dest="host", 
+        dest="host",
         default="127.0.0.1",
         help="serving on host")
     parser.add_option(
         "-r",
         "--reload",
         dest="reload",
-        action="store_true",  
+        action="store_true",
         help="reload on changing files")
     parser.add_option(
         "-u",
         "--update",
         dest="update",
-        action="store_true",         
+        action="store_true",
         help="update suplementary data and files")
-        
+
     (opt, args) = parser.parse_args()
 
     config_default = {
@@ -131,16 +131,16 @@ def command(engine=None):
         "pyxer.engine":             (cSTRING, ""),
         "pyxer.templating":         (cSTRING, ""),
         "pyxer.host":               (cSTRING, "127.0.0.1"),
-        "pyxer.port":               (cINT, 8080, 0, 65536),        
+        "pyxer.port":               (cINT, 8080, 0, 65536),
         }
 
     if not (1 <= len(args) <= 1):
-        parser.print_help()  
+        parser.print_help()
         # parser.error("incorrect number of arguments")
-        sys.exit(1)        
+        sys.exit(1)
 
     command = args[0].lower()
-    
+
     if engine:
         opt.engine = engine
 
@@ -155,10 +155,10 @@ def command(engine=None):
     else:
         print "Python WSGI"
         engine = None
-        
+
     # Serve
     if command=="serve":
-            
+
         if engine:
             engine.serve(opt)
         else:
@@ -166,53 +166,53 @@ def command(engine=None):
             serve(opt)
 
     # Setup
-    elif (command=="setup" or command=="create"):
-                    
+    elif (command in ("setup", "create", "init")):
+
         import pyxer.create
         pyxer.create.create(opt)
-        
+
     # Activate
-    elif (command=="open" or command=="activate"):
-        
+    elif (command in ("open", "activate", "vm")):
+
         root = find_root()
         if not root:
             print "No project found"
-        elif iswin:            
+        elif iswin:
             # call_subprocess([os.path.join(root, "scripts", "activate.bat")])
             system("start " + os.path.join(root, "scripts", "activate.bat"))
         else:
-            pass                
+            pass
 
     # Deactivate
     elif (command=="close" or command=="deactivate"):
-        
+
         root = find_root()
         if not root:
             print "No project found"
         elif iswin:
             system(os.path.join(root, "scripts", "deactivate.bat"))
         else:
-            pass                
+            pass
 
     # Daemon
-    elif command=="start" and opt.engine=="paster":        
+    elif command=="start" and opt.engine=="paster":
         engine.serve(opt, daemon="start")
-    elif command=="stop" and opt.engine=="paster":        
+    elif command=="stop" and opt.engine=="paster":
         engine.serve(opt, daemon="stop")
-    elif command=="status" and opt.engine=="paster":        
+    elif command=="status" and opt.engine=="paster":
         engine.serve(opt, daemon="status")
-    elif (command=="reload" or command=="restart") and opt.engine=="paster":        
+    elif (command=="reload" or command=="restart") and opt.engine=="paster":
         engine.serve(opt, daemon="restart")
-    
+
     # Upload
-    elif (command=="upload" or command=="deploy") and opt.engine=="gae":        
+    elif (command=="upload" or command=="deploy") and opt.engine=="gae":
         engine.upload(opt)
-        
+
     else:
         parser.print_help()
         sys.exit(1)
         # parser.error("unsupported command")
-        
+
     # print options, args
 
 def command_gae():
@@ -220,4 +220,3 @@ def command_gae():
 
 def command_paster():
     command("paster")
-    

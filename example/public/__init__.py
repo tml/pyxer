@@ -20,3 +20,7 @@ __hide__ = ["template.html"]
 @controller
 def test():
     return "Noch ein Test"
+
+@controller
+def error():
+    return str(0/1 + 1/0)
