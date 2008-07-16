@@ -14,7 +14,7 @@ except ImportError:
 
 setup(
     name           = "Pyxer",
-    version        = "0.5",
+    version        = "0.5.1",
     description    = "Python X Framework",
     license        = "MIT",
     author         = "Dirk Holtwick",

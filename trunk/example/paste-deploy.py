@@ -35,7 +35,7 @@ try:
 
     site.addsitedir(site_packages)
 
-    import appengine_monkey
+    import pyxer.gae.appengine_monkey
     ## If you want to use httplib but get socket errors, you should uncomment this line:
     #appengine_monkey.install_httplib()
 
