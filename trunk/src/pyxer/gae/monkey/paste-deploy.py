@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-CONF_FILE = 'development.ini'
+CONF_FILE = 'gae.ini'
 
 import sys
 import os
@@ -35,7 +35,8 @@ try:
 
     site.addsitedir(site_packages)
 
-    import appengine_monkey
+    import pyxer.gae.monkey.appengine_monkey
+    # import appengine_monkey
     ## If you want to use httplib but get socket errors, you should uncomment this line:
     #appengine_monkey.install_httplib()
 
