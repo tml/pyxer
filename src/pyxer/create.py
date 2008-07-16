@@ -17,7 +17,7 @@ import pyxer.gae.monkey.boot as monkey
 
 from pyxer.utils import call_subprocess, find_root
 
-DEVELOPMENT_INI = """
+GAE_INI = """
 [pipeline:main]
 pipeline = error the-app
 
@@ -26,40 +26,36 @@ use = egg:Paste#error_catcher
 debug = true
 
 [app:the-app]
-use = config:src/$name/development.ini
+use = config:development.ini
 """.lstrip()
 
 def create(opt):
-     
-    print
-    name = raw_input("Project name: ")
 
     # Change to AppEngine module replacements
     # os.chdir(os.path.join(os.path.dirname(monkey.__file__), "monkey"))
     
     # Start appengine-boot.py
-    sys.argv = ["appengine_monkey.py", 
+    sys.argv = ["XXX", 
         "--paste-deploy", 
         "-v", 
         "--no-site-packages", 
         "--unzip-setuptools",
-        "--easy-install=pylons",
+        "--easy-install=pyxer",
         # "--easy-install=beaker==dev",
         name]
     monkey.main()
     
-    root = find_root(name)
+    root = os.getcwd(name)
     
     # Update development.ini
-    open(os.path.join(root, "development.ini"), "w").write(DEVELOPMENT_INI.replace("$name", name))
+    open(os.path.join(root, "gae.ini"), "w").write(GAE_INI)
     
     # Create Pylons project    
-    os.chdir(os.path.join(root, "src"))
-    env = {"VIRTUAL_ENV": root}    
-    call_subprocess(["paster", "create", "-t", "pylons", name], extra_env=env)
+    #os.chdir(os.path.join(root, "src"))
+    #env = {"VIRTUAL_ENV": root}    
+    #call_subprocess(["paster", "create", "-t", "pylons", name], extra_env=env)
     
     # Setup.py develop
     os.chdir(os.path.join(root, "src", name))
     env = {"VIRTUAL_ENV": root}    
     call_subprocess(["python", "setup.py", "develop"], extra_env=env)
-    
