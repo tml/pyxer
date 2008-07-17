@@ -113,8 +113,6 @@ def serve(opt):
     global pyxer
     
     # setup(opt)
-    
-    #os.system(r'c:\python25\python c:\Programme\Google\google_appengine\dev_appserver.py "%s"' % os.getcwd())
     #return
     
     options = []
@@ -130,12 +128,17 @@ def serve(opt):
         except ImportError:
             sys.path.append(r"C:\Programme\Google\google_appengine")
             import dev_appserver
+                    
+        os.system('%s %s "%s"' % (
+            sys.executable,
+            dev_appserver.__file__,
+            os.getcwd()))
         
-        sys.path = dev_appserver.EXTRA_PATHS + sys.path    
-        script_path = os.path.join(dev_appserver.DIR_PATH, dev_appserver.DEV_APPSERVER_PATH)
-        import google.appengine.tools.dev_appserver_main as gmain
-        options = [""] + options + [os.getcwd()]
-        sys.exit(gmain.main(options))
+        #sys.path = dev_appserver.EXTRA_PATHS + sys.path    
+        #script_path = os.path.join(dev_appserver.DIR_PATH, dev_appserver.DEV_APPSERVER_PATH)
+        #import google.appengine.tools.dev_appserver_main as gmain
+        #options = [""] + options + [os.getcwd()]
+        #sys.exit(gmain.main(options))
     
     elif sys.platform=="darwin":
             

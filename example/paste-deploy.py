@@ -16,11 +16,25 @@ if os.environ.get('PYTHONPATH'):
 import site
 import wsgiref.handlers
 
+def _test():
+    print "sys.path = ["
+    for dir in sys.path:
+        print "    %r," % (dir,)
+    print "]"    
+    print "sys.modules = ["
+    for dir in sorted(sys.modules):
+        try:
+            f = sys.modules[dir].__file__
+        except:
+            f = None        
+        print "    %r, # -> %r " % (dir, f)
+    print "]"
+    
 try:
     here = os.path.dirname(__file__)
 
     # Don't get confused with non locally installed packages
-    # XXX Could become more sophisticated
+    # XXX Could become more sophisticated    
     sys.path = [path for path in sys.path if "site-packages" not in path]
 
     # The "src" path is added to ensure to find our main app (Problems under Windows)
@@ -35,6 +49,8 @@ try:
 
     site.addsitedir(site_packages)
 
+    #__import__("webob")
+    #import html5lib
     import pyxer.gae.monkey.appengine_monkey
     # import appengine_monkey
     ## If you want to use httplib but get socket errors, you should uncomment this line:
@@ -55,10 +71,7 @@ except:
     traceback.print_exc(file=sys.stdout)
     exc_value = sys.exc_info()[1]
     if 1: #isinstance(exc_value, ImportError):
-        print
-        print 'sys.path:'
-        for path in sys.path:
-            print ' ', path
+        _test()
 
         #print
         #print "PTH files"

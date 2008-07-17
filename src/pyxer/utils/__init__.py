@@ -13,8 +13,12 @@ __svnid__   = "$Id: pisa.py 103 2007-10-31 16:08:54Z holtwick $"
 import pyxer.utils.jsonhelper
 import os
 import os.path
-import subprocess
 import sys
+
+try:
+    import subprocess
+except:
+    subprocess = None
 
 iswin = (sys.platform=="win32")
 
