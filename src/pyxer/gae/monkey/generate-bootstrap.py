@@ -7,7 +7,7 @@ import subprocess
 import re
 
 here = os.path.dirname(os.path.abspath(__file__))
-script_name = os.path.join(here, 'appengine-boot.py')
+script_name = os.path.join(here, 'boot.py')
 
 import virtualenv
 
@@ -66,8 +66,8 @@ def adjust_options(options, args):
         options.app_script = 'main.py'
 
 def after_install(options, home_dir):
-    src_dir = join(home_dir, 'src')
-    mkdir(src_dir)
+    #src_dir = join(home_dir, 'src')
+    #mkdir(src_dir)
     logger.indent += 2
     fixup_distutils_cfg(options, home_dir)
     try:
@@ -85,10 +85,10 @@ def after_install(options, home_dir):
     install_app_yaml(options, home_dir)
     if options.paste_deploy:
         install_paste_deploy(options, home_dir)
-    logger.notify('\\nRun "%s -m pth_relpath_fixup" before deploying'
-                  % join(home_dir, 'bin', 'python'))
-    logger.notify('Run "%s Package" to install new packages that provide builds'
-                  % join(home_dir, 'bin', 'easy_install'))
+    #logger.notify('\\nRun "%s -m pth_relpath_fixup" before deploying'
+    #              % join(home_dir, 'bin', 'python'))
+    #logger.notify('Run "%s Package" to install new packages that provide builds'
+    #              % join(home_dir, 'bin', 'easy_install'))
 
 def fixup_distutils_cfg(options, home_dir):
     if sys.platform=="win32":
