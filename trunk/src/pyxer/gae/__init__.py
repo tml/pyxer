@@ -17,7 +17,7 @@ from shutil import *
 import wsgiref.handlers
 from pyxer.app import make_app
 
-from pyxer.utils import find_root, call_script
+from pyxer.utils import find_root, call_script, call_subprocess
 
 _app_yaml = """
 application: %s
@@ -113,6 +113,8 @@ def serve(opt):
     global pyxer
     
     # setup(opt)
+    
+    #os.system(r'c:\python25\python c:\Programme\Google\google_appengine\dev_appserver.py "%s"' % os.getcwd())
     #return
     
     options = []
@@ -129,10 +131,11 @@ def serve(opt):
             sys.path.append(r"C:\Programme\Google\google_appengine")
             import dev_appserver
                     
-        os.system('%s %s "%s"' % (
+        call_subprocess(['%s %s "%s"' % (
             sys.executable,
             dev_appserver.__file__,
-            os.getcwd()))
+            os.getcwd())
+            ])
         
         #sys.path = dev_appserver.EXTRA_PATHS + sys.path    
         #script_path = os.path.join(dev_appserver.DIR_PATH, dev_appserver.DEV_APPSERVER_PATH)

@@ -20,6 +20,8 @@ import sys
 import os
 import os.path
 
+log = logging.getLogger(__file__)
+
 _description = """
 Yet another Python framework
 """.strip()
@@ -69,7 +71,7 @@ def command(engine=None):
         # "usage: %prog [options] command",
         "usage: pyxer [options] command",
         description = _description,
-        version = "pyxer 1.0 (c) Dirk Holtwick <dirk.holtwick@gmail.com>, 2008",
+        version = "pyxer 1.0 (c) 2008 Dirk Holtwick <dirk.holtwick@gmail.com>",
         # epilog="Neu\n\r\n" + 20*"hallo ",
         )
 
@@ -125,24 +127,36 @@ def command(engine=None):
 
     (opt, args) = parser.parse_args()
 
-    config_default = {
-        "pyxer.debug":              (cBOOL, False),
-        "pyxer.sessions":           (cBOOL, False),
-        "pyxer.engine":             (cSTRING, ""),
-        "pyxer.templating":         (cSTRING, ""),
-        "pyxer.host":               (cSTRING, "127.0.0.1"),
-        "pyxer.port":               (cINT, 8080, 0, 65536),
-        }
+    showlog(opt.debug)
 
-    if not (1 <= len(args) <= 1):
+    #config_default = {
+    #    "pyxer.debug":              (cBOOL, False),
+    #    "pyxer.sessions":           (cBOOL, False),
+    #    "pyxer.engine":             (cSTRING, ""),
+    #    "pyxer.templating":         (cSTRING, ""),
+    #    "pyxer.host":               (cSTRING, "127.0.0.1"),
+    #    "pyxer.port":               (cINT, 8080, 0, 65536),
+    #    }
+
+    if (len(args) < 1) and (len(args) > 2):
+        log.debug("Minimum 1 argument, maximum 2")
         parser.print_help()
         # parser.error("incorrect number of arguments")
         sys.exit(1)
 
     command = args[0].lower()
 
+    # Directory argument
+    if len(args)==2:
+        here = os.path.abspath(args[1])
+    else:
+        here = os.getcwd(name)
+
+    # Get engine
     if engine:
         opt.engine = engine
+
+    log.debug("Command %r for engine %r in directory %r", command, engine, here)
 
     if opt.engine in ("gae", "google", "appengine", "googleappengine", "g"):
         print "Google AppEngine"
@@ -162,14 +176,13 @@ def command(engine=None):
         if engine:
             engine.serve(opt)
         else:
-            showlog(opt.debug)
             serve(opt)
 
     # Setup
     elif (command in ("setup", "create", "init")):
 
         import pyxer.create
-        pyxer.create.create(opt)
+        pyxer.create.create(opt, here)
 
     # Activate
     elif (command in ("open", "activate", "vm")):

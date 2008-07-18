@@ -14,6 +14,10 @@ import pyxer.utils.jsonhelper
 import os
 import os.path
 import sys
+import types
+import logging
+
+log = logging.getLevelName(__file__)
 
 try:
     import subprocess
@@ -63,10 +67,12 @@ def find_root(*path):
         cwd = os.path.join(cwd, *path)
     while cwd:       
         if os.path.isfile(os.path.join(cwd, "app.yaml")):
+            log.debug("Projects root directory is %r", cwd)
             return cwd
         cwd, last = os.path.split(cwd)
         if not last:
             break
+    log.warn("Projects root directory could not be found")
     return None
 
 def find_name(root=None):
@@ -77,10 +83,17 @@ def find_name(root=None):
             return name
     return None
 
-def call_subprocess(command, show_stdout=True,
-                    filter_stdout=None, cwd=None,
-                    raise_on_returncode=True, extra_env=None):
+def call_subprocess(
+    command, 
+    show_stdout=True,
+    filter_stdout=None, 
+    cwd=None,
+    raise_on_returncode=True, 
+    extra_env=None):
     
+    if type(command) not  in (types.ListType, types.TupleType):
+        raise Exception("List or tuple expected")
+        
     cmd = []    
     for part in command:
         if ' ' in part or '\n' in part or '"' in part or "'" in part:
@@ -146,7 +159,7 @@ def call_subprocess(command, show_stdout=True,
     #    print k,v 
     #os.environ = env
 
-def call_virtual(cmd, root=None):
+def call_virtual(cmd, root=None, cwd=None):
     if not root:
         root = find_root()
     print "Init virtualenv", root
@@ -154,17 +167,25 @@ def call_virtual(cmd, root=None):
         call_subprocess(cmd, extra_env={
             "VIRTUAL_ENV": root,
             "PATH": os.path.join(root, "Scripts") + ";" + os.environ.get("PATH"),
-            })
+            }, cwd=cwd)
     else:    
         call_subprocess(cmd, extra_env={
             "VIRTUAL_ENV": root,
             "PATH": os.path.join(root, "Scripts") + ";" + os.environ.get("PATH"),
-            })    
+            }, cwd=cwd)    
 
-def call_script(cmd, root=None):
+def call_script(cmd, root=None, cwd=None):
     if not root:
         root = find_root()
     if iswin:        
         cmd[0] = os.path.join(root, "Scripts", cmd[0] + ".exe")
-    call_virtual(cmd, root)
+    #if cwd is not None:
+    #    _cwd = os.getcwd()
+    #    os.chdir(cwd)
+    #try: 
+    call_virtual(cmd, root, cwd=cwd)
+    #finally:
+        #if cwd is not None:
+        #    os.chdir(_cwd) 
     
+call_bin = call_script
