@@ -1,0 +1,16 @@
+Metadata-Version: 1.1
+Name: pyxer
+Version: 0.5.2
+Summary: Simple Python Framework for Paste and Google AppEngine
+Home-page: http://www.pyxer.net/
+Author: Dirk Holtwick
+Author-email: holtwick@web.de
+License: MIT
+Download-URL: http://www.pyxer.net/
+Description: Pyxer is a simple Python Framework for Paste and Google AppEngine.
+Keywords: HTML,AJAX,Javascript,Server,Turbogears,Cherrypy
+Platform: UNKNOWN
+Requires: jsonlib
+Requires: webob
+Requires: paste
+Requires: html5lib
