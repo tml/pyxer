@@ -106,7 +106,7 @@ def fixup_distutils_cfg(options, home_dir):
         logger.notify('distutils.cfg already has zip_ok set')
         return
     f = open(distutils_cfg, 'a')
-    f.write('\n[easy_install]\nzip_ok = False\nalways_copy = True\n')
+    f.write('\\n[easy_install]\\nzip_ok = False\\nalways_copy = True\\n')
     f.close()
     logger.info('Set zip_ok = False in distutils.cfg')
 
@@ -125,15 +125,20 @@ def install_app_yaml(options, home_dir):
 
 def install_paste_deploy(options, home_dir):
     shutil.copyfile(os.path.join(os.path.dirname(__file__), 'paste-deploy.py'),
-                    os.path.join(home_dir, 'paste-deploy.py'))
-    dest = os.path.join(home_dir, 'development.ini')
+                    os.path.join(home_dir, 'paste-deploy.py'))    
     msg = 'Wrote paste-deploy.py'
+    dest = os.path.join(home_dir, 'development.ini')
     if os.path.exists(dest):
         logger.notify('Not overwriting development.ini')
     else:
-        shutil.copyfile(os.path.join(os.path.dirname(__file__), 'development.ini.template'),
-                        dest)
+        shutil.copyfile(os.path.join(os.path.dirname(__file__), 'development.ini.template'), dest)
         msg += ' and development.ini'
+    dest = os.path.join(home_dir, 'gae.ini')
+    if os.path.exists(dest):
+        logger.notify('Not overwriting gae.ini')
+    else:
+        shutil.copyfile(os.path.join(os.path.dirname(__file__), 'gae.ini.template'), dest)
+        msg += ' and gae.ini'
     logger.notify(msg)
 
 def filter_python_develop(line):

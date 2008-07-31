@@ -157,6 +157,7 @@ def serve(opt):
     # execfile(script_path, globals())
 
 def upload(opt):
+    "python c:\Programme\Google\google_appengine\appcfg.py update ."
     pass
     
 def main():    

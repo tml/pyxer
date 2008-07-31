@@ -7,7 +7,9 @@ setup.cfg
 setup.py
 docs/pdf.css
 docs/pyxer.html
+docs/pyxer.pdf
 docs/screen.css
+example/README.txt
 example/app.yaml
 example/development.ini
 example/gae.ini
@@ -25,7 +27,11 @@ src/pyxer/command.py
 src/pyxer/configparser.py
 src/pyxer/create.py
 src/pyxer/helpers.py
+src/pyxer.egg-info/PKG-INFO
 src/pyxer.egg-info/SOURCES.txt
+src/pyxer.egg-info/dependency_links.txt
+src/pyxer.egg-info/entry_points.txt
+src/pyxer.egg-info/top_level.txt
 src/pyxer/engines/__init__.py
 src/pyxer/gae/__init__.py
 src/pyxer/gae/monkey/__init__.py

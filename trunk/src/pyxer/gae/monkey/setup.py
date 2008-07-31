@@ -1,9 +1,11 @@
+# Modified by Dirk Holtwick for use in Pyxer
+
 from setuptools import setup, find_packages
 import sys, os
 
 version = '0.1'
 
-setup(name='appengine-monkey',
+setup(name='pyxer-appengine-monkey',
       version=version,
       description="Monkeypatches for Google App Engine",
       long_description="""\
@@ -24,8 +26,6 @@ libraries.
       package_dir={'appengine_monkey_files': '.'},
       package_data={'appengine_monkey_files': ['module-replacements/*.py', 'development.ini', 'app.yaml.template']},
       zip_safe=False,
-      install_requires=[
-      ],
-      entry_points="""
-      """,
+      install_requires=[],
+      entry_points="",
       )
