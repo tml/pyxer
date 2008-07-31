@@ -762,7 +762,7 @@ def fixup_distutils_cfg(options, home_dir):
         logger.notify('distutils.cfg already has zip_ok set')
         return
     f = open(distutils_cfg, 'a')
-    f.write('\n[easy_install]\nzip_ok = False\n')
+    f.write('\n[easy_install]\nzip_ok = False\nalways_copy = True\n')
     f.close()
     logger.info('Set zip_ok = False in distutils.cfg')
 
