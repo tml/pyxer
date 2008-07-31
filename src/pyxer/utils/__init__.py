@@ -16,7 +16,6 @@ import os.path
 import sys
 import types
 import logging
-
 log = logging.getLogger(__file__)
 
 try:
@@ -171,7 +170,7 @@ def call_virtual(cmd, root=None, cwd=None):
     else:    
         call_subprocess(cmd, extra_env={
             "VIRTUAL_ENV": root,
-            "PATH": os.path.join(root, "Scripts") + ";" + os.environ.get("PATH"),
+            "PATH": os.path.join(root, "bin") + ";" + os.environ.get("PATH"),
             }, cwd=cwd)    
 
 def call_script(cmd, root=None, cwd=None):

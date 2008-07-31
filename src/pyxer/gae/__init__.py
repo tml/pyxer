@@ -129,7 +129,8 @@ def serve(opt):
         except ImportError:
             sys.path.append(r"C:\Programme\Google\google_appengine")
             import dev_appserver
-                    
+        
+        # cal_
         call_subprocess(['%s %s "%s"' % (
             sys.executable,
             dev_appserver.__file__.rsplit(".")[0] + ".py",
@@ -144,7 +145,9 @@ def serve(opt):
     
     elif sys.platform=="darwin":
             
-        os.system("dev_appserver.py %s ." % " ".join(options))        
+        os.system("dev_appserver.py %s %s" % (
+            " ".join(options),
+            os.getcwd()))        
         # print "Please launch using GoogleAppEngineLauncher.app"
     
     else:

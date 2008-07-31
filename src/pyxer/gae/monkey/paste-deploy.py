@@ -51,8 +51,8 @@ try:
 
     #__import__("webob")
     #import html5lib
-    import pyxer.gae.monkey.appengine_monkey
-    # import appengine_monkey
+    # import pyxer.gae.monkey.appengine_monkey
+    import appengine_monkey
     ## If you want to use httplib but get socket errors, you should uncomment this line:
     #appengine_monkey.install_httplib()
 

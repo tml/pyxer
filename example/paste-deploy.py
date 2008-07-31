@@ -20,23 +20,22 @@ def _test():
     print "sys.path = ["
     for dir in sys.path:
         print "    %r," % (dir,)
-    print "]"    
+    print "]"
     print "sys.modules = ["
     for dir in sorted(sys.modules):
         try:
             f = sys.modules[dir].__file__
         except:
-            f = None        
+            f = None
         print "    %r, # -> %r " % (dir, f)
     print "]"
-    
+
 try:
     here = os.path.dirname(__file__)
 
     # Don't get confused with non locally installed packages
-    # XXX Could become more sophisticated    
+    # XXX Could become more sophisticated
     sys.path = [path for path in sys.path if "site-packages" not in path]
-    # sys.path = [path for path in sys.path if "f:" not in path]
 
     # The "src" path is added to ensure to find our main app (Problems under Windows)
     # sys.path.insert(0, os.path.join(here, "src", "myapp"))

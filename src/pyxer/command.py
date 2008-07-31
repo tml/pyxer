@@ -194,7 +194,7 @@ def command(engine=None):
             # call_subprocess([os.path.join(root, "scripts", "activate.bat")])
             system("start " + os.path.join(root, "scripts", "activate.bat"))
         else:
-            pass
+            system("source  " + os.path.join(root, "bin", "activate"))
 
     # Deactivate
     elif (command=="close" or command=="deactivate"):
