@@ -97,7 +97,7 @@ class PyxerApp(object):
                 # als gäbe es die Datei nicht, das ist allerdings nicht wahr,
                 # daher nochmal dieser Check
                 log.debug("Import error %r for module name %r", msg, module_name)
-                if not (str(msg).endswith("." + module_parts[-1]) or str(msg).endswith(" " + module_parts[-1])):
+                if module_parts and (not (str(msg).endswith("." + module_parts[-1]) or str(msg).endswith(" " + module_parts[-1]))):
                     log.exception("Error in import")
                     raise
 

@@ -1,14 +1,14 @@
 Metadata-Version: 1.1
 Name: pyxer
-Version: 0.5.2
-Summary: Simple Python Framework for Paste and Google AppEngine
+Version: 0.4
+Summary: Simple Python Framework for Paste and Google App Engine (GAE)
 Home-page: http://www.pyxer.net/
 Author: Dirk Holtwick
-Author-email: holtwick@web.de
+Author-email: dirk.holtwick@gmail.com
 License: MIT
-Download-URL: http://www.pyxer.net/
-Description: Pyxer is a simple Python Framework for Paste and Google AppEngine.
-Keywords: HTML,AJAX,Javascript,Server,Turbogears,Cherrypy
+Download-URL: http://code.google.com/p/pyxer/
+Description: Pyxer is a simple Python Framework for Paste and Google App Engine (GAE)
+Keywords: Framework,Google App Engine,GAE,appengine,Paster,Server,Templating
 Platform: UNKNOWN
 Requires: jsonlib
 Requires: webob

@@ -22,7 +22,7 @@
   <!--VERSION-->
   <!--VERSION-->
   </em> </p>
-<p class="subtitle"> Yet another Python framework </p>
+<p class="subtitle"> Yet another Python Framework </p>
 <p> (C)opyright by Dirk Holtwick, Germany <br />
   <a href="mailto:dirk.holtwick@gmail.com">dirk.holtwick@gmail.com</a> <br />
   <a href="http://www.pyxer.net/">http://www.pyxer.net</a> </p>
@@ -104,6 +104,8 @@ def index():
   </li>
   <li>Looks for the template (foo/bar.html) </li>
 </ol>
+<h2>Upload to GAE</h2>
+<p>XXX</p>
 <h1>Templating</h1>
 <p><em>Pyxer</em> offers yet another templating language that is very close to
   Genshi and Kit. As the former did not work with Google AppEngine at
@@ -150,7 +152,17 @@ File &ldquo;b.html&rdquo;
   They are used like this:</p>
 <pre>&lt;div <strong>py:if=&rdquo;name.startswith('tom ')&rdquo;</strong>&gt;Welcome $name&lt;/div&gt;</pre>
 <p> xxx</p>
-<h1>XXX Engines</h1>
+<h1>Advanced</h1>
+<h2>Install additional Python packages </h2>
+<p>To install new Python packages you should first enter the virtual environment and the use <code>easy_install</code> or <code>python setup.py</code> install. On Windows this works like this:</p>
+<pre><em>$</em> Scripts\activate.bat<br /><em>$</em> easy_install SomePackageName
+<em>$</em> deactivate</pre>
+<p>And for other Unix like system like this:</p>
+<pre><em>$</em> source bin/activate
+<em>$</em> easy_install SomePackageName
+<em>$</em> deactivate</pre>
+<h1> Engines</h1>
+<p>XXX</p>
 <p><em>Pyxer</em> uses support different so called &quot;engines&quot;
   to publish a project. Most of them need own configurations and a well
   prepare environment to work fine. These are very specific to each of
@@ -159,6 +171,11 @@ File &ldquo;b.html&rdquo;
 <h2>Paster</h2>
 <pre><em>$</em> xpaster serve --reload </pre>
 <h2> Google Appengine</h2>
-<pre><em>$</em> xgae serve</pre>
+<pre><em>$</em> xgae serve</pre> 
+<h1>Links</h1>
+<p>Some usfull links:</p>
+<ol>
+  <li>GAE http://xxx   </li>
+</ol>
 </body>
 </html>

@@ -13,26 +13,25 @@ except ImportError:
     from setuptools import setup, find_packages
 
 long_description = """
-Pyxer is a simple Python Framework for Paste and Google AppEngine.
+Pyxer is a simple Python Framework for Paste and Google App Engine (GAE)
 """.strip()
 
 setup(
     name           = "pyxer",
-    version        = "0.5.2",
-    description    = "Simple Python Framework for Paste and Google AppEngine",
+    version        = "0.4",
+    description    = "Simple Python Framework for Paste and Google App Engine (GAE)",
     license        = "MIT",
     author         = "Dirk Holtwick",
-    author_email   = "holtwick@web.de",
+    author_email   = "dirk.holtwick@gmail.com",
     url            = "http://www.pyxer.net/",
-    download_url   = "http://www.pyxer.net/",
-    keywords       = "HTML, AJAX, Javascript, Server, Turbogears, Cherrypy",
+    download_url   = "http://code.google.com/p/pyxer/",
+    keywords       = "Framework, Google App Engine, GAE, appengine, Paster, Server, Templating",
 
     requires       = [
         "jsonlib",
         "webob",
         "paste",
-        "html5lib",
-        # "virtualenv",
+        "html5lib",        
         ],
 
     package_dir = {
@@ -60,13 +59,13 @@ setup(
     #    """.strip().splitlines()],
 
     entry_points="""
-    [paste.app_factory]
-    main = pyxer.app:app_factory
+[paste.app_factory]
+main = pyxer.app:app_factory
 
-    [console_scripts]
-    pyxer = pyxer.command:command
-    xgae = pyxer.command:command_gae
-    xpaster = pyxer.command:command_paster
-    """,
+[console_scripts]
+pyxer = pyxer.command:command
+xgae = pyxer.command:command_gae
+xpaster = pyxer.command:command_paster
+""".lstrip(),
 
     )

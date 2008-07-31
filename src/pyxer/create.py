@@ -20,6 +20,23 @@ log = logging.getLogger(__file__)
 
 from pyxer.utils import call_subprocess, call_script, find_root
 
+INDEX_HTML = """
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Welcome to Pyxer</title>
+</head>
+<body>
+    <h1>Welcome!</h1>
+    <p><strong>Your Pyxer installation is running!</strong></p>
+    <p>Continue by adding controllers and files to the &quot;public&quot; directory as described in the documentation.</p>
+    <p>Thanks for using Pyxer.</p>
+</body>
+</html>
+""".lstrip()
+
 def create(opt, here):
 
     # Change to AppEngine module replacements
@@ -31,7 +48,7 @@ def create(opt, here):
             
     # Create gae.ini
     app_name = []
-    path = os.path.join(here, "gae.ini")
+    path = os.path.join(here, "app.yaml")
     if not os.path.exists(path):        
         name = raw_input("Name of project: ")         
         app_name = ["--app-name=" + name]
@@ -41,7 +58,10 @@ def create(opt, here):
         "--paste-deploy", 
         "-v", 
         "--no-site-packages", 
-        "--unzip-setuptools",       
+        "--unzip-setuptools",   
+        "--easy-install=webob",
+        "--easy-install=html5lib",
+        # "--easy-install=beaker==dev",            
         ] + app_name + [
         # "--easy-install=pyxer",
         # "--easy-install=beaker==dev",
@@ -63,6 +83,14 @@ def create(opt, here):
         ["python", "setup.py", "install", "-f"], 
         cwd=dir,
         root=here)
+
+    # Create public dir    
+    path = os.path.join(here, "public")
+    if not os.path.exists(path):        
+        os.makedirs(path)              
+        open(os.path.join(path, "index.html"), "w").write(INDEX_HTML)
+    
+    print "Initialization completed!"
     
     # Create Pylons project    
     #os.chdir(os.path.join(root, "src"))
