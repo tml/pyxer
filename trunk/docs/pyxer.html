@@ -38,20 +38,30 @@
   directory. For a high end solution you should consider using Pylons,
   TurboGears, Django and similar. </p>
 <p> This work is inspired by <a href="http://pythonpaste.org/webob/do-it-yourself.html">http://pythonpaste.org/webob/do-it-yourself.html</a> </p>
+<h2>Technical background</h2>
+<p>The Google App Engine  (GAE) in version 1.1 offers a very restricted Python environment and the developer as to ship arround a lot of problems. Pyxer helps on this point by also providing solutions that work with the great WSGI Framework Paster by Ian Bicking. So you get the best from both sides: GAE and Paster. To achieve this some other great third party tools are used like WebOb and VirtualEnv (also by Ian Bicking) and for templating the html5lib is used.</p>
 <h1>Installation</h1>
 <p> Install Pyxer using easy_install: </p>
-<pre>$ easy_install pyxer  </pre>
+<pre><em>$</em> easy_install pyxer  </pre>
 <p> All required packages (webob, html5lib, beaker) should be installed automatically if needed. </p>
 <p> If you want to use Google AppEngine install it separately too. </p>
 <h1>Quick start </h1>
-<p> At first set up a new Pyxer project using the Pyxer command line tool like this: </p>
-<pre>$  pyxer init myexample</pre>
+<h2>Create a new project  </h2>
+<p>At first set up a new Pyxer project using the Pyxer command line tool like this: </p>
+<pre><em>$</em>  pyxer init myexample</pre>
 <p> In the newly created directory &quot;myexample&quot; you will find a directory structure like this one (under windows &quot;bin&quot; will be called &quot;Scripts&quot;): </p>
 <pre>bin/
 public/
 lib/</pre>
 <p> Place your files in the &quot;public&quot; directory. </p>
-<h2>Hello World</h2>
+<h2>Start the server </h2>
+<p>To start the server you may choose between the Paster-Engine:</p>
+<pre><em>$</em> xpaster serve</pre>
+<p>or the GAE-Engine:</p>
+<pre><em>$</em> xgae serve  </pre>
+<p>Or use Pyxer command line tool again to use the default engine (which is Paster):</p>
+<pre><em>$</em> pyxer serve </pre>
+<h2>&quot;Hello World&quot;</h2>
 <p> For a simple &quot;Hello World&quot; just put an &quot;index.html&quot;
   file into the &quot;public&quot; directory with the following content: </p>
 <pre>Hello World</pre>
@@ -61,14 +71,13 @@ lib/</pre>
 <pre>@controller
 def index():
     return &quot;Hello World&quot;</pre>
-<h2> Controller</h2>
+<h2> About controllers</h2>
 <p>Controller, templates and static files are placed in the same
   directory (usually &quot;public&quot;). First <em>Pyxer</em> looks for a matching controller. A controller is defined in the
-  &quot;__init__.py&quot; file.</p>
-<pre>from pyxer.base import *
+  &quot;__init__.py&quot; file and decorated by using <code>@controller</code> which is defined in <code>pyxer.base</code>.</p>
+<pre><strong>from pyxer.base import *</strong>
 
-
-@controller
+<strong>@controller</strong>
 def index():
     return &quot;Hello World&quot;</pre>
 <p> This example can be called like <code>/</code> or <code>/index</code>.
@@ -78,11 +87,10 @@ def index():
   are the same as used by Pylons: <code>c</code> = context, <code>g</code> = globals and <code>h</code> = helpers. </p>
 <pre>from pyxer.base import *
 
-
 @controller
 def index():
-    c.title = &quot;Hello World&quot;</pre>
-<p> xxx</p>
+    <strong>c.title = &quot;Hello World&quot;</strong></pre>
+<p> XXX</p>
 <ol>
   <li>
     <p>#Looks for a controller
@@ -94,9 +102,7 @@ def index():
     </li>
     </ol>
   </li>
-  <li>
-    <p>Looks for the template (foo/bar.html) </p>
-</li>
+  <li>Looks for the template (foo/bar.html) </li>
 </ol>
 <h1>Templating</h1>
 <p><em>Pyxer</em> offers yet another templating language that is very close to
@@ -107,23 +113,23 @@ def index():
 <p>The default templating works similar to most known other
   templating languages. Variables and expressions are realized like <code>$&lt;varname&gt;</code> (where <code>&lt;varname&gt;</code> may
   contain dots!) and <code>${&lt;expression&gt;}</code>:</p>
-<pre>Hello ${name.capitalize()}, you won $price.
-$item.amount times $item.name.</pre>
+<pre>Hello <strong>${name.capitalize()}</strong>, you won <strong>$price</strong>.
+<strong>$item.amount</strong> times <strong>$item.name</strong>.</pre>
 <h3> Commands</h3>
 <p>Commands are the same as used by Python. The only difference is,
-  that you have to tell that a block ends by calling the command &ldquo;end&rdquo;
-  (not needed for &ldquo;else&rdquo; and &ldquo;elif&rdquo;):</p>
-<pre>&lt;% def address(name): %&gt;
+  that you have to tell that a block ends by calling the command <code>end</code>
+  (not needed for <code>else</code> and <code>elif</code>):</p>
+<pre><strong>&lt;% def address(name): %&gt;</strong>
   ABCDEF Company
-  &lt;% if name: %&gt;
+  <strong>&lt;% if name: %&gt;</strong>
     Your contact: $name
-  &lt;% else: %&gt;
+  <strong>&lt;% else: %&gt;</strong>
     Unknown contact!
-  &lt;% end %&gt;
-&lt;% end %&gt;
-&lt;% for name in ['Tom', 'Fred']: %&gt;
+  <strong>&lt;% end %&gt;</strong>
+<strong>&lt;% end %&gt;
+&lt;% for name in ['Tom', 'Fred']: %&gt;</strong>
   ${ address(name) }
-&lt;% end %&gt;</pre>
+<strong>&lt;% end %&gt;</strong></pre>
 <h3> Includes and extends</h3>
 <p>You can insert content of other templates by using &ldquo;include&rdquo;:</p>
 <pre>&lt;% include(filename) %&gt;</pre>
@@ -142,17 +148,17 @@ File &ldquo;b.html&rdquo;
 <h3>HTML Attriutes</h3>
 <p>These are also known form many templating languages like Genshi.
   They are used like this:</p>
-<pre>&lt;div py:if=&rdquo;name.startswith('tom ')&rdquo;&gt;Welcome $name&lt;/div&gt;</pre>
+<pre>&lt;div <strong>py:if=&rdquo;name.startswith('tom ')&rdquo;</strong>&gt;Welcome $name&lt;/div&gt;</pre>
 <p> xxx</p>
-<h1>Engines</h1>
+<h1>XXX Engines</h1>
 <p><em>Pyxer</em> uses support different so called &quot;engines&quot;
   to publish a project. Most of them need own configurations and a well
   prepare environment to work fine. These are very specific to each of
   these engines and <em>Pyxer</em> tries to make the setup as easy as
   possible</p>
 <h2>Paster</h2>
-<pre>xpaster serve --reload </pre>
+<pre><em>$</em> xpaster serve --reload </pre>
 <h2> Google Appengine</h2>
-<pre>xgae serve</pre>
+<pre><em>$</em> xgae serve</pre>
 </body>
 </html>
