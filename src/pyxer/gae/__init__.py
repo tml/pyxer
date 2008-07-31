@@ -107,13 +107,12 @@ def setup(opt):
 
 def fix():
     print "Fix paths"
-    call_script(["python","-m","pyxer.gae.monkey.pth_relpath_fixup"])
+    call_script(["python", "-m", "pyxer.gae.monkey.pth_relpath_fixup"])
     
 def serve(opt):
     global pyxer
     
-    # setup(opt)
-    
+    # setup(opt)    
     #os.system(r'c:\python25\python c:\Programme\Google\google_appengine\dev_appserver.py "%s"' % os.getcwd())
     #return
     
@@ -133,7 +132,7 @@ def serve(opt):
                     
         call_subprocess(['%s %s "%s"' % (
             sys.executable,
-            dev_appserver.__file__,
+            dev_appserver.__file__.rsplit(".")[0] + ".py",
             os.getcwd())
             ])
         

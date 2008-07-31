@@ -36,6 +36,7 @@ try:
     # Don't get confused with non locally installed packages
     # XXX Could become more sophisticated    
     sys.path = [path for path in sys.path if "site-packages" not in path]
+    # sys.path = [path for path in sys.path if "f:" not in path]
 
     # The "src" path is added to ensure to find our main app (Problems under Windows)
     # sys.path.insert(0, os.path.join(here, "src", "myapp"))
@@ -51,8 +52,8 @@ try:
 
     #__import__("webob")
     #import html5lib
-    import pyxer.gae.monkey.appengine_monkey
-    # import appengine_monkey
+    # import pyxer.gae.monkey.appengine_monkey
+    import appengine_monkey
     ## If you want to use httplib but get socket errors, you should uncomment this line:
     #appengine_monkey.install_httplib()
 
