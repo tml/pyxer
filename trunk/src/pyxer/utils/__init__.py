@@ -17,7 +17,7 @@ import sys
 import types
 import logging
 
-log = logging.getLevelName(__file__)
+log = logging.getLogger(__file__)
 
 try:
     import subprocess
@@ -179,11 +179,16 @@ def call_script(cmd, root=None, cwd=None):
         root = find_root()
     if iswin:        
         cmd[0] = os.path.join(root, "Scripts", cmd[0] + ".exe")
+    else:
+        cmd[0] = os.path.join(root, "bin", cmd[0])
+    
     #if cwd is not None:
     #    _cwd = os.getcwd()
     #    os.chdir(cwd)
     #try: 
+    
     call_virtual(cmd, root, cwd=cwd)
+    
     #finally:
         #if cwd is not None:
         #    os.chdir(_cwd) 

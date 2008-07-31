@@ -480,6 +480,10 @@ class Template:
         template = Template().load(self.find(filename))
         sys.stdout.write(template.render(globals()))
 
+def HTMLTemplate(src=None, path=""):
+    " Shortcut for HTML Templates "
+    return Template(src, path, html=True)
+
 if __name__=="__main__":
     _test = """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">

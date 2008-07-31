@@ -138,7 +138,7 @@ def command(engine=None):
     #    "pyxer.port":               (cINT, 8080, 0, 65536),
     #    }
 
-    if (len(args) < 1) and (len(args) > 2):
+    if (len(args) < 1) or (len(args) > 2):
         log.debug("Minimum 1 argument, maximum 2")
         parser.print_help()
         # parser.error("incorrect number of arguments")
@@ -150,7 +150,7 @@ def command(engine=None):
     if len(args)==2:
         here = os.path.abspath(args[1])
     else:
-        here = os.getcwd(name)
+        here = os.getcwd()
 
     # Get engine
     if engine:
