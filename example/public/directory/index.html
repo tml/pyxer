@@ -1,0 +1,19 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Session</title>
+</head>
+<body>
+<h1>
+  Contents of '$c.dir'</h1>
+<ul>
+  <li><a href="?dir=$c.parent">..</a></li>
+  <li py:for="name, path, isdir in sorted(c.files)">
+  	<strong py:if="isdir"><a href="?dir=$path">$name</a></strong>
+	<span py:if="not isdir">$name</span>
+  </li>
+</ul>
+</body>
+</html>
