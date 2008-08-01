@@ -26,6 +26,7 @@ from pyxer.utils.jsonhelper import render_json, json
 
 c = StackedObjectProxy(name="C")
 g = StackedObjectProxy(name="G")
+g = StackedObjectProxy(name="H")
 
 # cache = StackedObjectProxy(name="Cache")
 request = req = StackedObjectProxy(name="Request")
@@ -57,7 +58,7 @@ def redirect(location, code=301):
 def render(path):
     # path = os.path.join(os.getcwd(), 'public', path)
     log.debug("Loading template %r", path)
-    template = Template(file(path, "r").read(), html=True)
+    template = Template(file(path, "r").read(), path=path, html=True)
     # print template.source.encode("latin1","ignore")
     return template.render(dict(c=c), encoding="utf8")
 

@@ -38,3 +38,4 @@ for fname in FILES:
     data = rxbuild.sub("BUILD{" + BUILD + "}BUILD", data)
     data = rxhelphtml.sub(HELP, data)
     open(fname, "wb").write(data)
+print "Done."
