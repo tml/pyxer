@@ -4,11 +4,6 @@
 ## All rights reserved                     ##
 #############################################
 
-__version__ = "$Revision: 103 $"
-__author__  = "$Author: holtwick $"
-__date__    = "$Date: 2007-10-31 17:08:54 +0100 (Mi, 31 Okt 2007) $"
-__svnid__   = "$Id: pisa.py 103 2007-10-31 16:08:54Z holtwick $"
-
 import pyxer
 import os
 import os.path
@@ -108,7 +103,12 @@ def setup(opt):
 def fix():
     print "Fix paths"
     call_script(["python", "-m", "pyxer.gae.monkey.pth_relpath_fixup"])
-    
+
+def normalize_py_file(name):
+    if name.lower().endswith(".pyc"):
+        return name[:-1]
+    return name
+
 def serve(opt):
     global pyxer
     
@@ -131,10 +131,10 @@ def serve(opt):
             import dev_appserver
         
         # cal_
-        call_subprocess(['%s %s "%s"' % (
+        call_subprocess([
             sys.executable,
-            dev_appserver.__file__.rsplit(".")[0] + ".py",
-            os.getcwd())
+            normalize_py_file(dev_appserver.__file__),
+            os.getcwd()
             ])
         
         #sys.path = dev_appserver.EXTRA_PATHS + sys.path    
@@ -158,8 +158,46 @@ def serve(opt):
 
 def upload(opt):
     "python c:\Programme\Google\google_appengine\appcfg.py update ."
-    pass
+    options = []
+    if opt.debug:
+        options.append("-d")
     
+    fix()
+    
+    if sys.platform=="win32":
+        
+        try:
+            import appcfg
+        except ImportError:
+            sys.path.append(r"C:\Programme\Google\google_appengine")
+            import appcfg
+        
+        call_subprocess([
+            sys.executable,
+            normalize_py_file(appcfg.__file__) ] + 
+            options + [     
+            "update",       
+            os.getcwd()
+            ])
+        
+        #sys.path = dev_appserver.EXTRA_PATHS + sys.path    
+        #script_path = os.path.join(dev_appserver.DIR_PATH, dev_appserver.DEV_APPSERVER_PATH)
+        #import google.appengine.tools.dev_appserver_main as gmain
+        #options = [""] + options + [os.getcwd()]
+        #sys.exit(gmain.main(options))
+    
+    elif sys.platform=="darwin":
+        call_subprocess([
+            "appcfg.py"] + 
+            options + [
+            "upload",
+            os.getcwd()
+            ])
+    
+    else:
+        
+        print "Please launch Google AppEngine directly"
+
 def main():    
     wsgiref.handlers.CGIHandler().run(make_app())
 

@@ -18,7 +18,7 @@ Pyxer is a simple Python Framework for Paste and Google App Engine (GAE)
 
 setup(
     name           = "pyxer",
-    version        = "0.4",
+    version        = "VERSION{0.4.0alpha}VERSION"[8:-8],
     description    = "Simple Python Framework for Paste and Google App Engine (GAE)",
     license        = "MIT",
     author         = "Dirk Holtwick",
@@ -31,7 +31,7 @@ setup(
         "jsonlib",
         "webob",
         "paste",
-        "html5lib",        
+        "html5lib",
         ],
 
     package_dir = {
