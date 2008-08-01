@@ -1,14 +1,8 @@
-#!/bin/python2.5
 # -*- coding: UTF-8 -*-
 #############################################
 ## (C)opyright by Dirk Holtwick, 2008      ##
 ## All rights reserved                     ##
 #############################################
-
-__version__ = "$Revision: 103 $"
-__author__  = "$Author: holtwick $"
-__date__    = "$Date: 2007-10-31 17:08:54 +0100 (Mi, 31 Okt 2007) $"
-__svnid__   = "$Id: pisa.py 103 2007-10-31 16:08:54Z holtwick $"
 
 import pyxer.utils.jsonhelper
 import os
@@ -156,7 +150,8 @@ def call_subprocess(
                 % (cmd_desc, proc.returncode))
     #for k, v in env.items():
     #    print k,v 
-    #os.environ = env
+    if env:
+        os.environ = env
 
 def call_virtual(cmd, root=None, cwd=None):
     if not root:

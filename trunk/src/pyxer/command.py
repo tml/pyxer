@@ -1,14 +1,8 @@
-#!/bin/python2.5
 # -*- coding: UTF-8 -*-
 #############################################
 ## (C)opyright by Dirk Holtwick, 2008      ##
 ## All rights reserved                     ##
 #############################################
-
-__version__ = "$Revision: 103 $"
-__author__  = "$Author: holtwick $"
-__date__    = "$Date: 2007-10-31 17:08:54 +0100 (Mi, 31 Okt 2007) $"
-__svnid__   = "$Id: pisa.py 103 2007-10-31 16:08:54Z holtwick $"
 
 from optparse import OptionParser
 from pyxer.app import serve
@@ -217,10 +211,14 @@ def command(engine=None):
     elif (command=="reload" or command=="restart") and opt.engine=="paster":
         engine.serve(opt, daemon="restart")
 
-    # Upload
+    # GAE Upload
     elif (command=="upload" or command=="deploy") and opt.engine=="gae":
         engine.upload(opt)
 
+    # GAE fix
+    elif (command=="fix" or command=="fixup") and opt.engine=="gae":
+        engine.fix(opt)
+        
     else:
         parser.print_help()
         sys.exit(1)

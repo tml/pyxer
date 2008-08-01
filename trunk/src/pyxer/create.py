@@ -1,14 +1,8 @@
-#!/bin/python2.5
 # -*- coding: UTF-8 -*-
 #############################################
 ## (C)opyright by Dirk Holtwick, 2008      ##
 ## All rights reserved                     ##
 #############################################
-
-__version__ = "$Revision: 103 $"
-__author__  = "$Author: holtwick $"
-__date__    = "$Date: 2007-10-31 17:08:54 +0100 (Mi, 31 Okt 2007) $"
-__svnid__   = "$Id: pisa.py 103 2007-10-31 16:08:54Z holtwick $"
 
 import logging
 import os, os.path
@@ -37,6 +31,16 @@ INDEX_HTML = """
 </html>
 """.lstrip()
 
+INIT_PY = """
+# -*- coding: UTF-8 -*-
+
+from pyxer.base import *
+
+#@controller
+#def index():
+#    c.message = "Welcome"    
+""".lstrip()
+
 def create(opt, here):
 
     # Change to AppEngine module replacements
@@ -54,11 +58,11 @@ def create(opt, here):
         app_name = ["--app-name=" + name]
            
     # Start appengine-boot.py
-    sys.argv = ["XXXDUMMYXXX", 
-        "--paste-deploy", 
-        "-v", 
-        "--no-site-packages", 
-        "--unzip-setuptools",   
+    sys.argv = ["XXXDUMMYXXX",
+        "--paste-deploy",
+        "-v",
+        "--no-site-packages",
+        "--unzip-setuptools",
         "--easy-install=webob",
         "--easy-install=html5lib",
         # "--easy-install=beaker==dev",            
@@ -80,7 +84,7 @@ def create(opt, here):
     dir = os.path.split(os.path.split(os.path.dirname(__file__))[0])[0]
     log.debug("Pyxer setup.py dir %r", dir)
     call_script(
-        ["python", "setup.py", "install", "-f"], 
+        ["python", "setup.py", "install", "-f"],
         cwd=dir,
         root=here)
 
@@ -89,6 +93,7 @@ def create(opt, here):
     if not os.path.exists(path):        
         os.makedirs(path)              
         open(os.path.join(path, "index.html"), "w").write(INDEX_HTML)
+        open(os.path.join(path, "__init__.py"), "w").write(INIT_PY)
     
     print "Initialization completed!"
     

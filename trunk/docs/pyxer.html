@@ -19,8 +19,7 @@
 </div>
 <p class="title"> 
   <em>Pyxer
-  <!--VERSION-->
-  <!--VERSION-->
+  <!--VERSION-->0.4.0alpha<!--VERSION-->
   </em> </p>
 <p class="subtitle"> Yet another Python Framework </p>
 <p> (C)opyright by Dirk Holtwick, Germany <br />
@@ -80,8 +79,9 @@ def index():
 <strong>@controller</strong>
 def index():
     return &quot;Hello World&quot;</pre>
-<p> This example can be called like <code>/</code> or <code>/index</code>.
-  To use a Genshi template with this file you may use the <code>render()</code> function or just return <code>None</code> (that is the same as not
+<h2>Using templates  </h2>
+<p>This example can be called like <code>/</code> or <code>/index</code>.
+  To use a Pyxer template with this file you may use the <code>render()</code> function or just return <code>None</code> (that is the same as not
   returning anything) and the matching template will be used, in this
   case <code>index.html</code>. The available object in the template
   are the same as used by Pylons: <code>c</code> = context, <code>g</code> = globals and <code>h</code> = helpers. </p>
@@ -90,7 +90,13 @@ def index():
 @controller
 def index():
     <strong>c.title = &quot;Hello World&quot;</strong></pre>
-<p> XXX</p>
+<h2>Using JSON</h2>
+<p>To return data as JSON just return a dict or list object from your controller:</p>
+<pre>from pyxer.base import *<br /><br />@controller <br />def index(): <strong><br />   return dict(success=True, msg=&quot;Everything ok&quot;)</strong></pre>
+<p>To call it explicitly you may use the helper function <code>render_json(&lt;your data&gt;)</code>. </p>
+<h2>Using sessions </h2>
+<p>xxx</p>
+<p>??? XXX </p>
 <ol>
   <li>
     <p>#Looks for a controller
@@ -104,8 +110,11 @@ def index():
   </li>
   <li>Looks for the template (foo/bar.html) </li>
 </ol>
-<h2>Upload to GAE</h2>
-<p>XXX</p>
+<h2>Publish to GAE</h2>
+<p>To publish your project to GAE you may also use the Pyxer command line tool. First check if your &quot;app.yaml&quot; file contains the right informations like the project name and version infos. Then just do like this:</p>
+<pre><em>$</em> xgae upload</pre>
+<p>Be aware that Pyxer first needs to fix the paths to be relative. If you choose not to use Pyxer for uploading you have to do this fix up explicitly <strong>before</strong> you upload your applikation, like this:</p>
+<pre><em>$</em> xgae  fix </pre>
 <h1>Templating</h1>
 <p><em>Pyxer</em> offers yet another templating language that is very close to
   Genshi and Kit. As the former did not work with Google AppEngine at
