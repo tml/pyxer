@@ -33,6 +33,7 @@ import pprint
 import logging
 log = logging.getLogger(__file__)
 
+# XXX Needed?
 sys.path = [os.getcwd()] + sys.path
 
 class ContextObj(object):
@@ -151,7 +152,7 @@ class PyxerApp(object):
                         # Consider lists and hashes as JSON data
                         elif type(result) in (types.ListType, types.DictionaryType, types.DictType, types):
                             response.headers['Content-Type'] = 'application/json'
-                            result = json()
+                            result = json(result)
                         # Ergebnisstring ausgeben
                         resp.body = result
                         return resp(environ, start_response)
