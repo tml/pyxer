@@ -8,6 +8,7 @@ from optparse import OptionParser
 from pyxer.app import serve
 from pyxer.configparser import *
 from pyxer.utils import system, call_subprocess, find_root
+from pyxer import VERSION_STR
 
 import logging
 import sys
@@ -65,7 +66,7 @@ def command(engine=None):
         # "usage: %prog [options] command",
         "usage: pyxer [options] command",
         description = _description,
-        version = "pyxer 1.0 (c) 2008 Dirk Holtwick <dirk.holtwick@gmail.com>",
+        version = VERSION_STR,
         # epilog="Neu\n\r\n" + 20*"hallo ",
         )
 
@@ -220,6 +221,12 @@ def command(engine=None):
     # GAE fix
     elif (command=="fix" or command=="fixup") and opt.engine=="gae":
         engine.fix(opt)
+
+    # Setup Pyxer
+    elif command=="pyxer":
+        
+        import pyxer.create
+        pyxer.create.self_setup()
         
     else:
         parser.print_help()
