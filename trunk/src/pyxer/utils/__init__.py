@@ -19,11 +19,6 @@ except:
 
 iswin = (sys.platform=="win32")
 
-def json(*a, **kw):
-    if len(a)==1:
-        return pyxer.utils.jsonhelper.write(a[0])
-    return pyxer.utils.jsonhelper.write(kw)
-
 class Dict(dict):   
     
     def __getattr__(self, name):       

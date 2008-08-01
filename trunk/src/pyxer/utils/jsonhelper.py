@@ -308,3 +308,24 @@ def write(obj, escaped_forward_slash=False):
 
 def read(s):
     return JsonReader().read(s)
+
+# ---------------
+
+try:
+    import jsonlib
+    write = jsonlib.write
+    read = jsonlib.read
+except ImportError:
+    try:
+        import simplejson
+        write = simplejson.dumps
+        read = simplejson.loads
+    except ImportError:
+    	pass
+    
+def json(*a, **kw):
+    if len(a)==1:
+        return pyxer.utils.jsonhelper.write(a[0])
+    return pyxer.utils.jsonhelper.write(kw)
+
+render_json = json

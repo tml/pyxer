@@ -35,7 +35,7 @@ try:
 
     # Don't get confused with non locally installed packages
     # XXX Could become more sophisticated
-    sys.path = [path for path in sys.path if "site-packages" not in path]
+    # sys.path = [path for path in sys.path if "site-packages" not in path]
 
     # The "src" path is added to ensure to find our main app (Problems under Windows)
     # sys.path.insert(0, os.path.join(here, "src", "myapp"))

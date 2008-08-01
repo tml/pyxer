@@ -21,6 +21,9 @@ import types
 
 from paste.registry import StackedObjectProxy
 
+from pyxer.template import Template
+from pyxer.utils.jsonhelper import render_json, json
+
 c = StackedObjectProxy(name="C")
 g = StackedObjectProxy(name="G")
 
@@ -41,8 +44,6 @@ def url(url):
 # Redirect to other page
 def redirect(location, code=301):   
     raise exc.HTTPMovedPermanently(location=url(location))
-
-from pyxer.template import Template
     
 #try:
 #    from genshi.template import TemplateLoader
@@ -54,7 +55,7 @@ from pyxer.template import Template
 #    log.exception("Failed loading Genshi")
     
 def render(path):
-    path = os.path.join(os.getcwd(), 'public', path)
+    # path = os.path.join(os.getcwd(), 'public', path)
     log.debug("Loading template %r", path)
     template = Template(file(path, "r").read(), html=True)
     # print template.source.encode("latin1","ignore")

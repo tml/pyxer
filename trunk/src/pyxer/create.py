@@ -65,6 +65,7 @@ def create(opt, here):
         "--unzip-setuptools",
         "--easy-install=webob",
         "--easy-install=html5lib",
+        "--easy-install=beaker",
         # "--easy-install=beaker==dev",            
         ] + app_name + [
         # "--easy-install=pyxer",

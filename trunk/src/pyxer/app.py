@@ -116,11 +116,12 @@ class PyxerApp(object):
 
             #pprint.pprint(environ)
 
-            request.template_url = "/".join(module_parts) + "/" + action + ".html"
-            # request.template_url = "/".join(module_parts) + "/" + action + ".html"
-            #print request.template_url
+            # Calculate path of corresponding template file
+            if module_parts:
+                request.template_url = "/".join(module_parts) + "/" + action + ".html"
+            request.template_url = action + ".html"
 
-            # Esistiert das Modul?
+            # Does the module exist?
             if module:
                 log.debug("Module found: %r, Action: %r", module, action)
 
@@ -130,6 +131,10 @@ class PyxerApp(object):
 
                     # Handelt es sich um einen Controller?
                     if getattr(func, "controller", False) is True:
+                        
+                        # log.debug("Module filename %r", module.__file__)
+                        request.template_url = os.path.join(os.path.dirname(module.__file__), action + ".html")
+                        
                         result = func()
 
                         # If the result is None (same as no return in function at all)
@@ -144,16 +149,7 @@ class PyxerApp(object):
                         # Consider lists and hashes as JSON data
                         elif type(result) in (types.ListType, types.DictionaryType, types.DictType, types):
                             response.headers['Content-Type'] = 'application/json'
-                            try:
-                                import jsonlib
-                                result = jsonlib.write(result)
-                            except ImportError:
-                                try:
-                                    import simplejson
-                                    result = simplejson.dumps(result)
-                                except ImportError:
-                                    import utils.jsonhelper
-                                    result = utils.jsonhelper.write(result)
+                            result = json()
                         # Ergebnisstring ausgeben
                         resp.body = result
                         return resp(environ, start_response)
@@ -168,13 +164,14 @@ class PyxerApp(object):
         # Handle HTTPException
         except exc.HTTPException, e:
             return e(environ, start_response)
-
+        
 # Sessions available?
+SessionMiddleware = None
 try:
-    from beaker.middleware import SessionMiddleware
+    from beaker.middleware import SessionMiddleware       
 except:
-    SessionMiddleware = None
-
+    pass
+    
 # Make WSGI application, wrapping sessions etc.
 def make_app(global_conf={}, root="public", path=None, **app_conf):
 
@@ -184,9 +181,13 @@ def make_app(global_conf={}, root="public", path=None, **app_conf):
     base = os.path.join(os.getcwd(), "public")
     # app = App(global_conf=None, root="public", path=None, **app_conf)
     app = PyxerApp()
+    
     if SessionMiddleware:
         log.debug("Beaker sessions")
-        app = SessionMiddleware(app, type='dbm', data_dir='./cache')
+        if "google.appengine" in sys.modules:
+            app = SessionMiddleware(app, type='google', table_name='PyxerSession')
+        else:
+            app = SessionMiddleware(app, type='dbm', data_dir='./cache')
 
     app = RegistryManager(app)
 
@@ -209,7 +210,7 @@ def app_factory(global_config, **local_conf):
 
 # Serve with Python on board WSGI
 def serve(opt={}):
-    print "serving on http://%s:%s" % (opt.host, opt.port)
+    print "Serving on http://%s:%s" % (opt.host, opt.port)
     from wsgiref.simple_server import make_server
     server = make_server(opt.host, int(opt.port), make_app())
     server.serve_forever()
