@@ -170,6 +170,8 @@ def command(engine=None):
         if engine:
             engine.serve(opt)
         else:
+            if opt.debug:
+                logging.basicConfig(level=logging.DEBUG)
             serve(opt)
 
     # Setup

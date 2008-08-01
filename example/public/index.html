@@ -7,11 +7,20 @@
 </head>
 <body>
 <h1>Samples</h1>
+<p>
+	You are running on 
+	<em py:if="c.ispaster">Paster</em>
+	<em py:if="c.isgae">Google App Engine</em>
+</p>
 <ul>
   <li><a href="guestbook/">Guestbook</a></li>
   <li><a href="wiki/">Wiki</a></li>
   <li><a href="session/">Session</a></li>
   <li><a href="error">Error</a></li>
+</ul>
+<p>All modules</p>
+<ul>
+  <li py:for="m in sorted(c.modules)">$m</li>
 </ul>
 </body>
 </html>

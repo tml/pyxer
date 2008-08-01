@@ -120,7 +120,8 @@ def serve(opt):
     if opt.debug:
         options.append("-d")
     
-    fix()
+    fix()    
+    root = find_root()
     
     if sys.platform=="win32":
         
@@ -133,8 +134,9 @@ def serve(opt):
         # cal_
         call_subprocess([
             sys.executable,
-            normalize_py_file(dev_appserver.__file__),
-            os.getcwd()
+            normalize_py_file(dev_appserver.__file__) ] + 
+            options + [     
+            root
             ])
         
         #sys.path = dev_appserver.EXTRA_PATHS + sys.path    
@@ -144,15 +146,16 @@ def serve(opt):
         #sys.exit(gmain.main(options))
     
     elif sys.platform=="darwin":
-            
-        os.system("dev_appserver.py %s %s" % (
-            " ".join(options),
-            os.getcwd()))        
-        # print "Please launch using GoogleAppEngineLauncher.app"
+
+        call_subprocess([
+            "dev_appserver.py"] + 
+            options + [            
+            root
+            ])
     
     else:
         
-        print "Please launch Google AppEngine directly"
+        print "Please launch Google App Engine directly"
     
     # execfile(script_path, globals())
 
@@ -163,6 +166,7 @@ def upload(opt):
         options.append("-d")
     
     fix()
+    root = find_root()
     
     if sys.platform=="win32":
         
@@ -177,7 +181,7 @@ def upload(opt):
             normalize_py_file(appcfg.__file__) ] + 
             options + [     
             "update",       
-            os.getcwd()
+            root
             ])
         
         #sys.path = dev_appserver.EXTRA_PATHS + sys.path    
@@ -187,11 +191,12 @@ def upload(opt):
         #sys.exit(gmain.main(options))
     
     elif sys.platform=="darwin":
+        
         call_subprocess([
             "appcfg.py"] + 
             options + [
             "upload",
-            os.getcwd()
+            root
             ])
     
     else:

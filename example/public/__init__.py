@@ -13,10 +13,14 @@ base = os.path.join(basedir, "data")
 
 __hide__ = ["template.html"]
 
-#@controller
-#def index():
-#   return "Hallo, es funktioniert %r" % req.path_info
+import sys
 
+@controller
+def index():
+    c.isgae =  "google.appengine" in sys.modules
+    c.ispaster = not c.isgae
+    c.modules = sys.modules    
+   
 @controller
 def test():
     return "Noch ein Test"
