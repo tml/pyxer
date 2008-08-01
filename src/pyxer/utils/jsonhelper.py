@@ -325,7 +325,7 @@ except ImportError:
     
 def json(*a, **kw):
     if len(a)==1:
-        return pyxer.utils.jsonhelper.write(a[0])
-    return pyxer.utils.jsonhelper.write(kw)
+        return write(a[0])
+    return write(kw)
 
 render_json = json

@@ -93,9 +93,10 @@ def index():
 <h2>Using JSON</h2>
 <p>To return data as JSON just return a dict or list object from your controller:</p>
 <pre>from pyxer.base import *<br /><br />@controller <br />def index(): <strong><br />   return dict(success=True, msg=&quot;Everything ok&quot;)</strong></pre>
-<p>To call it explicitly you may use the helper function <code>render_json(&lt;your data&gt;)</code>. </p>
 <h2>Using sessions </h2>
-<p>xxx</p>
+<p>Session are realized using the Beaker package. You may use the variable <code>session</code> to set and get values. To store the session data use <code>session.save()</code>. Here is a simple example of a counter: </p>
+<pre>from pyxer.base import *
+<br />@controller<br />def index():<br />    c.ctr = session.get(&quot;ctr&quot;, 0)<br />    session[&quot;ctr&quot;] = c.ctr + 1<br />    session.save()</pre>
 <p>??? XXX </p>
 <ol>
   <li>
@@ -160,6 +161,8 @@ File &ldquo;b.html&rdquo;
 <p>These are also known form many templating languages like Genshi.
   They are used like this:</p>
 <pre>&lt;div <strong>py:if=&rdquo;name.startswith('tom ')&rdquo;</strong>&gt;Welcome $name&lt;/div&gt;</pre>
+<p> xxx</p>
+<pre>&lt;div <strong>py:for=&rdquo;name in sorted(c.listOfNames)&rdquo;</strong>&gt;Welcome $name&lt;/div&gt;</pre>
 <p> xxx</p>
 <h1>Advanced</h1>
 <h2>Install additional Python packages </h2>

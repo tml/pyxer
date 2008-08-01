@@ -303,10 +303,10 @@ class Parser:
                 self._data.append(u" ")
             
             has_childs = node.hasChildNodes()
-            if has_childs:
-                self._data.append(u">")
-            else:
-                self._data.append(u"/>")
+            #if has_childs:
+            self._data.append(u">")
+            #else:
+            #    self._data.append(u"/>")
                 # Special feature byID
                 #if attr.has_key("id"):
                 #    expr = attr["id"].strip()
@@ -328,7 +328,7 @@ class Parser:
             self._escape = True
             
         # Closing tag
-        if (not strip) and has_childs:
+        if (not strip): # and has_childs:
             self._data.append(u"</%s>" % tag)
                 
         # Flush all including indent
