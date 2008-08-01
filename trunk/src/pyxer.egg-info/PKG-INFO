@@ -2,7 +2,7 @@ Metadata-Version: 1.1
 Name: pyxer
 Version: 0.4.0alpha
 Summary: Simple Python Framework for Paste and Google App Engine (GAE)
-Home-page: http://www.pyxer.net/
+Home-page: http://code.google.com/p/pyxer/
 Author: Dirk Holtwick
 Author-email: dirk.holtwick@gmail.com
 License: MIT
