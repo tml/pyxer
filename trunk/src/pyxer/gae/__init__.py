@@ -195,7 +195,7 @@ def upload(opt):
         call_subprocess([
             "appcfg.py"] + 
             options + [
-            "upload",
+            "update",
             root
             ])
     
