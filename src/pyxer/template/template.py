@@ -25,6 +25,8 @@ from StringIO import StringIO
 import html5lib
 from html5lib import treebuilders, serializer, treewalkers
 from html5lib.filters import sanitizer
+from html5lib.constants import voidElements
+
 from pyxer.utils import * 
 from xml.dom import minidom, Node
  
@@ -101,6 +103,7 @@ class Parser:
         pass
 
     def parse(self, src, html=True):
+        self.xhtml = False
         self._indent = 2
         self._code = []
         self._escape = True
@@ -112,6 +115,9 @@ class Parser:
             document = parser.parse(f)
             self._data = []
             self._id_pool = []
+            
+            print document.toxml()
+            
             self._walkNodes(document)
             self._flushData()
         else:
@@ -302,11 +308,12 @@ class Parser:
                         html_escape(value)))                
                 self._data.append(u" ")
             
-            has_childs = node.hasChildNodes()
-            #if has_childs:
-            self._data.append(u">")
-            #else:
-            #    self._data.append(u"/>")
+            has_childs = node.hasChildNodes() 
+            if (not has_childs) and self.xhtml:
+                self._data.append(u"/>")
+            else:                
+                self._data.append(u">")                                        
+                    
                 # Special feature byID
                 #if attr.has_key("id"):
                 #    expr = attr["id"].strip()
@@ -328,7 +335,7 @@ class Parser:
             self._escape = True
             
         # Closing tag
-        if (not strip): # and has_childs:
+        if (not strip) and has_childs and (tag not in voidElements):
             self._data.append(u"</%s>" % tag)
                 
         # Flush all including indent
@@ -350,13 +357,15 @@ class Parser:
     def _walkNodes(self, node):
 
         loop = 1
-
+        dump = 1
+        
         # Document Type        
         if node.nodeType == Node.DOCUMENT_TYPE_NODE:
             if node.name:
                 if node.publicId or node.systemId:
                     pubid = node.publicId or ""
                     sysid = node.systemId or ""
+                    self.xhtml = "xhtml" in (pubid + " " + sysid).lower()                     
                     self._data.append(u'<!DOCTYPE %s' % node.name.upper())
                     if pubid:
                         self._data.append(u' PUBLIC "%s"' % pubid)
@@ -372,13 +381,15 @@ class Parser:
 
         # Text
         elif node.nodeType == Node.TEXT_NODE:
+            if dump: print "TEXT", repr(node.data)
             if self._escape:
                 self._data.append(html_escape(node.data))
             else:
                 self._data.append(node.data)
 
         # Tag
-        elif node.nodeType == Node.ELEMENT_NODE:         
+        elif node.nodeType == Node.ELEMENT_NODE:    
+            if dump: print "TAG", repr(node.tagName)     
             loop = self._handleTag(node)
 
         # Comment
@@ -451,7 +462,7 @@ class Template:
             raise exc_info[0], e, exc_info[2]
         if self._extends is not None:
             template = Template().load(self.find(self._extends))        
-            # print context.keys()     
+            # print context.keys()
             return template.render(context)
         #for l in out.buf:
         #    print "->", repr(l)
