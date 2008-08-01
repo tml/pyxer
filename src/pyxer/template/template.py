@@ -115,9 +115,7 @@ class Parser:
             document = parser.parse(f)
             self._data = []
             self._id_pool = []
-            
-            print document.toxml()
-            
+            # print document.toxml()            
             self._walkNodes(document)
             self._flushData()
         else:
@@ -306,10 +304,10 @@ class Parser:
                     self._data.append(' %s="%s"' % (
                         html_escape(name),
                         html_escape(value)))                
-                self._data.append(u" ")
+                # self._data.append(u" ")
             
             has_childs = node.hasChildNodes() 
-            if (not has_childs) and self.xhtml:
+            if (not has_childs) and self.xhtml and (tag not in ("script", "style")):
                 self._data.append(u"/>")
             else:                
                 self._data.append(u">")                                        
@@ -333,6 +331,7 @@ class Parser:
 
         if tag in ("script", "style"):
             self._escape = True
+            has_childs = True
             
         # Closing tag
         if (not strip) and has_childs and (tag not in voidElements):
@@ -357,9 +356,9 @@ class Parser:
     def _walkNodes(self, node):
 
         loop = 1
-        dump = 1
+        dump = 0
         
-        # Document Type        
+        # Document Type        DOM Treebuilder 
         if node.nodeType == Node.DOCUMENT_TYPE_NODE:
             if node.name:
                 if node.publicId or node.systemId:
@@ -595,5 +594,5 @@ if __name__=="__main__":
 
     # t = Template(_test)
     t = Template(_test3, html=True, path=r"c:\test.html")
-    print t.source.encode("latin1","ignore")
+    print t.source.encode("latin1", "ignore")
     print t.render(dict(name='dirk "enzo" holtwick'), encoding="ascii")
