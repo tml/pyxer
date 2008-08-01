@@ -220,7 +220,7 @@ def command(engine=None):
 
     # GAE fix
     elif (command=="fix" or command=="fixup") and opt.engine=="gae":
-        engine.fix(opt)
+        engine.fix()
 
     # Setup Pyxer
     elif command=="pyxer":

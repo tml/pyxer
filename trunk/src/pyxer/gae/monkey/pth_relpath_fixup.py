@@ -4,18 +4,16 @@ Changes any absolute paths in .pth files to be relative.  Also changes .egg-link
 import sys
 import os
 
+iswin = sys.platform=="win32"
+
 def main(path_list=sys.path):
     for path in path_list:
         if not path:
             path = '.'
         if not os.path.isdir(path):
-            continue
-        if "appengine" in path:
-            print "Looking in", path, "..."
-        for filename in os.listdir(path):
-            if "myapp" in filename:
-                print "*****", filename
-            filename = os.path.join(path, filename)
+            continue        
+        for name in os.listdir(path):            
+            filename = os.path.join(path, name)            
             if filename.endswith('.pth'):
                 if not os.access(filename, os.W_OK):
                     print 'Cannot write .pth file %s, skipping' % filename
@@ -23,15 +21,21 @@ def main(path_list=sys.path):
                     print 'Fixing up pth file %s' % filename
                     fixup_pth_file(filename)
             if filename.endswith('.egg-link'):
-                print 'XXX Fixing up egg-link file %s' % filename
+                print 'Fixing up egg-link file %s' % filename
                 if not os.access(filename, os.W_OK):
                     print 'Cannot write .egg-link file %s, skipping' % filename
                 else:
                     print 'Fixing up egg-link file %s' % filename
                     fixup_egg_link(filename)
-            if filename.endswith('.egg') and os.path.isfile(filename):
-                print 'WARNING: %s is installed as a zip file' % filename
-                print '         Libraries must be installed with easy_install --always-unzip'
+            if filename.endswith('.egg'):                
+                if os.path.isfile(filename):
+                    print 'WARNING: %s is installed as a zip file' % filename
+                    print '         Libraries must be installed with easy_install --always-unzip'
+                    
+                # Work arround for bug under Windows
+                elif iswin and name<>name.lower():
+                    print "Fixing upper case egg-directory %s", name
+                    os.rename(filename, os.path.join(path, name.lower()))                      
 
 def fixup_pth_file(filename):
     lines = []
