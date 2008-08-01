@@ -66,7 +66,9 @@ class PyxerApp(object):
                 environ['paste.registry'].register(c, ContextObj())
                 if environ.has_key('beaker.session'):
                     environ['paste.registry'].register(session, environ['beaker.session'])
-
+                else:
+                    environ['paste.registry'].register(session, None)
+                    
             #module_parts = parts
             #module_name = ".".join(base + module_parts)
             #exec "import " + module_name

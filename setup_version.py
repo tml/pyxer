@@ -1,9 +1,8 @@
-# -*- coding: ISO-8859-1 -*-
+# -*- coding: UTF-8 -*-
 #############################################
-## (C)opyright by Dirk Holtwick, 2002-2008 ##
+## (C)opyright by Dirk Holtwick, 2008      ##
 ## All rights reserved                     ##
 #############################################
-
 """
 Updates the version infos
 """
@@ -16,9 +15,11 @@ VERSION = open("VERSION.txt", "r").read().strip()
 BUILD = time.strftime("%Y-%m-%d")
 FILES = [
     "setup.py",
+    "src/pyxer/setup.py",
     "src/pyxer/__init__.py",
     "docs/pyxer.html",
     ]
+
 try:
     HELP = cgi.escape(open("HELP.txt", "r").read(), 1)
 except:

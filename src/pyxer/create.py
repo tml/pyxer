@@ -41,6 +41,18 @@ from pyxer.base import *
 #    c.message = "Welcome"    
 """.lstrip()
 
+def self_setup(root=None):
+    if not root:
+        root = find_root()    
+    # Get parent directory
+    dir = os.path.split(os.path.dirname(__file__))[0]
+    log.debug("Pyxer setup.py dir %r", dir)
+    # Do setup 
+    call_script(
+        ["python", "pyxer/setup.py", "install", "-f"],
+        cwd=dir,
+        root=root)    
+
 def create(opt, here):
 
     # Change to AppEngine module replacements
@@ -81,13 +93,7 @@ def create(opt, here):
     #    cwd=cwd)
 
     # Install pyxer
-    # XXX Should be something like pyxer.pyxer or similar
-    dir = os.path.split(os.path.split(os.path.dirname(__file__))[0])[0]
-    log.debug("Pyxer setup.py dir %r", dir)
-    call_script(
-        ["python", "setup.py", "install", "-f"],
-        cwd=dir,
-        root=here)
+    self_setup(here)
 
     # Create public dir    
     path = os.path.join(here, "public")

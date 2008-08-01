@@ -33,10 +33,6 @@ setup(
         "html5lib",
         ],
 
-    package_dir = {
-        '': 'src'
-        },
-
     packages = [
         "pyxer",
         "pyxer.gae",
@@ -45,18 +41,9 @@ setup(
         "pyxer.template",
         ],
 
-    # packages = find_packages(exclude=['ez_setup']),
-
     include_package_data = True,
 
-    #entry_points = {
-    #    'console_scripts': ['pyxer = pyxer.command:command',]
-    #    },
-
     long_description = long_description,
-
-    #classifiers = [x.strip() for x in """
-    #    """.strip().splitlines()],
 
     entry_points="""
 [paste.app_factory]
