@@ -55,7 +55,7 @@ def redirect(location, code=301):
 #except:
 #    log.exception("Failed loading Genshi")
     
-def render(path):
+def render_pyxer(path):
     # path = os.path.join(os.getcwd(), 'public', path)
     log.debug("Loading template %r", path)
     template = Template(file(path, "r").read(), path=path, html=True)
@@ -64,6 +64,14 @@ def render(path):
 
     #tmpl = genshi_loader.load(template)
     #return tmpl.generate(c=c).render('xhtml', doctype='xhtml')
+
+def render_kid(path):
+    import pyxer.kid as kid
+    log.debug("Loading template %r with Kid", path)
+    template = kid.Template(source=file(path, "r").read(), c=c)
+    return template.serialize()
+    
+render = render_kid
 
 # Decorator for controllers
 def controller(func):
