@@ -1,13 +1,17 @@
 Metadata-Version: 1.1
 Name: pyxer
-Version: 0.4.1alpha
-Summary: Simple Python Framework for Paste and Google App Engine (GAE)
+Version: 0.5.0
+Summary: Simple Python Framework and Templating for Paste, Google App Engine (GAE) and WSGI
 Home-page: http://code.google.com/p/pyxer/
 Author: Dirk Holtwick
 Author-email: dirk.holtwick@gmail.com
 License: MIT
 Download-URL: http://code.google.com/p/pyxer/
-Description: Pyxer is a simple Python Framework for Paste and Google App Engine (GAE)
+Description: Yet another framework with a new very simple programming concept.
+        Offers also an own templating language mostly compatible to Genshi.
+        The command line tool makes creating GAE projects as easy as possible.
+        Projects may also be used with Paster or other WSGI frameworks.
+        Very liberal Open Source licensing.
 Keywords: Framework,Google App Engine,GAE,appengine,Paster,Server,Templating
 Platform: UNKNOWN
 Requires: jsonlib

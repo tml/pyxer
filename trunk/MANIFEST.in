@@ -1,0 +1,1 @@
+global-exclude *.bat *.odt *.bak *.pyc .svn* *.pyo *.ttf sitecustomize.py

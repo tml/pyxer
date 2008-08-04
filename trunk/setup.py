@@ -12,13 +12,17 @@ except ImportError:
     from setuptools import setup, find_packages
 
 long_description = """
-Pyxer is a simple Python Framework for Paste and Google App Engine (GAE)
+Yet another framework with a new very simple programming concept. 
+Offers also an own templating language mostly compatible to Genshi. 
+The command line tool makes creating GAE projects as easy as possible. 
+Projects may also be used with Paster or other WSGI frameworks. 
+Very liberal Open Source licensing. 
 """.strip()
 
 setup(
     name           = "pyxer",
-    version        = "VERSION{0.4.1alpha}VERSION"[8:-8],
-    description    = "Simple Python Framework for Paste and Google App Engine (GAE)",
+    version        = "VERSION{0.5.0}VERSION"[8:-8],
+    description    = "Simple Python Framework and Templating for Paste, Google App Engine (GAE) and WSGI",
     license        = "MIT",
     author         = "Dirk Holtwick",
     author_email   = "dirk.holtwick@gmail.com",
