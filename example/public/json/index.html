@@ -1,15 +1,15 @@
-﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:py="http://purl.org/kid/ns#">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Session</title>
-<script type="text/javascript" src="/res/js/prototype.js"></script>
-<script type="text/javascript" src="/res/js/effects.js"></script>
+<script type="text/javascript" language="javascript" src="/res/js/prototype.js"></script>
+<script type="text/javascript" language="javascript" src="/res/js/effects.js"></script>
 <script type="text/javascript">
 window.onload = function() {	
-	$('sqrt').focus()
-	$('sqrt').onkeyup = function() {
-		var value = $F('sqrt')
+	$$('sqrt').focus()
+	$$('sqrt').onkeyup = function() {
+		var value = $$F('sqrt')
 		new Ajax.Request(
 			'calc', {
 				method: 'GET',
@@ -22,8 +22,8 @@ window.onload = function() {
 				onSuccess: function(response) {
 					data = response.responseJSON
 					// if(data.success) {
-						$('result').update(data.result)
-						$('result').highlight()
+						$$('result').update(data.result)
+						$$('result').highlight()
 					// } else alert(data.result)
 				}
 			})		
@@ -35,7 +35,7 @@ window.onload = function() {
 <h1>
   JSON Demo</h1>
   <form action="">
-	<p>sqrt(<input type="text" size="3" value="" name="sqrt" id="sqrt">) =  <span id="result">?</span> </p>
+	<p>sqrt(<input type="text" size="3" value="" name="sqrt" id="sqrt" />) =  <span id="result">?</span> </p>
   </form>
 </body>
 </html>
