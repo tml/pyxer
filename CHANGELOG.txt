@@ -1,14 +1,19 @@
 CHANGELOG
 =========
 
-Version 0.5
+Version 0.5.1, 2008-xxx
+
+- NEW: Added Kid to Pyxer under "pyxer.kid."
+- UPD: Documentation
+
+Version 0.5.0, 2008-08-04
 
 - Initial version of Pyxer framework
 
 *** BREAK ***
 
-    SWITCHED TO FRAMEWORK DEVELOPMENT INSTEAD OF 
-    PYTHON TO JAVASCRIPT CONVERSION. 
+    SWITCHED TO FRAMEWORK DEVELOPMENT INSTEAD OF
+    PYTHON TO JAVASCRIPT CONVERSION.
 
 *** BREAK ***
 

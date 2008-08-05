@@ -7,8 +7,8 @@
 __version__ = "$Revision: 103 $"
 __author__  = "$Author: holtwick $"
 __date__    = "$Date: 2007-10-31 17:08:54 +0100 (Mi, 31 Okt 2007) $"
-__version__ = VERSION = "VERSION{0.5.0}VERSION"[8:-8]
-__build__   = BUILD   = "BUILD{2008-08-04}BUILD"[6:-6]
+__version__ = VERSION = "VERSION{0.5.1}VERSION"[8:-8]
+__build__   = BUILD   = "BUILD{2008-08-05}BUILD"[6:-6]
 
 VERSION_STR = "Pyxer %s (Build %s)\n(c) Dirk Holtwick <dirk.holtwick@gmail.com>, Germany\nWebsite http:www.pyxer.net" % (
     __version__,

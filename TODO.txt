@@ -1,0 +1,19 @@
+TODO
+====
+
+- Introduce "lib" directory for Python modules like "base.py", "globals.py"
+  or "helpers.py" like in Pylons
+- Make @controller extensible by users
+- Let the user access the config file
+
+Templating
+- Let the user choose the templating machine
+- Make extend and layout work for Kid
+- Make templates hashable under GAE
+
+Marketing
+- Create a video with a simple coding session
+
+Future
+- Full integration into Eclipse/PyDev
+- Windows/Mac/Linux native tool placed in the Systray/Menu/Dock
