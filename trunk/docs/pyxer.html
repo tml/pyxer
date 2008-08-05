@@ -8,18 +8,15 @@
 </head>
 <body>
 <div id="footer">
-  <p align="right"> 
-  	Page <pdf:pagenumber /> 
+  <p align="right"> Page
+    <pdf:pagenumber />
   </p>
 </div>
 <div id="footer-pisa">
-  <p> 
-  	Generated using the <a href="http://www.htmltopdf.org/">Pisa HTML2PDF Converter</a> 
-  </p>
+  <p> Generated using the <a href="http://www.htmltopdf.org/">Pisa HTML2PDF Converter</a> </p>
 </div>
-<p class="title"> 
-  <em>Pyxer
-  <!--VERSION-->0.5.0<!--VERSION-->
+<p class="title"> <em>Pyxer
+  <!--VERSION-->0.5.1<!--VERSION-->
   </em> </p>
 <p class="subtitle"> Yet another Python Framework </p>
 <p> (C)opyright by Dirk Holtwick, Germany <br />
@@ -45,7 +42,7 @@
 <p> All required packages (webob, html5lib, beaker) should be installed automatically if needed. </p>
 <p> If you want to use Google AppEngine install it separately too. </p>
 <h1>Quick start </h1>
-<h2>Create a new project  </h2>
+<h2>Create a new project </h2>
 <p>At first set up a new Pyxer project using the Pyxer command line tool like this: </p>
 <pre><em>$</em>  pyxer init myexample</pre>
 <p> In the newly created directory &quot;myexample&quot; you will find a directory structure like this one (under windows &quot;bin&quot; will be called &quot;Scripts&quot;): </p>
@@ -60,7 +57,7 @@ lib/</pre>
 <pre><em>$</em> xgae serve  </pre>
 <p>Or use Pyxer command line tool again to use the default engine (which is WSGI from Python standard lib):</p>
 <pre><em>$</em> pyxer serve </pre>
-<p>  But you may also use Pyxer without using the command line tools e.g. like this:</p>
+<p> But you may also use Pyxer without using the command line tools e.g. like this:</p>
 <pre><em>$</em> paster serve development.ini </pre>
 <h2>&quot;Hello World&quot;</h2>
 <p> For a simple &quot;Hello World&quot; just put an &quot;index.html&quot;
@@ -81,7 +78,7 @@ def index():
 <strong>@controller</strong>
 def index():
     return &quot;Hello World&quot;</pre>
-<h2>Using templates  </h2>
+<h2>Using templates </h2>
 <p>This example can be called like <code>/</code> or <code>/index</code>.
   To use a Pyxer template with this file you may use the <code>render()</code> function or just return <code>None</code> (that is the same as not
   returning anything) and the matching template will be used, in this
@@ -108,7 +105,7 @@ def index():
       <li>
         <p>If the controller returns a
           dictionary this will be applied to template (step 2) </p>
-    </li>
+      </li>
     </ol>
   </li>
   <li>Looks for the template (foo/bar.html) </li>
@@ -117,10 +114,11 @@ def index():
 <p>To publish your project to GAE you may also use the Pyxer command line tool. First check if your &quot;app.yaml&quot; file contains the right informations like the project name and version infos. Then just do like this:</p>
 <pre><em>$</em> xgae upload</pre>
 <p>Be aware that Pyxer first needs to fix the paths to be relative. If you choose not to use Pyxer for uploading you have to do this fix up explicitly <strong>before</strong> you upload your applikation, like this:</p>
-<pre><em>$</em> xgae  fix </pre>
+<pre><em>$</em> xgae fix </pre>
 <h1>Templating</h1>
+<p>XXX Kid or how to configure </p>
 <p><em>Pyxer</em> offers yet another templating language that is very close to
-  Genshi and Kit. As the former did not work with Google AppEngine at
+  Genshi and Kid. As the former did not work with Google AppEngine at
   the moment of birth of <em>Pyxer</em> the new templating tools had been
   implemented. It is based on html5lib.</p>
 <h3>Variables and expressions</h3>
@@ -131,8 +129,7 @@ def index():
 <strong>$item.amount</strong> times <strong>$item.name</strong>.</pre>
 <h3> Commands</h3>
 <p>Commands are the same as used by Python. The only difference is,
-  that you have to tell that a block ends by calling the command <code>end</code>
-  (not needed for <code>else</code> and <code>elif</code>):</p>
+  that you have to tell that a block ends by calling the command <code>end</code> (not needed for <code>else</code> and <code>elif</code>):</p>
 <pre><strong>&lt;% def address(name): %&gt;</strong>
   ABCDEF Company
   <strong>&lt;% if name: %&gt;</strong>
@@ -175,10 +172,17 @@ File &ldquo;b.html&rdquo;
 <pre><em>$</em> source bin/activate
 <em>$</em> easy_install SomePackageName
 <em>$</em> deactivate</pre>
+<h2>Development of Pyxer under GAE </h2>
+<p>If you  decide to develop Pyxer you may run into the following problem: each project comes with an own virtual machine (VM)and its own installation of Pyxer in it. So if you change the development version it will have no effect on your installation. Therefore a command &quot;pyxer&quot; is added that synchronizes the Pyxer installation in the VM with the development version:</p>
+<pre><em>$</em> pyxer pyxer  </pre>
+<p>BTW: To install the development version using SetupTools do like this:</p>
+<pre><em>$</em> cd &lt;Path_to_development_version_of_Pyxer&gt; 
+<em>$</em> python setup.py develop</pre>
+<p>You will have to repeat this each time the version of Pyxer changes, because otherwise the command line tools do not work. </p>
 <h2>Use within Eclipse</h2>
 <p>xxx</p>
 <h2>Use Google App Engine Launscher on Mac OS</h2>
-<p>xxx   </p>
+<p>xxx </p>
 <h1>Engines</h1>
 <p>XXX</p>
 <p><em>Pyxer</em> uses support different so called &quot;engines&quot;
@@ -189,11 +193,11 @@ File &ldquo;b.html&rdquo;
 <h2>Paster</h2>
 <pre><em>$</em> xpaster serve --reload </pre>
 <h2> Google Appengine</h2>
-<pre><em>$</em> xgae serve</pre> 
+<pre><em>$</em> xgae serve</pre>
 <h1>Links</h1>
 <p>Some usfull links:</p>
 <ol>
-  <li>GAE http://xxx   </li>
+  <li>GAE http://xxx </li>
 </ol>
 </body>
 </html>
