@@ -1,7 +1,0 @@
-[paste.app_factory]
-main = pyxer.app:app_factory
-
-[console_scripts]
-pyxer = pyxer.command:command
-xgae = pyxer.command:command_gae
-xpaster = pyxer.command:command_paster
