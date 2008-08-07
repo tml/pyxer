@@ -33,13 +33,6 @@ def _test():
 try:
     here = os.path.dirname(__file__)
 
-    # Don't get confused with non locally installed packages
-    # XXX Could become more sophisticated
-    # sys.path = [path for path in sys.path if "site-packages" not in path]
-
-    # The "src" path is added to ensure to find our main app (Problems under Windows)
-    # sys.path.insert(0, os.path.join(here, "src", "myapp"))
-
     # Test for correct site-packages directory, because if developed on
     # Windows we have different paths as everywhere else. And this has also
     # to work on the Google machine too!
@@ -48,10 +41,7 @@ try:
         site_packages = os.path.join(here, 'Lib', 'site-packages')
 
     site.addsitedir(site_packages)
-
-    #__import__("webob")
-    #import html5lib
-    # import pyxer.gae.monkey.appengine_monkey
+  
     import appengine_monkey
     ## If you want to use httplib but get socket errors, you should uncomment this line:
     #appengine_monkey.install_httplib()
