@@ -109,9 +109,9 @@ def call_subprocess(
             cwd=cwd,
             env=env)
     except Exception, e:
-        print (
-            "Error %s while executing command %s" % (e, cmd_desc))
-        raise
+        if raise_on_returncode:
+            print ("Error %s while executing command %s" % (e, cmd_desc))
+            raise
     all_output = []
     if stdout is not None:
         stdout = proc.stdout

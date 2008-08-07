@@ -49,7 +49,7 @@ def self_setup(root=None):
     log.debug("Pyxer setup.py dir %r", dir)
     # Do setup 
     call_script(
-        ["python", "pyxer/setup.py", "install", "-f"],
+        ["python", os.path.join(dir, "pyxer", "setup.py"), "install", "-f"],
         cwd=dir,
         root=root)    
 
