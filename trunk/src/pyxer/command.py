@@ -191,8 +191,9 @@ def command(engine=None):
             # call_subprocess([os.path.join(root, "scripts", "activate.bat")])
             system("start " + os.path.join(root, "scripts", "activate.bat"))
         else:
-            system("source  " + os.path.join(root, "bin", "activate"))
-
+            print "IMPORTANT! Leave VM with command 'exit'."
+            call_subprocess(["bash", "--init-file", os.path.join(root, "bin", "activate")], raise_on_returncode=False)
+            
     # Deactivate
     elif (command=="close" or command=="deactivate"):
 
