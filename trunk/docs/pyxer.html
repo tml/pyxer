@@ -89,6 +89,7 @@ def index():
 @controller
 def index():
     <strong>c.title = &quot;Hello World&quot;</strong></pre>
+<p>By default the Kid templating language is used and output is specified as &quot;xhtml-strict&quot;.</p>
 <h2>Using JSON</h2>
 <p>To return data as JSON just return a dict or list object from your controller:</p>
 <pre>from pyxer.base import *<br /><br />@controller <br />def index(): <strong><br />   return dict(success=True, msg=&quot;Everything ok&quot;)</strong></pre>

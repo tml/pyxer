@@ -135,25 +135,35 @@ class PyxerApp(object):
                     # Handelt es sich um einen Controller?
                     if getattr(func, "controller", False) is True:
                         
-                        # log.debug("Module filename %r", module.__file__)
-                        request.template_url = os.path.join(os.path.dirname(module.__file__), action + ".html")
-                        
+                        # Execute controller and get its result            
                         result = func()
+                        
+                        # Choose a renderer
+                        render_func = None
+                        
+                        # Render is explicitly defined by @controller
+                        if func.controller_render is not None:
+                            render_func = func.controller_render
 
                         # If the result is None (same as no return in function at all)
                         # then apply the corresponding template
                         # XXX Maybe better test if response.body/body_file is also empty
-                        if result is None:
-                            log.debug("Render with default template %r", request.template_url)
-                            vars = ContextObj()
-                            vars.c = c
-                            result = render(request.template_url)
+                        elif result is None:
+                            render_func = render                            
 
-                        # Consider lists and hashes as JSON data
-                        elif type(result) in (types.ListType, types.DictionaryType, types.DictType, types):
-                            response.headers['Content-Type'] = 'application/json'
-                            result = json(result)
-                        # Ergebnisstring ausgeben
+                        # Consider everything which is not a string as JSON data
+                        elif type(result) not in types.StringTypes:
+                            render_func = render_json
+                        
+                        # Execute render function
+                        if render_func is not None:
+                            # Set path to default template
+                            request.result = result
+                            request.template_url = os.path.join(os.path.dirname(module.__file__), action + ".html")
+                            log.debug("Render with func %r", func.controller_render)
+                            result = render_func(**func.controller_kwargs)                            
+                                                                            
+                        # Publish result
                         resp.body = result
                         return resp(environ, start_response)
                     else:
