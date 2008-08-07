@@ -3,6 +3,7 @@ pyxer/app.py
 pyxer/base.py
 pyxer/command.py
 pyxer/configparser.py
+pyxer/controller.py
 pyxer/create.py
 pyxer/helpers.py
 pyxer/setup.py

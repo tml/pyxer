@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: pyxer
-Version: 0.5.0
+Version: 0.5.1
 Summary: Simple Python Framework and Templating for Paste, Google App Engine (GAE) and WSGI
 Home-page: http://code.google.com/p/pyxer/
 Author: Dirk Holtwick

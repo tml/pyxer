@@ -107,7 +107,7 @@ class HTTPResponse(object):
     def reason(self):
         return responses.get(self._fetch_response.status_code, 'Unknown')
 
-    
+
 
 class HTTPSConnection(HTTPConnection):
 
