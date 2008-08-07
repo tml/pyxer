@@ -22,7 +22,7 @@ import types
 from paste.registry import StackedObjectProxy
 
 from pyxer.template import Template
-from pyxer.utils.jsonhelper import render_json, json
+from pyxer.utils.jsonhelper import json
 
 c = StackedObjectProxy(name="C")
 g = StackedObjectProxy(name="G")
@@ -55,7 +55,8 @@ def redirect(location, code=301):
 #except:
 #    log.exception("Failed loading Genshi")
     
-def render_pyxer(path):
+def render_pyxer(*kw):
+    path = request.template_url
     # path = os.path.join(os.getcwd(), 'public', path)
     log.debug("Loading template %r", path)
     template = Template(file(path, "r").read(), path=path, html=True)
@@ -65,17 +66,33 @@ def render_pyxer(path):
     #tmpl = genshi_loader.load(template)
     #return tmpl.generate(c=c).render('xhtml', doctype='xhtml')
 
-def render_kid(path):
+def render_kid(**kw):
+    " 'c' and 'request' are global variables " 
     import pyxer.kid as kid
-    log.debug("Loading template %r with Kid", path)
+    path = request.template_url    
+    # Force output to be something that makes sense ;)
+    if "output" not in kw:
+        kw["output"] = "xhtml-strict"
+    log.debug("Loading template %r with Kid and arguments %r", path, kw)
     template = kid.Template(source=file(path, "r").read(), c=c)
-    return template.serialize()
-    
+    return template.serialize(**kw)
+
+# Make Kid the default templating language
 render = render_kid
 
+def render_json():
+    " Render output as JSON object "
+    response.headers['Content-Type'] = 'application/json'
+    result = json(request.result)    
+    log.debug("JSON: %r", result)
+    return result
+
 # Decorator for controllers
-def controller(func):
+def controller(func, render=None, **kwargs):
     func.controller = True
+    func.controller_render = render
+    func.controller_kwargs = kwargs
+    log.debug("@controller %r %r %r", func, render, kwargs)
     return func
 
 '''

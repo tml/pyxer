@@ -11,16 +11,25 @@
 	<em py:if="c.ispaster">Paster</em>
 	<em py:if="c.isgae">Google App Engine</em></p>
 <ul>
-  <li><a href="guestbook/">Guestbook</a></li>
+  <li py:for="name, link, description in c.samples">
+    <a href="$link">$name</a>
+    <div py:if="description">
+        $description
+    </div>
+  </li>
+  <!--! 
   <li><a href="wiki/">Wiki</a></li>
   <li><a href="session/">Session</a></li>
   <li><a href="error">Error</a></li>
   <li><a href="directory/">Directory</a> </li>
   <li><a href="json/">JSON</a></li>
+   -->
 </ul>
+<!--!   
 <p>All modules</p>
 <ul>
   <li py:for="m in sorted(c.modules)">$m</li>
 </ul>
+-->
 </body>
 </html>

@@ -1,5 +1,7 @@
 import string
 import types
+import logging
+log = logging.getLogger(__name__)
 
 ##    json.py implements a JSON (http://json.org) reader and writer.
 ##    Copyright (C) 2005  Patrick D. Logan
@@ -311,21 +313,30 @@ def read(s):
 
 # ---------------
 
+#try:
+#    import jsonlib
+#    write = jsonlib.write
+#    read = jsonlib.read
+#    log.debug("Using JSON module %r", jsonlib)
+#except ImportError:
+#    try:
+#        import simplejson
+#        write = simplejson.dumps
+#        read = simplejson.loads
+#        log.debug("Using JSON module %r", simplejson)
+#    except ImportError:
+#    	log.debug("Using JSON module %r", __file__)
+
 try:
-    import jsonlib
-    write = jsonlib.write
-    read = jsonlib.read
+    import simplejson
+    write = simplejson.dumps
+    read = simplejson.loads
+    log.debug("Using JSON module %r", simplejson)
 except ImportError:
-    try:
-        import simplejson
-        write = simplejson.dumps
-        read = simplejson.loads
-    except ImportError:
-    	pass
+	log.debug("Using JSON module %r", __file__)
     
 def json(*a, **kw):
     if len(a)==1:
         return write(a[0])
     return write(kw)
 
-render_json = json

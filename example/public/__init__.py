@@ -6,25 +6,30 @@
 
 from pyxer.base import *
 
-import logging
-log = logging.getLogger(__name__)
-basedir = os.path.dirname(__file__)
-base = os.path.join(basedir, "data")
-
-__hide__ = ["template.html"]
-
 import sys
+import os
+import logging
+
+log = logging.getLogger(__name__)
+here = os.path.dirname(__file__)
+base = os.path.join(here, "data")
 
 @controller
 def index():
     c.isgae =  "google.appengine" in sys.modules
     c.ispaster = not c.isgae
-    c.modules = sys.modules    
-   
-@controller
-def test():
-    return "Noch ein Test"
-
-@controller
-def error():
-    return str(0/1 + 1/0)
+    c.modules = sys.modules
+    c.samples = []
+    for name in sorted(os.listdir(here)):
+        try:
+            readme = os.path.join(here, name, "README.txt")
+            if os.path.isfile(os.path.join(here, name, "README.txt")):
+                f = open(readme, "r")
+                c.samples.append((
+                    f.readline().strip(),
+                    name + "/",
+                    f.read().strip()))
+                f.close()
+                log.debug("Added sample %r", c.samples[-1])
+        except:
+            log.exception("Error while collecting samples")
