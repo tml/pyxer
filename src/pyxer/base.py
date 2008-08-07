@@ -61,6 +61,7 @@ def render_kid(**kw):
 
 # Make Kid the default templating language
 render_default = render_kid
+# render_default = render_pyxer
 
 def render_json():
     " Render output as JSON object "

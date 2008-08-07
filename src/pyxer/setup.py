@@ -43,6 +43,7 @@ setup(
         "pyxer.paster",
         "pyxer.utils",
         "pyxer.template",
+        "pyxer.kid",
         ],
 
     include_package_data = True,

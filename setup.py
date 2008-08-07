@@ -47,6 +47,7 @@ setup(
         "pyxer.paster",
         "pyxer.utils",
         "pyxer.template",
+        "pyxer.kid",
         ],
 
     # packages = find_packages(exclude=['ez_setup']),
