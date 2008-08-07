@@ -156,7 +156,7 @@ def _create_module(code, name, filename,
         template.stale = True
         template._python = template._code = None
         code = template.compile(dump_source=environ.get('KID_OUTPUT_PY'))
-    if store:
+    if store and filename != "<string>": # Don't make modules with name <string> because causes errors in GAE
         sys.modules[name] = mod
     return mod
 

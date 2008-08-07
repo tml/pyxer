@@ -127,7 +127,7 @@ def load_template(file, name='', cache=True, encoding=None, ns={},
       module and the code to be executed as parameters, after the code has
       been compiled and the module has been created.
 
-    """
+    """    
     if isinstance(file, basestring):
         if xml_sniff(file):
             fo = QuickTextReader(file)
