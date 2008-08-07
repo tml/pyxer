@@ -7,7 +7,6 @@
 # import pyxer.helpers as h
 # import pyxer.model as model
 
-from webob import Request, Response
 from webob import exc
 
 import sys
@@ -19,47 +18,30 @@ import os
 import os.path
 import types
 
-from paste.registry import StackedObjectProxy
-
-from pyxer.template import Template
 from pyxer.utils.jsonhelper import json
-
-c = StackedObjectProxy(name="C")
-g = StackedObjectProxy(name="G")
-g = StackedObjectProxy(name="H")
-
-# cache = StackedObjectProxy(name="Cache")
-request = req = StackedObjectProxy(name="Request")
-response = resp = StackedObjectProxy(name="Response")
-session = StackedObjectProxy(name="Session")
+from pyxer.controller import Controller, isController, c, g, h, session, response, request, resp, req
 
 import logging
 log = logging.getLogger(__file__)
 
+# Abort with error 
 def abort(code=404):
     raise exc.HTTPNotFound()
 
+# Normalize URL
 def url(url):
     return req.relative_url(url)
 
 # Redirect to other page
 def redirect(location, code=301):   
     raise exc.HTTPMovedPermanently(location=url(location))
-    
-#try:
-#    from genshi.template import TemplateLoader
-#    
-#    genshi_loader = TemplateLoader(
-#        os.path.join(os.getcwd(), 'public'),
-#        auto_reload=True)
-#except:
-#    log.exception("Failed loading Genshi")
-    
+
 def render_pyxer(*kw):
+    import pyxer.template
     path = request.template_url
     # path = os.path.join(os.getcwd(), 'public', path)
     log.debug("Loading template %r", path)
-    template = Template(file(path, "r").read(), path=path, html=True)
+    template = pyxer.template.Template(file(path, "r").read(), path=path, html=True)
     # print template.source.encode("latin1","ignore")
     return template.render(dict(c=c), encoding="utf8")
 
@@ -78,7 +60,7 @@ def render_kid(**kw):
     return template.serialize(**kw)
 
 # Make Kid the default templating language
-render = render_kid
+render_default = render_kid
 
 def render_json():
     " Render output as JSON object "
@@ -87,67 +69,36 @@ def render_json():
     log.debug("JSON: %r", result)
     return result
 
-# Decorator for controllers
-class controller(object):
- 
-    def __init__(self, func_=None, **kw):
-        self.func = func_
-        self.kw = kw
-        if self.func is not None:
-            self.decorate(self)
+class controller(Controller):
 
-    def __call__(self, *a, **kw):
-        if self.func is None:
-            self.func, a = a[0], a[1:]
-            self.decorate(self.func, self.kw)
-            return self.func
-        return self.func(*a, **kw)
+    def render(self, result, render=None, **kw):
 
-    def decorate(self, func, kw={}):
-        func.controller = True
-        func.controller_render = None
-        if "render" in kw: 
-            func.controller_render = kw.pop("render")            
-        func.controller_kwargs = kw
-        log.debug("@controller %r %r %r", func, func.controller_render, func.controller_kwargs)
+        log.debug("Render called with %r %r %r", result, render, kw)
         
-#def controller(func, render=None, **kwargs):
-#    func.controller = True
-#    func.controller_render = render
-#    func.controller_kwargs = kwargs
-#    log.debug("@controller %r %r %r", func, render, kwargs)
-#    return func
+        # Choose a renderer
+        render_func = None
+        
+        # Render is explicitly defined by @controller
+        if render is not None:
+            render_func = render
 
-'''
-    def replacement(environ, start_response):
-        req = Request(environ)
+        # If the result is None (same as no return in function at all)
+        # then apply the corresponding template
+        # XXX Maybe better test if response.body/body_file is also empty
+        elif result is None:
+            render_func = render_default                            
 
-        # Execute function
-        try:
-            resp = func(req, **req.urlvars)
-            # resp = func(req, **dict(req.params))
-        except exc.HTTPException, e:
-            resp = e
+        # Consider everything which is not a string as JSON data
+        elif type(result) not in types.StringTypes:
+            render_func = render_json
+        
+        # Execute render function
+        log.debug("Render func %r", render_func)
+        if render_func is not None:           
+            request.result = result            
+            log.debug("Render with func %r", render_func)
+            result = render_func(**kw)                            
 
-        # Handle template
-        if  isinstance(resp, dict):
-            log.debug("apply template on %r", resp)
-            filename = os.path.join(
-                environ["pyxer.root"],
-                os.path.dirname(req.path_info).strip("/"),
-                func.__name__) + ".html"
-
-            try:
-                resp = render(filename, resp)
-            except:
-                log.exception("render")
-
-        # Prepare response
-        if isinstance(resp, basestring):
-            log.debug("create a response of %r", resp[:24])
-            resp = Response(body=resp)
-        return resp(environ, start_response)
-    return replacement
-'''
+        return result
 
 expose = controller

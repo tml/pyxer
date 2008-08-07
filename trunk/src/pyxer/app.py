@@ -17,9 +17,6 @@ from paste.util.import_string import import_module
 
 from pyxer.base import *
 
-#from mako.template import Template
-#from mako.runtime import Context
-
 import sys
 import logging
 import string
@@ -128,44 +125,16 @@ class PyxerApp(object):
             if module:
                 log.debug("Module found: %r, Action: %r", module, action)
 
-                # Existiert die Aktion/ Funktion?
+                # Does the function exist?
                 func = getattr(module, action, None)
                 if func:
 
-                    # Handelt es sich um einen Controller?
-                    if getattr(func, "controller", False) is True:
-                        
-                        # Execute controller and get its result            
-                        result = func()
-                        
-                        # Choose a renderer
-                        render_func = None
-                        
-                        # Render is explicitly defined by @controller
-                        if func.controller_render is not None:
-                            render_func = func.controller_render
+                    # Is it a controller?
+                    if isController(func):    
+                        request.start_response = start_response          
+                        request.template_url = os.path.join(os.path.dirname(module.__file__), action + ".html")
+                        return func()
 
-                        # If the result is None (same as no return in function at all)
-                        # then apply the corresponding template
-                        # XXX Maybe better test if response.body/body_file is also empty
-                        elif result is None:
-                            render_func = render                            
-
-                        # Consider everything which is not a string as JSON data
-                        elif type(result) not in types.StringTypes:
-                            render_func = render_json
-                        
-                        # Execute render function
-                        if render_func is not None:
-                            # Set path to default template
-                            request.result = result
-                            request.template_url = os.path.join(os.path.dirname(module.__file__), action + ".html")
-                            log.debug("Render with func %r", func.controller_render)
-                            result = render_func(**func.controller_kwargs)                            
-                                                                            
-                        # Publish result
-                        resp.body = result
-                        return resp(environ, start_response)
                     else:
                         log.debug("Function %r is not a controller", func)
                 else:
