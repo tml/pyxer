@@ -88,12 +88,35 @@ def render_json():
     return result
 
 # Decorator for controllers
-def controller(func, render=None, **kwargs):
-    func.controller = True
-    func.controller_render = render
-    func.controller_kwargs = kwargs
-    log.debug("@controller %r %r %r", func, render, kwargs)
-    return func
+class controller(object):
+ 
+    def __init__(self, func_=None, **kw):
+        self.func = func_
+        self.kw = kw
+        if self.func is not None:
+            self.decorate(self)
+
+    def __call__(self, *a, **kw):
+        if self.func is None:
+            self.func, a = a[0], a[1:]
+            self.decorate(self.func, self.kw)
+            return self.func
+        return self.func(*a, **kw)
+
+    def decorate(self, func, kw={}):
+        func.controller = True
+        func.controller_render = None
+        if "render" in kw: 
+            func.controller_render = kw.pop("render")            
+        func.controller_kwargs = kw
+        log.debug("@controller %r %r %r", func, func.controller_render, func.controller_kwargs)
+        
+#def controller(func, render=None, **kwargs):
+#    func.controller = True
+#    func.controller_render = render
+#    func.controller_kwargs = kwargs
+#    log.debug("@controller %r %r %r", func, render, kwargs)
+#    return func
 
 '''
     def replacement(environ, start_response):
