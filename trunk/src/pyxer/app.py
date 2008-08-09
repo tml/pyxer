@@ -39,6 +39,9 @@ class ContextObj(object):
 # The WSGI application
 class PyxerApp(object):
 
+    def __init__(self, base=["public"]):
+        self.base = base
+
     def __call__(self, environ, start_response):
 
         try:
@@ -49,10 +52,7 @@ class PyxerApp(object):
             # Pfad auch nichts zu suchen, daher direkt weiter an die anderen
             if "." in url:
                 abort(404)
-
-            # XXX Basis des Moduls
-            base = ["public"]
-
+            
             # URL aufsplitten in seine Bestandteile (ohne Slashes)
             parts = [x for x in url.strip("/").split("/") if x]
 
@@ -75,7 +75,7 @@ class PyxerApp(object):
 
                 # Handelt es sich um ein "Verzeichnis"
                 module_parts = parts
-                module_name = ".".join(base + module_parts)
+                module_name = ".".join(self.base + module_parts)
                 exec("import " + module_name)
                 # __import__(module_name)
                 action = "index"
@@ -99,7 +99,7 @@ class PyxerApp(object):
 
                     # oder eine "Datei"
                     module_parts = parts[:-1]
-                    module_name = ".".join(base + module_parts)
+                    module_name = ".".join(self.base + module_parts)
                     exec("import " + module_name)
                     # __import__(module_name)
                     action = parts[-1]

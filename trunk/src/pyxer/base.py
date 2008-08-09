@@ -30,7 +30,7 @@ def abort(code=404):
 
 # Normalize URL
 def url(url):
-    return req.relative_url(url)
+    return request.relative_url(url)
 
 # Redirect to other page
 def redirect(location, code=301):   
@@ -48,15 +48,35 @@ def render_pyxer(*kw):
     #tmpl = genshi_loader.load(template)
     #return tmpl.generate(c=c).render('xhtml', doctype='xhtml')
 
+class KidTemplateManager:
+    
+    cache = {}
+    
+    def __init__(self, root):    
+        self.root = root
+    
+    def load(self, path):
+        import  kid
+        path = os.path.abspath(os.path.join(self.root, path))
+        template = self.cache.get(path)
+        if not template:
+            log.debug("Loading template %r in KidTemplateManager", path)
+            template = kid.load_template(
+                path, cache=False,
+                ns=dict(load=self.load, c=c))  
+        self.cache[path] = template
+        return template        
+           
 def render_kid(**kw):
     " 'c' and 'request' are global variables " 
-    import pyxer.kid as kid
+    # import pyxer.kid as kid
     path = request.template_url    
     # Force output to be something that makes sense ;)
     if "output" not in kw:
         kw["output"] = "xhtml-strict"
     log.debug("Loading template %r with Kid and arguments %r", path, kw)
-    template = kid.Template(source=file(path, "r").read(), c=c)
+    template = KidTemplateManager(os.path.dirname(path)).load(path)    
+    # template = kid.Template(source=file(path, "r").read(), c=c, load=kid_loader)
     return template.serialize(**kw)
 
 # Make Kid the default templating language
