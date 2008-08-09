@@ -33,7 +33,7 @@
   respecting the MVC concept but the files can be mixed in one
   directory. For a high end solution you should consider using Pylons,
   TurboGears, Django and similar. </p>
-<p> This work is inspired by <a href="http://pythonpaste.org/webob/do-it-yourself.html">http://pythonpaste.org/webob/do-it-yourself.html</a> </p>
+<p> This work is inspired by <a href="http://pythonpaste.org/webob/do-it-yourself.html">&lt;http://pythonpaste.org/webob/do-it-yourself.html&gt;</a>. </p>
 <h2>Technical background</h2>
 <p>The Google App Engine  (GAE) in version 1.1 offers a very restricted Python environment and the developer as to ship arround a lot of problems. Pyxer helps on this point by also providing solutions that work with the great WSGI Framework Paster by Ian Bicking. So you get the best from both sides: GAE and Paster. To achieve this some other great third party tools are used like WebOb and VirtualEnv (also by Ian Bicking) and for templating the html5lib is used.</p>
 <h1>Installation</h1>
@@ -45,7 +45,7 @@
 <h2>Create a new project </h2>
 <p>At first set up a new Pyxer project using the Pyxer command line tool like this: </p>
 <pre><em>$</em>  pyxer init myexample</pre>
-<p> In the newly created directory &quot;myexample&quot; you will find a directory structure like this one (under windows &quot;bin&quot; will be called &quot;Scripts&quot;): </p>
+<p> In the newly created directory &quot;myexample&quot; you will find a directory structure like this one (under Windows &quot;bin&quot; will be called &quot;Scripts&quot;): </p>
 <pre>bin/
 public/
 lib/</pre>
@@ -135,7 +135,7 @@ def index():
 <h2>Publish to GAE</h2>
 <p>To publish your project to GAE you may also use the Pyxer command line tool. First check if your &quot;app.yaml&quot; file contains the right informations like the project name and version infos. Then just do like this:</p>
 <pre><em>$</em> xgae upload</pre>
-<p>Be aware that Pyxer first needs to fix the paths to be relative. If you choose not to use Pyxer for uploading you have to do this fix up explicitly <strong>before</strong> you upload your applikation, like this:</p>
+<p>Be aware that Pyxer first needs to fix the paths to be relative instead of absolute to make them work on the GAE environment. If you choose not to use Pyxer for uploading you have to do this fix up explicitly <strong>before</strong> you upload your applikation, like this:</p>
 <pre><em>$</em> xgae fix </pre>
 <h1>Templating</h1>
 <p>XXX Kid or how to configure </p>
@@ -186,8 +186,12 @@ File &ldquo;b.html&rdquo;
 <pre>&lt;div <strong>py:for=&rdquo;name in sorted(c.listOfNames)&rdquo;</strong>&gt;Welcome $name&lt;/div&gt;</pre>
 <p> xxx</p>
 <h1>Advanced</h1>
-<h2>Install additional Python packages </h2>
-<p>To install new Python packages you should first enter the virtual environment and the use <code>easy_install</code> or <code>python setup.py</code> install. On Windows this works like this:</p>
+<h2>Python virtual environment </h2>
+<p>To make deployment of GAE projects easy a virtual environment (VM) is created. If you start GAE via <code>xgae</code> or paster via <code>xpaster</code> these virtual environments will automatically be used. Pyxer determines the root of the VM by looking for the <code>app.yaml</code> file. If you have to enter the VM for installing packages or for other reasons you may to it like this:</p>
+<pre><em>$</em> pyxer vm
+<em>(vm)$</em> easy_install html5lib
+<em>(vm)$</em> exit</pre>
+<p>You may also use the usual functions as described in virtualenv by Ian Bicking &lt;<a href="http://pypi.python.org/pypi/virtualenv/">http://pypi.python.org/pypi/virtualenv/</a>&gt;. </p>
 <pre><em>$</em> Scripts\activate.bat<br /><em>$</em> easy_install SomePackageName
 <em>$</em> deactivate</pre>
 <p>And for other Unix like system like this:</p>
@@ -201,9 +205,21 @@ File &ldquo;b.html&rdquo;
 <pre><em>$</em> cd &lt;Path_to_development_version_of_Pyxer&gt; 
 <em>$</em> python setup.py develop</pre>
 <p>You will have to repeat this each time the version of Pyxer changes, because otherwise the command line tools do not work. </p>
+<h2>Writing test cases </h2>
+<p>Since a Pyxer project is based in Paster writing test cases is quite the same. The most simple test looks like this. (We asume that the test file to be placed in the root of the project. For normal testing you have do add root to <code>sys.path</code> and modify the <code>loadapp</code> argument.):</p>
+<pre>
+from paste.deploy import loadapp
+from paste.fixture import TestApp
+import os.path
+
+app = TestApp(loadapp('config:%s' % os.path.abspath('development.ini')))
+res = app.get("/")
+assert ('&lt;body' in res)
+</pre>
+<p>For more informations look here &lt;<a href="http://pythonpaste.org/testing-applications.html">http://pythonpaste.org/testing-applications.html</a>&gt;.  </p>
 <h2>Use within Eclipse</h2>
 <p>xxx</p>
-<h2>Use Google App Engine Launscher on Mac OS</h2>
+<h2>Use Google App Engine Launcher on Mac OS</h2>
 <p>xxx </p>
 <h1>Engines</h1>
 <p>XXX</p>
@@ -219,7 +235,7 @@ File &ldquo;b.html&rdquo;
 <h1>Links</h1>
 <p>Some usfull links:</p>
 <ol>
-  <li>GAE http://xxx </li>
+  <li>XXX</li>
 </ol>
 </body>
 </html>

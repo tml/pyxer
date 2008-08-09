@@ -43,6 +43,11 @@ def py_compile(code, filename='<string>', kind='exec'):
             # we want the line numbering to match with the source file,
             # so we only remove the magic word in the comment line:
             code = '# -*-' + code[13:]
+    if False:
+        ctr = 1
+        for line in code.splitlines():
+            print "%03d: %s" % (ctr, line.rstrip())
+            ctr += 1
     return _py_compile(code, filename, 'exec')
 
 def compile(source, filename='<string>', encoding=None, entity_map=None):

@@ -12,11 +12,11 @@ except ImportError:
     from setuptools import setup, find_packages
 
 long_description = """
-Yet another framework with a new very simple programming concept. 
-Offers also an own templating language mostly compatible to Genshi. 
-The command line tool makes creating GAE projects as easy as possible. 
-Projects may also be used with Paster or other WSGI frameworks. 
-Very liberal Open Source licensing. 
+Yet another framework with a new very simple programming concept.
+Offers also an own templating language mostly compatible to Genshi.
+The command line tool makes creating GAE projects as easy as possible.
+Projects may also be used with Paster or other WSGI frameworks.
+Very liberal Open Source licensing.
 """.strip()
 
 setup(
@@ -31,10 +31,8 @@ setup(
     keywords       = "Framework, Google App Engine, GAE, appengine, Paster, Server, Templating",
 
     requires       = [
-        "jsonlib",
         "webob",
         "paste",
-        "html5lib",
         ],
 
     package_dir = {

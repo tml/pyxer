@@ -150,12 +150,12 @@ def load_template(file, name='', cache=True, encoding=None, ns={},
             return sys.modules.get(name)
     import pyxer.kid.compiler as compiler
     if filename == '<string>':
-        code = compiler.compile(fo, filename, encoding, entity_map)
+        code = compiler.compile(fo, filename, encoding, entity_map)        
     else:
         template = compiler.KidFile(filename, force=False,
             encoding=encoding, entity_map=entity_map)
         code = template.compile(dump_code=cache,
-            dump_source=os.environ.get('KID_OUTPUT_PY'))
+            dump_source=os.environ.get('KID_OUTPUT_PY'))    
     mod = importer._create_module(code, name, filename,
         store=cache, ns=ns, exec_module=exec_module)
     return mod

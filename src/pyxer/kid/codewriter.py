@@ -289,7 +289,7 @@ class KidWriter(object):
             # imports
             'import pyxer.kid',
             'from pyxer.kid.template_util import *',
-            'import pyxer.kid.template_util as template_util',
+            'import pyxer.kid.template_util as template_util',            
             '_def_names = []',
             # default variables (can be overridden by template)
             'encoding = "%s"' % self.encoding,
