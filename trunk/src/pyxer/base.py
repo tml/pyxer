@@ -58,13 +58,20 @@ class KidTemplateManager:
     def load(self, path):
         import  kid
         path = os.path.abspath(os.path.join(self.root, path))
-        template = self.cache.get(path)
-        if not template:
-            log.debug("Loading template %r in KidTemplateManager", path)
-            template = kid.load_template(
-                path, cache=False,
-                ns=dict(load=self.load, c=c))  
-        self.cache[path] = template
+        # Test if it is in cache and return if found
+        mtime = os.path.getmtime(path)
+        if self.cache.has_key(path):            
+            template, last = self.cache.get(path)            
+            if mtime <= last:                
+                return template
+            else:
+                log.debug("Found a newer file than the one in the cache for %r", path)
+        # Load the template                 
+        log.debug("Loading template %r in KidTemplateManager", path)
+        template = kid.load_template(
+            path, cache=False,
+            ns=dict(load=self.load, c=c))  
+        self.cache[path] = (template, mtime)
         return template        
            
 def render_kid(**kw):
