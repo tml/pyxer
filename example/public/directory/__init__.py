@@ -13,3 +13,19 @@ def index():
         c.files = [(name, os.path.join(c.dir, name), os.path.isdir(os.path.join(c.dir, name))) for name in os.listdir(c.dir)]
     else:
         return "Directory name required"
+
+@controller
+def show():
+    c.file = req.params.get("file", os.path.dirname(__file__))
+    c.code = open(c.file, "rb").read()   
+    try: 
+        from pygments import highlight
+        from pygments.lexers import get_lexer_for_filename
+        from pygments.formatters import HtmlFormatter
+        lexer = get_lexer_for_filename(c.file)
+        formatter = HtmlFormatter(linenos=True, cssclass="source")
+        c.pretty = highlight(c.code, lexer, formatter)
+        c.css = HtmlFormatter().get_style_defs('.highlight')
+    except:
+        c.pretty = None
+        c.css = ""
