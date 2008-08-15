@@ -60,7 +60,7 @@ class KidTemplateManager:
         path = os.path.abspath(os.path.join(self.root, path))
         # Test if it is in cache and return if found
         mtime = os.path.getmtime(path)
-        if self.cache.has_key(path):            
+        if 0 and self.cache.has_key(path):            
             template, last = self.cache.get(path)            
             if mtime <= last:                
                 return template

@@ -9,6 +9,7 @@ from pyxer.base import *
 import sys
 import os
 import logging
+import pyxer
 
 log = logging.getLogger(__name__)
 here = os.path.dirname(__file__)
@@ -18,6 +19,7 @@ base = os.path.join(here, "data")
 def index():
     c.isgae =  "google.appengine" in sys.modules
     c.ispaster = not c.isgae
+    c.pyxerversion = pyxer.__version__
     c.modules = sys.modules
     c.samples = []
     for name in sorted(os.listdir(here)):
