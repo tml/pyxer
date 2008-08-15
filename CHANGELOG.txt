@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+Version 0.5.2, 2008-08-xxx
+
+- XXX
+
 Version 0.5.1, 2008-08-15
 
 - NEW: Added Kid to Pyxer under "pyxer.kid."
