@@ -1,29 +1,25 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:py="http://purl.org/kid/ns#">
+<html py:extends="load('layout.html')" xmlns:py="http://purl.org/kid/ns#">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Home</title>
 </head>
 <body>
-<h1>Samples</h1>
+<h1>Pyxer Examples</h1>
 <p>
-	You are running on
-	<em py:if="c.ispaster">Paster</em>
-	<em py:if="c.isgae">Google App Engine</em></p>
+	You are running 
+    <a href="http://code.google.com/p/pyxer/">Pyxer ${c.pyxerversion}</a>
+    on
+	<a py:if="c.ispaster" href="http://pythonpaste.org/">Paster</a>
+	<a py:if="c.isgae" href="http://code.google.com/appengine/">Google App Engine</a>  
+  </p>
 <ul>
   <li py:for="name, link, description in c.samples">
     <a href="$link">$name</a>
     <div py:if="description">
         $description
     </div>
-  </li>
-  <!--!
-  <li><a href="wiki/">Wiki</a></li>
-  <li><a href="session/">Session</a></li>
-  <li><a href="error">Error</a></li>
-  <li><a href="directory/">Directory</a> </li>
-  <li><a href="json/">JSON</a></li>
-   -->
+  </li>  
 </ul>
 <!--!
 <p>All modules</p>
