@@ -67,7 +67,11 @@ class Controller(Decorator):
         log.debug("Render call %r (%r) = %r", self.render, self.kw, result)
         
         # Publish result
-        response.body = result
+        if isinstance(result, unicode):
+            response.charset = 'utf8'
+            response.unicode_body = result
+        else:
+            response.body = result
         return response(request.environ, request.start_response)
 
     def render(self, result, **kw):
