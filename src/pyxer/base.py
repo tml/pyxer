@@ -116,8 +116,8 @@ class controller(Controller):
         elif result is None:
             render_func = render_default                            
 
-        # Consider everything which is not a string as JSON data
-        elif type(result) not in types.StringTypes:
+        # Consider dict and list as JSON data
+        elif isinstance(result, dict) or isinstance(result, list):
             render_func = render_json
         
         # Execute render function
@@ -126,6 +126,10 @@ class controller(Controller):
             request.result = result            
             log.debug("Render with func %r", render_func)
             result = render_func(**kw)                            
+
+            # Normalize output
+            if (not None) and (not isinstance(result, str)) and (not isinstance(result, str)):
+                result = str(result)
 
         return result
 

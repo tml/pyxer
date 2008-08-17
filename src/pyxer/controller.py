@@ -46,7 +46,7 @@ class Decorator(object):
 
     def wrapper(self, *a, **kw):
         # To be overloaded
-        log.info("Decorator.wrapper should be overloaded")
+        log.error("Decorator.wrapper should be overloaded")
         return self.func(*a, **kw)
 
 class Controller(Decorator):
@@ -60,11 +60,11 @@ class Controller(Decorator):
         
         # Execute controller and get its result
         result = self.func(*a, **kw)
-        log.debug("Controller call %r (%r %r) = %r", self.func, a, kw, result)
+        # log.debug("Controller call %r (%r %r) = %r", self.func, a, kw, result)
 
         # Ask render what to do with it
         result = self.render(result, **self.kw)
-        log.debug("Render call %r (%r) = %r", self.render, self.kw, result)
+        # log.debug("Render call %r (%r) = %r", self.render, self.kw, result)
         
         # Publish result
         if isinstance(result, unicode):
@@ -76,7 +76,7 @@ class Controller(Decorator):
 
     def render(self, result, **kw):
         # To be overloaded
-        log.info("Controller.render should be overloaded")
+        log.error("Controller.render should be overloaded")
         return result
 
 def isController(obj):
