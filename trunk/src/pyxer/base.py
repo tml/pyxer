@@ -94,14 +94,15 @@ def render_json():
     " Render output as JSON object "
     response.headers['Content-Type'] = 'application/json'
     result = json(request.result)    
-    log.debug("JSON: %r", result)
+    # log.debug("JSON: %r", result)
     return result
 
 class controller(Controller):
 
     def render(self, result, render=None, **kw):
 
-        log.debug("Render called with %r %r %r", result, render, kw)
+        log.debug("Render called with %r %r %r", repr(result)[:40], render, kw)
+        # log.debug("Render called with %r %r", render, kw)
         
         # Choose a renderer
         render_func = None
@@ -128,8 +129,8 @@ class controller(Controller):
             result = render_func(**kw)                            
 
             # Normalize output
-            if (not None) and (not isinstance(result, str)) and (not isinstance(result, str)):
-                result = str(result)
+            # if (not None) and (not isinstance(result, str)) and (not isinstance(result, str)):
+            #    result = str(result)
 
         return result
 

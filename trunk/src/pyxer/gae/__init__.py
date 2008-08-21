@@ -118,7 +118,11 @@ def serve(opt):
     
     options = []
     if opt.debug:
-        options.append("-d")
+        options.append("--debug")
+    if opt.host:
+        options.append("--address=%s" % opt.host)
+    if opt.port:
+        options.append("--port=%s" % opt.port)
     
     fix()    
     root = find_root()
@@ -163,7 +167,7 @@ def upload(opt):
     "python c:\Programme\Google\google_appengine\appcfg.py update ."
     options = []
     if opt.debug:
-        options.append("-d")
+        options.append("--debug")
     
     fix()
     root = find_root()
