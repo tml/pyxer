@@ -118,10 +118,11 @@ def install_app_yaml(options, home_dir):
     c = c.replace('__APP_SCRIPT__', options.app_script)
     dest = os.path.join(home_dir, 'app.yaml')
     if os.path.exists(dest):
-        logger.warn('Warning: overwriting %s' % dest)
-    f = open(dest, 'wb')
-    f.write(c)
-    f.close()
+        logger.warn('Warning: not overwriting %s' % dest)
+    else:
+        f = open(dest, 'wb')
+        f.write(c)
+        f.close()
 
 def install_paste_deploy(options, home_dir):
     shutil.copyfile(os.path.join(os.path.dirname(__file__), 'paste-deploy.py'),

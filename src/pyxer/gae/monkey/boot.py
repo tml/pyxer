@@ -23,7 +23,7 @@ try:
     set
 except NameError:
     from sets import Set as set
-
+    
 join = os.path.join
 py_version = 'python%s.%s' % (sys.version_info[0], sys.version_info[1])
 
@@ -442,7 +442,7 @@ def create_environment(home_dir, site_packages=True, clear=False,
     if sys.executable.startswith(bin_dir):
         print 'Please use the *system* python to run this script'
         return
-
+        
     if clear:
         rmtree(lib_dir)
         ## FIXME: why not delete it?
@@ -519,11 +519,11 @@ def create_environment(home_dir, site_packages=True, clear=False,
             logger.notify('Also creating executable in %s' % secondary_exe)
             shutil.copyfile(sys.executable, secondary_exe)
             make_exe(secondary_exe)
-
+    
     if 'Python.framework' in prefix:
         logger.debug('MacOSX Python framework detected')
 
-        # Copy the framework's dylib into the virtual
+        # Copy the framework's dylib into the virtual 
         # environment
         virtual_lib = os.path.join(home_dir, '.Python')
 
@@ -607,7 +607,7 @@ def fix_lib64(lib_dir):
     instead of lib/pythonX.Y.  If this is such a platform we'll just create a
     symlink so lib64 points to lib
     """
-    if [(i,j) for (i,j) in distutils.sysconfig.get_config_vars().items()
+    if [(i,j) for (i,j) in distutils.sysconfig.get_config_vars().items() 
         if isinstance(j, basestring) and 'lib64' in j]:
         logger.debug('This system uses lib64; symlinking lib64 to lib')
         assert os.path.basename(lib_dir) == 'python%s' % sys.version[:3], (
@@ -774,14 +774,15 @@ def install_app_yaml(options, home_dir):
     c = c.replace('__APP_SCRIPT__', options.app_script)
     dest = os.path.join(home_dir, 'app.yaml')
     if os.path.exists(dest):
-        logger.warn('Warning: overwriting %s' % dest)
-    f = open(dest, 'wb')
-    f.write(c)
-    f.close()
+        logger.warn('Warning: not overwriting %s' % dest)
+    else:
+        f = open(dest, 'wb')
+        f.write(c)
+        f.close()
 
 def install_paste_deploy(options, home_dir):
     shutil.copyfile(os.path.join(os.path.dirname(__file__), 'paste-deploy.py'),
-                    os.path.join(home_dir, 'paste-deploy.py'))
+                    os.path.join(home_dir, 'paste-deploy.py'))    
     msg = 'Wrote paste-deploy.py'
     dest = os.path.join(home_dir, 'development.ini')
     if os.path.exists(dest):

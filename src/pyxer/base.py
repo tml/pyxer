@@ -134,3 +134,32 @@ class controller(Controller):
         return result
 
 expose = controller
+
+# XXX Parameters
+
+def getparams(*a, **kw):
+    """
+    a, b = getparams("a b")
+    a, b = getparams("a", "b")
+    # a, b = getparams(["a", "b"])
+    # a, b = getparams(a=1, b=2)
+    # a, b = getparams("a", b=2)
+    
+    But not (because of order of elements):
+    a, b = getparams({"a": 1, "b": 2})    
+    """
+    values = []
+    for name in [x.strip().split() for x in a]:
+        request.params.get(name, None)
+
+"""
+from inspect import *
+
+def f(**kw):
+    locals_ = currentframe().f_back.f_locals
+    for k, v in kw.items():
+        locals_[k] = v
+
+f(a=1, b=1, c=1, d=1, x=1, e=2)
+print a,b,c,d,e,x
+"""       
