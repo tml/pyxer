@@ -60,11 +60,11 @@ class Controller(Decorator):
         
         # Execute controller and get its result
         result = self.func(*a, **kw)
-        # log.debug("Controller call %r (%r %r) = %r", self.func, a, kw, result)
+        log.debug("Controller call %r (%r %r) = %r", self.func, a, kw, repr(result)[:40])
 
         # Ask render what to do with it
         result = self.render(result, **self.kw)
-        # log.debug("Render call %r (%r) = %r", self.render, self.kw, result)
+        log.debug("Render call %r (%r) = %r", self.render, self.kw, repr(result)[:40])
         
         # Publish result
         if isinstance(result, unicode):
