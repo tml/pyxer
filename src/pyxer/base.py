@@ -98,7 +98,7 @@ def render_json():
     return result
 
 class controller(Controller):
-
+ 
     def render(self, result, render=None, **kw):
 
         log.debug("Render called with %r %r %r", repr(result)[:40], render, kw)
@@ -134,8 +134,13 @@ class controller(Controller):
 
         return result
 
-expose = controller
-
+class expose(controller):
+    
+    def call(self, *a, **kw):
+        " Add arguments "
+        log.debug("Call func with params %r", dict(request.params))
+        return self.func(**dict(request.params))
+    
 # XXX Parameters
 
 def getparams(*a, **kw):
