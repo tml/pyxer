@@ -11,9 +11,10 @@ from paste.urlparser import StaticURLParser
 from paste.cascade import Cascade
 # from paste.cgitb_catcher import CgitbMiddleware
 from paste.registry import RegistryManager
-from paste.config import ConfigMiddleware, CONFIG
+from paste.config import ConfigMiddleware #, CONFIG
 from paste.exceptions.errormiddleware import ErrorMiddleware
 from paste.util.import_string import import_module
+import paste.deploy
 
 from pyxer.base import *
 
@@ -71,77 +72,88 @@ class PyxerApp(object):
             #module_name = ".".join(base + module_parts)
             #exec "import " + module_name
             # log.debug("CWD %r %r", os.getcwd(), sys.path)
-            try:
-
-                # Handelt es sich um ein "Verzeichnis"
-                module_parts = parts
-                module_name = ".".join(self.base + module_parts)
-                exec("import " + module_name)
-                # __import__(module_name)
-                action = "index"
-
-                # Relative Dateien bekommen Probleme wenn das "Verzeichnis" keinen
-                # abschließenden Slash hat
-                if not url.endswith("/"):
-                    redirect(url + "/")
-
-            except ImportError, msg:
-
-                # Wenn im Import selbst ein Fehler auftritt dann sieht es so aus
-                # als gäbe es die Datei nicht, das ist allerdings nicht wahr,
-                # daher nochmal dieser Check
-                log.debug("Import error %r for module name %r", msg, module_name)
-                if module_parts and (not (str(msg).endswith("." + module_parts[-1]) or str(msg).endswith(" " + module_parts[-1]))):
-                    log.exception("Error in import")
-                    raise
-
+            
+            if 1: 
+            
                 try:
-
-                    # oder eine "Datei"
-                    module_parts = parts[:-1]
+    
+                    # Handelt es sich um ein "Verzeichnis"
+                    module_parts = parts
                     module_name = ".".join(self.base + module_parts)
                     exec("import " + module_name)
                     # __import__(module_name)
-                    action = parts[-1]
+                    action = "index"
+    
+                    # We need to add the trailing slash so relative URL's
+                    # work fine with the output
+                    if not url.endswith("/"):
+                        redirect(url + "/")
+    
                 except ImportError, msg:
+    
+                    # Wenn im Import selbst ein Fehler auftritt dann sieht es so aus
+                    # als gäbe es die Datei nicht, das ist allerdings nicht wahr,
+                    # daher nochmal dieser Check
                     log.debug("Import error %r for module name %r", msg, module_name)
-                    abort(404)
-
-            # Modul nochmal aus der Liste fischen, weil __import__ nicht das
-            # richtige Modul zurückgibt
-            module = sys.modules[module_name]
-
-            # XXX Nochmal laden im Debug-Modus
-            module = reload(module)
-
-            #pprint.pprint(environ)
-
-            # Calculate path of corresponding template file
-            if module_parts:
-                request.template_url = "/".join(module_parts) + "/" + action + ".html"
-            request.template_url = action + ".html"
-
-            # Does the module exist?
-            if module:
-                log.debug("Module found: %r, Action: %r", module, action)
-
-                # Does the function exist?
-                func = getattr(module, action, None)
-                if func:
-
-                    # Is it a controller?
-                    if isController(func):    
-                        request.start_response = start_response          
-                        request.template_url = os.path.join(os.path.dirname(module.__file__), action + ".html")
-                        return func()
-
+                    if module_parts and (not (str(msg).endswith("." + module_parts[-1]) or str(msg).endswith(" " + module_parts[-1]))):
+                        log.exception("Error in import")
+                        raise
+    
+                    try:
+    
+                        # oder eine "Datei"
+                        module_parts = parts[:-1]
+                        module_name = ".".join(self.base + module_parts)
+                        exec("import " + module_name)
+                        # __import__(module_name)
+                        action = parts[-1]
+                    except ImportError, msg:
+                        log.debug("Import error %r for module name %r", msg, module_name)
+                        abort(404)
+    
+                # Modul nochmal aus der Liste fischen, weil __import__ nicht das
+                # richtige Modul zurückgibt
+                module = sys.modules[module_name]
+    
+                # XXX Nochmal laden im Debug-Modus
+                module = reload(module)
+    
+                log.debug("%s", pprint.pformat(environ))
+    
+                # Does the module exist?
+                if module:
+                    log.debug("Module found: %r, Action: %r", module, action)
+    
+                    # Does the function exist?
+                    func = getattr(module, action, None)
+    
+                    if not func:                    
+                        # Test for 'default'
+                        action = "default"
+                        func = getattr(module, action, None)
+                        
+                    if func:
+    
+                        # Is it a controller?
+                        if isController(func):
+                                
+                            # Calculate path of corresponding template file
+                            #if module_parts:
+                            #    request.template_url = "/".join(module_parts) + "/" + action + ".html"
+                            #request.template_url = action + ".html"
+                             
+                            request.start_response = start_response          
+                            request.template_url = os.path.join(os.path.dirname(module.__file__), action + ".html")
+                            
+                            return func()
+    
+                        else:
+                            log.debug("Function %r is not a controller", func)
                     else:
-                        log.debug("Function %r is not a controller", func)
-                else:
-                    log.debug("Could not find action %r", action)
-
-            # Weiter geben zum nächsten WSGI Handler
-            abort(404)
+                        log.debug("Could not find action %r", action)    
+    
+                # Weiter geben zum nächsten WSGI Handler
+                abort(404)
 
         # Handle HTTPException
         except exc.HTTPException, e:
@@ -153,18 +165,29 @@ try:
     from beaker.middleware import SessionMiddleware       
 except:
     pass
-    
+ 
 # Make WSGI application, wrapping sessions etc.
-def make_app(global_conf={}, root="public", path=None, **app_conf):
+def make_app(global_conf={}, **app_conf):
 
     #pprint.pprint(global_conf)
     #pprint.pprint(app_conf)
 
+    try:
+        import ConfigParser
+        config = ConfigParser.SafeConfigParser()
+        config.read(os.path.join(os.path.dirname(global_conf["__file__"]), "pyxer.ini"))
+        config = dict(config.items("pyxer"))
+        
+        log.debug("Config: %r", config)
+    except:
+        log.exception("Config file not found")
+        config = {}
+        
     base = os.path.join(os.getcwd(), "public")
     # app = App(global_conf=None, root="public", path=None, **app_conf)
     app = PyxerApp()
     
-    if SessionMiddleware:
+    if SessionMiddleware and (config.get("session", "beaker")=="beaker"):
         log.debug("Beaker sessions")
         if "google.appengine" in sys.modules:
             app = SessionMiddleware(app, type='google', table_name='PyxerSession')
@@ -173,11 +196,12 @@ def make_app(global_conf={}, root="public", path=None, **app_conf):
 
     app = RegistryManager(app)
 
-    #conf = global_conf.copy()
-    #conf.update(app_conf)
+    # conf = global_conf.copy()
+    # conf.update(app_conf)    
     #conf.update(dict(app_conf=app_conf, global_conf=global_conf))
     # CONFIG.push_process_config(conf)
-    #app = ConfigMiddleware(app, conf)
+    #conf = paste.deploy.appconfig('config:' + global_conf["__file__"])
+    app = ConfigMiddleware(app, config.copy())
 
     # app = CgitbMiddleware(app)
     app = ErrorMiddleware(app, debug=True)

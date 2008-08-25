@@ -56,10 +56,13 @@ class Controller(Decorator):
     which has to be overloaded by the controller implementations.
     """
 
+    def call(self, *a, **kw):
+        return self.func(*a, **kw) 
+
     def wrapper(self, *a, **kw):
         
         # Execute controller and get its result
-        result = self.func(*a, **kw)
+        result = self.call(*a, **kw)        
         log.debug("Controller call %r (%r %r) = %r", self.func, a, kw, repr(result)[:40])
 
         # Ask render what to do with it
