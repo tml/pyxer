@@ -67,6 +67,7 @@ class PyxerApp(object):
                     environ['paste.registry'].register(session, environ['beaker.session'])
                 else:
                     environ['paste.registry'].register(session, None)
+                environ['paste.registry'].register(config, environ.get("paste.config", {}))
                     
             #module_parts = parts
             #module_name = ".".join(base + module_parts)
