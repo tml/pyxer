@@ -78,6 +78,20 @@ def index():
 <strong>@controller</strong>
 def index():
     return &quot;Hello World&quot;</pre>
+<h3>@expose</h3>
+<p>This controller adds the GET and POST parameters as arguments to the function call (like in CherryPy):</p>
+<pre><strong>from pyxer.base import *</strong>
+
+<strong>@expose</strong>
+def index(name=&quot;unknown&quot;):
+    return &quot;Your name is &quot; + name </pre>
+<h3>default()</h3>
+<p>If the matching controller can not be found the one called &quot;default&quot; will be called:</p>
+<pre><strong>from pyxer.base import *</strong>
+
+<strong>@controller</strong>
+def default():
+    return &quot;This is path: &quot; + request.path</pre>
 <h2>Using templates </h2>
 <p>This example can be called like <code>/</code> or <code>/index</code>.
   To use a Pyxer template with this file you may use the <code>render()</code> function or just return <code>None</code> (that is the same as not
@@ -222,6 +236,10 @@ assert ('&lt;body' in res)
 <p>xxx</p>
 <h2>Use Google App Engine Launcher on Mac OS</h2>
 <p>xxx </p>
+<h2>Configuration</h2>
+<p>The configuration file has to be in the same directory like the <code>development.ini</code> file and hast to be called <code>pyxer.ini</code>. Example: </p>
+<pre>[pyxer]
+session = beaker </pre>
 <h1>Engines</h1>
 <p>XXX</p>
 <p><em>Pyxer</em> uses support different so called &quot;engines&quot;
@@ -229,6 +247,8 @@ assert ('&lt;body' in res)
   prepare environment to work fine. These are very specific to each of
   these engines and <em>Pyxer</em> tries to make the setup as easy as
   possible</p>
+<h2>WSGI</h2>
+<pre><em>$</em> pyxer serve </pre>
 <h2>Paster</h2>
 <pre><em>$</em> xpaster serve --reload </pre>
 <h2> Google Appengine</h2>

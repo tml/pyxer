@@ -18,6 +18,7 @@ h = StackedObjectProxy(name="H")
 request = req = StackedObjectProxy(name="Request")
 response = resp = StackedObjectProxy(name="Response")
 session = StackedObjectProxy(name="Session")
+config = StackedObjectProxy(name="Config")
 
 class Decorator(object):
 
