@@ -178,7 +178,7 @@ def make_app(global_conf={}, **app_conf):
         import ConfigParser
         conf = ConfigParser.SafeConfigParser()
         conf.read(os.path.join(os.path.dirname(global_conf["__file__"]), "pyxer.ini"))
-        conf = dict(config.items("pyxer"))        
+        conf = dict(conf.items("pyxer"))        
         log.debug("Config: %r", conf)
     except:
         log.exception("Config file not found")

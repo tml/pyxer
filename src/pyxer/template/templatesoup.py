@@ -14,14 +14,15 @@ import re
 import string
 import sys
 import types
+import re
+try:
+    import StringIO
+except:
+    import cStringIO as StringIO
+
 log = logging.getLogger(__name__)
 
 from BeautifulSoup import *
-import StringIO
-import re
-
-import logging
-log = logging.getLogger(__name__)
 
 # _commands = re.compile(u"\&lt;\%(.*?)\%\&gt;", re.M)
 _vars = re.compile(u"""
@@ -52,7 +53,7 @@ class PyxerSoup(BeautifulSoup):
     def byid(self, name):
         res = self.findAll(id=name)
         if len(res)==1:
-            return res[0].contents
+            return res[0].contents[:]   # ! makes a copy
         return None
 
 class CodeGenerator(object):
@@ -107,15 +108,17 @@ class CodeGenerator(object):
             out.append("%4d: %s" % (n+1, self.code[n].replace("\t", "    ")))
         return "\n".join(out)
 
-# tree = etree.parse(input, PyxerTreeBuilder())
-#for node in tree:
-#    print "#", len(node)
-
 class TemplateSoup(object):
 
-    def __init__(self, source, html5=False, strict=True):
+    """
+    Yet another templating system based on BeautyfulSoup
+    """
+
+    def __init__(self, source, html5=False, strict=True, debug=True):
         self.strict = strict
         self.html5 = html5
+        self.debug = debug
+        self.code = None
         self.bytecode = None
         self.sourcecode = u""
         self.layout = []
@@ -123,6 +126,12 @@ class TemplateSoup(object):
         self.parse(source)
         self.generateCode()
         self.generateByteCode()
+
+        # Save memory
+        if not self.debug:
+            self.code = None
+            self.sourcecode = None
+            self.sourcecode = None
 
     def parse(self, source):
         self.source = source
@@ -178,10 +187,15 @@ class TemplateSoup(object):
 
     def render(self, vars={}, encoding="utf8", parent=None):
 
+        # For referencing
+        if not vars.has_key("top"):
+            vars["top"] = None
+
         # Prepare context
         context = Dict(vars)
         context.update(
             add=add,
+            fromid=fromid,
             PyxerSoup=PyxerSoup,
             HTML=PyxerSoup,
             XML=PyxerSoup,
@@ -263,7 +277,8 @@ class TemplateSoup(object):
                 pyStrip = self.getAttr(node, "strip")
 
                 pyExtends = self.getAttr(node, "extends")               # XXX todo
-                pyLayout = self.getAttr(node, "layout")                 # XXX todo
+                pyLayout = self.getAttr(node, "layout")
+                pyFromid = self.getAttr(node, "fromid")
 
                 if pyExtends:
                     self.extends.append(pyExtends)
@@ -299,13 +314,38 @@ class TemplateSoup(object):
                         # pyWith
                     )
 
-                if pyReplace or pyStrip:
+                if (pyReplace) or pyStrip:
                     pyStrip = True
                 else:
+                    attrs = []
+                    for name, value in node.attrs:
+
+                        pos = 0
+                        expr = []
+                        for m in _vars.finditer(value):
+                            cmd = m.group(1)
+                            if cmd != "$":
+                                if cmd.startswith("{"):
+                                    cmd = cmd[1:-1].strip()
+                                if value[pos:m.start()]:
+                                    expr.append(repr(unicode(value[pos:m.start()])))
+                                expr.append(self.checkSyntax("unicode(%s)" % cmd))
+                            else:
+                                expr.append(repr(u"$"))
+                                # Escaped dollar $$ -> $
+                            pos = m.end()
+                        if value[pos:]:
+                            expr.append(repr(unicode(value[pos:])))
+
+                        attrs.append("(%r, %s)" % (name, " + ".join(expr)))
+
                     self.code.line(
-                        "node = Tag(soup, %r, %r)" % (node.name, node.attrs),
+                        "node = Tag(soup, %r, [%s])" % (node.name, ", ".join(attrs)),
                         "parent.append(node)",
                     )
+
+                if pyFromid:
+                    pyContent = "fromid(%r, top, soup)" % pyFromid
 
                 if pyStrip and pyContent:
                     pyReplace = pyContent
@@ -392,7 +432,7 @@ class TemplateSoup(object):
             # This must be an error!
             else:
                 # print "XXX", type(node), repr(node)
-                raise "Unknown element"
+                raise "Unknown element of type %r: %r" % (type(node), node)
 
             # Next level
             if hasattr(node, "contents") and not(pyContent or pyReplace):
@@ -415,6 +455,13 @@ class TemplateSoup(object):
                 lines = self.code.code
                 self.code = code_backup
                 self.code.code = lines + self.code.code
+
+def fromid(name, *soups):
+    for soup in soups:
+        res = soup.findAll(id=name)
+        if len(res)==1:
+            return res[0].contents
+    return None
 
 def add(parent, value):
     try:
@@ -441,9 +488,11 @@ if __name__=="__main__":
         return TemplateSoup("""
         <html>
             <head>
-                <title>Great!</title>
+                <title  data="$add test">Great!</title>
             </head>
-            <strong py:content="top.byid('test')">$demo</strong>
+            <body>
+                <div py:fromid="test">$demo</div>
+            </body>
         </html>
         """)
 
@@ -464,7 +513,7 @@ if __name__=="__main__":
     """)
     ts = TemplateSoup("""
     <html py:layout="layout(123)">
-        <body id="test">
+        <body id="test" data="$add test">
             Here we go!
         </body>
     </html>
