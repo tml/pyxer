@@ -152,19 +152,17 @@ def index():
 <p>Be aware that Pyxer first needs to fix the paths to be relative instead of absolute to make them work on the GAE environment. If you choose not to use Pyxer for uploading you have to do this fix up explicitly <strong>before</strong> you upload your applikation, like this:</p>
 <pre><em>$</em> xgae fix </pre>
 <h1>Templating</h1>
-<p>XXX Kid or how to configure </p>
-<p>DEPRECATED:</p>
 <p><em>Pyxer</em> offers yet another templating language that is very close to
   Genshi and Kid. As the former did not work with Google AppEngine at
   the moment of birth of <em>Pyxer</em> the new templating tools had been
   implemented. It is based on BeautyfulSoup.</p>
-<h3>Variables and expressions</h3>
+<h2>Variables and expressions</h2>
 <p>The default templating works similar to most known other
   templating languages. Variables and expressions are realized like <code>$&lt;varname&gt;</code> (where <code>&lt;varname&gt;</code> may
   contain dots!) and <code>${&lt;expression&gt;}</code>:</p>
 <pre>Hello <strong>${name.capitalize()}</strong>, you won <strong>$price</strong>.
 <strong>$item.amount</strong> times <strong>$item.name</strong>.</pre>
-<h3> Commands</h3>
+<h2> Commands</h2>
 <p>Commands are the same as used by Python. The only difference is,
   that you have to tell that a block ends by calling the command <code>end</code> (not needed for <code>else</code> and <code>elif</code>):</p>
 <pre><strong>&lt;% def address(name): %&gt;</strong>
@@ -178,7 +176,7 @@ def index():
 &lt;% for name in ['Tom', 'Fred']: %&gt;</strong>
   ${ address(name) }
 <strong>&lt;% end %&gt;</strong></pre>
-<h3> Includes and extends</h3>
+<h2> Includes and extends</h2>
 <p>You can insert content of other templates by using &ldquo;include&rdquo;:</p>
 <pre>&lt;% include(filename) %&gt;</pre>
 <p> More sophisticated is the extension of a file. </p>
@@ -193,13 +191,15 @@ File &ldquo;a.html&rdquo;
 <address>
 File &ldquo;b.html&rdquo;
 </address>
-<h3>HTML Attriutes</h3>
+<h2>HTML Attriutes</h2>
 <p>These are also known form many templating languages like Genshi.
   They are used like this:</p>
 <pre>&lt;div <strong>py:if=&rdquo;name.startswith('tom ')&rdquo;</strong>&gt;Welcome $name&lt;/div&gt;</pre>
 <p> xxx</p>
 <pre>&lt;div <strong>py:for=&rdquo;name in sorted(c.listOfNames)&rdquo;</strong>&gt;Welcome $name&lt;/div&gt;</pre>
 <p> xxx</p>
+<h2>XPath Support</h2>
+<p>If you want to use XPath within or on the template you may use bsoupxpath.py from <a href="http://www3.itu.edu.tr/~uyar/bsoupxpath/">http://www3.itu.edu.tr/~uyar/bsoupxpath/</a>.</p>
 <h1>Advanced</h1>
 <h2>Python virtual environment </h2>
 <p>To make deployment of GAE projects easy a virtual environment (VM) is created. If you start GAE via <code>xgae</code> or paster via <code>xpaster</code> these virtual environments will automatically be used. Pyxer determines the root of the VM by looking for the <code>app.yaml</code> file. If you have to enter the VM for installing packages or for other reasons you may to it like this:</p>
