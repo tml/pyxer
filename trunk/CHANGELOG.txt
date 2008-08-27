@@ -1,11 +1,12 @@
 CHANGELOG
 =========
 
-Version 0.5.2, 2008-08-xxx
+Version 0.6.0, 2008-08-xxx
 
+- NEW: New templating language based on BeautifulSoup
 - NEW: Additional controller type '@expose'
 - NEW: Special method 'default' for handling all
-- NEW: Config file "pyxer.ini" 
+- NEW: Config file "pyxer.ini"
 - BUG: Many small fixes
 
 Version 0.5.1, 2008-08-15
