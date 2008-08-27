@@ -19,7 +19,7 @@ import os.path
 import types
 
 from pyxer.utils.jsonhelper import json
-from pyxer.controller import Controller, isController, c, g, h, session, response, request, resp, req
+from pyxer.controller import Controller, isController, c, g, h, config, session, response, request, resp, req
 
 import logging
 log = logging.getLogger(__file__)
@@ -47,6 +47,18 @@ def render_pyxer(*kw):
 
     #tmpl = genshi_loader.load(template)
     #return tmpl.generate(c=c).render('xhtml', doctype='xhtml')
+
+def render_soup(*kw):
+    import pyxer.template as pyxtemp 
+    pyxtemp = reload(pyxtemp)
+    path = request.template_url
+    # path = os.path.join(os.getcwd(), 'public', path)
+    log.debug("Loading template %r", path)
+    template = pyxtemp.TemplateSoup(file(path, "r").read())
+    # print template.source.encode("latin1","ignore")
+    log.debug("%s", template.sourcecode)
+    soup = template.render(dict(c=c), encoding="utf8")
+    return str(soup)
 
 class KidTemplateManager:
     

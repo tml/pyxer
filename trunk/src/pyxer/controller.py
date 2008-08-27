@@ -53,7 +53,7 @@ class Decorator(object):
 class Controller(Decorator):
 
     """
-    The oveloaded wrapper method prepares usual stuff and then calls render
+    The overloaded wrapper method prepares usual stuff and then calls render
     which has to be overloaded by the controller implementations.
     """
 

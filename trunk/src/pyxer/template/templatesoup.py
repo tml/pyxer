@@ -47,6 +47,14 @@ class Dict(dict):
     def __setattr__(self, name, value):
         self[name] = value
 
+class PyxerSoup(BeautifulSoup):
+
+    def byid(self, name):
+        res = self.findAll(id=name)
+        if len(res)==1:
+            return res[0].contents
+        return None
+
 class CodeGenerator(object):
 
     level = 0
@@ -93,6 +101,12 @@ class CodeGenerator(object):
         for n in range(0, len(self.code)):
             print "%4d:" % (n+1), self.code[n]
 
+    def pretty(self):
+        out = []
+        for n in range(0, len(self.code)):
+            out.append("%4d: %s" % (n+1, self.code[n].replace("\t", "    ")))
+        return "\n".join(out)
+
 # tree = etree.parse(input, PyxerTreeBuilder())
 #for node in tree:
 #    print "#", len(node)
@@ -104,6 +118,8 @@ class TemplateSoup(object):
         self.html5 = html5
         self.bytecode = None
         self.sourcecode = u""
+        self.layout = []
+        self.extends = []
         self.parse(source)
         self.generateCode()
         self.generateByteCode()
@@ -118,7 +134,7 @@ class TemplateSoup(object):
             parser = html5lib.HTMLParser(tree=html5lib.treebuilders.getTreeBuilder("beautifulsoup"))
             self.soup = parser.parse(StringIO.StringIO(self.source))
         else:
-            self.soup = BeautifulSoup(self.source)
+            self.soup = PyxerSoup(self.source)
         return self.soup
 
     def generateCode(self):
@@ -126,13 +142,13 @@ class TemplateSoup(object):
         self.code_line = 1
 
         # Create code
-        self.code.line(
-            "from BeautifulSoup import *",
+        #self.code.line(
+            # "from BeautifulSoup import *",
             # "soup = BeautifulSoup()",
-        )
-        self.code.start_block("def main(soup):")
+        #)
+        self.code.start_block("def main():")
         self.code.line(
-            "parent = soup",
+            "soup = parent = node = PyxerSoup()",
         )
 
         try:
@@ -159,21 +175,36 @@ class TemplateSoup(object):
 
     def generateByteCode(self):
         self.bytecode = compile(self.sourcecode, "<string>", "exec")
-        return self.bytecode
 
     def render(self, vars={}, encoding="utf8", parent=None):
+
         # Prepare context
         context = Dict(vars)
         context.update(
-            element=element,
-            HTML=BeautifulSoup,
-            XML=BeautifulSoup,
+            add=add,
+            PyxerSoup=PyxerSoup,
+            HTML=PyxerSoup,
+            XML=PyxerSoup,
+            Tag=Tag,
+            CData=CData,
+            Comment=Comment,
+            NavigableString=NavigableString,
+            Declaration=Declaration,
             )
+
         # print context.keys()
-        soup = BeautifulSoup()
+        soup = None
         try:
             exec(self.bytecode, context)
-            context["main"](soup)
+            soup = context["main"]()
+            context["top"] = soup
+
+            # Applying the layouts
+            for layout in self.layout:
+                template = eval(layout, context)
+                if isinstance(template, TemplateSoup):
+                    soup = template.render(context, encoding, parent)
+
         except:
             # XXX must become more Python conform
             error = inspect.trace()[-1][0].f_locals.get("error", None)
@@ -194,45 +225,65 @@ class TemplateSoup(object):
         if node.has_key("py:" + name):
             value = node["py:" + name]
             del node["py:" + name]
-        if node.has_key(name):
+        # Only <meta> has an 'content' attribute
+        if node.name != "meta" and name != "content" and node.has_key(name):
             if value is not None:
                 raise "Attribute %s is defined twice"
             value = node[name]
             del node[name]
         return value
 
-    def checkSyntax(self, value):
+    def checkSyntax(self, value, mode="eval"):
         if self.strict:
-            compile(value, "<string>", "eval")
+            try:
+                compile(value, "<string>", mode)
+            except SyntaxError, msg:
+                raise SyntaxError, str(msg) + " in expression %s" % value
         return value
 
     def loop(self, nodes, depth=0):
         for node in nodes:
             indent = 0
+            pyDef = None
 
             # Handle tags
             if isinstance(node, Tag):
 
-                # For error handling
-                self.code.line(
-                    "error = (%d, %r)" % (self.code_line, unicode(node)[:60])
-                    )
-
                 pyDef = self.getAttr(node, "def")
-                pyMatch = self.getAttr(node, "match")
-                # pyWhen = self.getAttr(node, "when")
-                # pyOtherwise = self.getAttr(node, "otherwise")
+                pyMatch = self.getAttr(node, "match")                   # XXX todo
+                pyWhen = self.getAttr(node, "when")                     # XXX todo
+                pyOtherwise = self.getAttr(node, "otherwise")           # XXX todo
                 pyFor = self.getAttr(node, "for")
                 pyIf = self.getAttr(node, "if")
-                pyChoose = self.getAttr(node, "choose")
+                pyChoose = self.getAttr(node, "choose")                 # XXX todo
                 pyWith = self.getAttr(node, "with")
                 pyReplace = self.getAttr(node, "replace")
                 pyContent = self.getAttr(node, "content")
                 pyAttrs = self.getAttr(node, "attrs")
                 pyStrip = self.getAttr(node, "strip")
 
-                pyExtends = self.getAttr(node, "extends")
-                pyLayout = self.getAttr(node, "layout")
+                pyExtends = self.getAttr(node, "extends")               # XXX todo
+                pyLayout = self.getAttr(node, "layout")                 # XXX todo
+
+                if pyExtends:
+                    self.extends.append(pyExtends)
+
+                if pyLayout:
+                    self.layout.append(pyLayout)
+
+                if pyDef:
+                    self.code, code_backup = CodeGenerator(), self.code
+                    if not pyDef.strip().endswith(")"):
+                        pyDef += "()"
+                    self.code.start_block("def %s:" % pyDef)
+                    self.code.line(
+                        "soup = parent = node = PyxerSoup()"
+                    )
+
+                # For error handling
+                self.code.line(
+                    "error = (%d, %r)" % (self.code_line, unicode(node)[:60])
+                    )
 
                 if pyFor:
                     self.code.start_block("for %s:" % self.checkSyntax(pyFor))
@@ -241,6 +292,12 @@ class TemplateSoup(object):
                 if pyIf:
                     self.code.start_block("if %s:" % self.checkSyntax(pyIf))
                     indent += 1
+
+                if pyWith:
+                    self.code.line(
+                        self.checkSyntax(pyWith, "exec"),
+                        # pyWith
+                    )
 
                 if pyReplace or pyStrip:
                     pyStrip = True
@@ -256,16 +313,14 @@ class TemplateSoup(object):
 
                 if pyReplace:
                     self.code.line(
-                        "value = element(%s)" % self.checkSyntax(pyReplace),
-                        # "print '#', type(value)",
-                        "parent.append(value)",
+                        "add(parent, %s)" % self.checkSyntax(pyReplace),
                         )
 
                 elif pyContent:
                     self.code.line(
-                        "value = element(%s)" % self.checkSyntax(pyContent),
+                        "add(node, %s)" % self.checkSyntax(pyContent),
                         # "print '#', type(value)",
-                        "node.append(value)",
+                        # "node.append(value)",
                         )
 
                 if pyAttrs and not pyStrip:
@@ -295,10 +350,12 @@ class TemplateSoup(object):
                         "parent.append(node)",
                     )
                 elif isinstance(node, Comment):
-                    self.code.line(
-                        "node = Comment(%r)" % NavigableString.__str__(node),
-                        "parent.append(node)",
-                    )
+                    value = NavigableString.__str__(node)
+                    if not value.startswith("!"):
+                        self.code.line(
+                            "node = Comment(%r)" % value,
+                            "parent.append(node)",
+                        )
                 else:
 
                     # Handle ${...}
@@ -315,9 +372,9 @@ class TemplateSoup(object):
                                     "parent.append(node)",
                                 )
                             self.code.line(
-                                "value = element(%s)" % self.checkSyntax(cmd),
+                                "add(parent, %s)" % self.checkSyntax(cmd),
                                 # "node = NavigableString(value)",
-                                "parent.append(value)",
+                                # "parent.append(value)",
                             )
                         else:
                             # Escaped dollar $$ -> $
@@ -338,7 +395,7 @@ class TemplateSoup(object):
                 raise "Unknown element"
 
             # Next level
-            if hasattr(node, "contents") and not(pyContent or pyReplace or pyStrip):
+            if hasattr(node, "contents") and not(pyContent or pyReplace):
                 self.code.line(
                     "parent = node",
                 )
@@ -350,37 +407,78 @@ class TemplateSoup(object):
             for i in range(indent):
                 self.code.end_block()
 
-def element(value):
+            if pyDef:
+                self.code.line(
+                    "return soup"
+                )
+                self.code.end_block()
+                lines = self.code.code
+                self.code = code_backup
+                self.code.code = lines + self.code.code
+
+def add(parent, value):
     try:
         if type(value) is types.FunctionType:
             value = value()
         if value is None:
-            return NavigableString(u'')
-        if isinstance(value, Tag):
-            return value
-        return NavigableString(unicode(value))
+            return
+        if isList(value):
+            for node in value:
+                parent.append(node)
+            return
+        if not isinstance(value, Tag):
+            value = unicode(value)
+        node = NavigableString(value)
+        parent.append(node)
     except Exception, e:
         log.exception("element error")
-        return NavigableString(unicode(e))
-    return NavigableString(u'')
+        node = NavigableString(unicode(e))
+        parent.append(node)
 
 if __name__=="__main__":
 
+    def layout(name):
+        return TemplateSoup("""
+        <html>
+            <head>
+                <title>Great!</title>
+            </head>
+            <strong py:content="top.byid('test')">$demo</strong>
+        </html>
+        """)
+
     ts = TemplateSoup("""
-    <div py:content="y"></div>
+    <html py:layout1="layout(123)">
+    <div py:with="a=1; b=2">$a $b</div>
+    <div py:def="demo" py:strip="1">Hier ist was drin</div>
     <hr />
-    xxx
+    $demo
+    <!-- Comment -->
+    <!--! Comment -->
+    <div id="super">
+        Super important
+    </div>
+    End
+    <div py:content="soup.findAll(id='super')[0].contents">Ersetzen!</div>
+    </html>
     """)
-    print ts.sourcecode
-    print ts.render(dict(x=1))
+    ts = TemplateSoup("""
+    <html py:layout="layout(123)">
+        <body id="test">
+            Here we go!
+        </body>
+    </html>
+    """)
+    print ts.code.pretty()
+    soup = ts.render(dict(x=1, layout=layout))
+
+    print 40*"-"
+    print soup.prettify()
 
     if 0:
         mod = TemplateSoup(data2, html5=True)
         mod.code.debug()
         exec(str(mod.code), dict(
-            element=element,
-            HTML=BeautifulSoup,
-            XML=BeautifulSoup,
             x=1,
             samples=[
                 ("Home", "/"),

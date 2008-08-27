@@ -127,7 +127,8 @@ class PyxerApp(object):
     
                     # Does the function exist?
                     func = getattr(module, action, None)
-    
+                    name = action
+                    
                     if not func:                    
                         # Test for 'default'
                         action = "default"
@@ -144,7 +145,7 @@ class PyxerApp(object):
                             #request.template_url = action + ".html"
                              
                             request.start_response = start_response          
-                            request.template_url = os.path.join(os.path.dirname(module.__file__), action + ".html")
+                            request.template_url = os.path.join(os.path.dirname(module.__file__), name + ".html")
                             
                             return func()
     
@@ -175,20 +176,19 @@ def make_app(global_conf={}, **app_conf):
 
     try:
         import ConfigParser
-        config = ConfigParser.SafeConfigParser()
-        config.read(os.path.join(os.path.dirname(global_conf["__file__"]), "pyxer.ini"))
-        config = dict(config.items("pyxer"))
-        
-        log.debug("Config: %r", config)
+        conf = ConfigParser.SafeConfigParser()
+        conf.read(os.path.join(os.path.dirname(global_conf["__file__"]), "pyxer.ini"))
+        conf = dict(config.items("pyxer"))        
+        log.debug("Config: %r", conf)
     except:
         log.exception("Config file not found")
-        config = {}
+        conf = {}
         
     base = os.path.join(os.getcwd(), "public")
     # app = App(global_conf=None, root="public", path=None, **app_conf)
     app = PyxerApp()
     
-    if SessionMiddleware and (config.get("session", "beaker")=="beaker"):
+    if SessionMiddleware and (conf.get("session", "beaker")=="beaker"):
         log.debug("Beaker sessions")
         if "google.appengine" in sys.modules:
             app = SessionMiddleware(app, type='google', table_name='PyxerSession')
@@ -202,7 +202,8 @@ def make_app(global_conf={}, **app_conf):
     #conf.update(dict(app_conf=app_conf, global_conf=global_conf))
     # CONFIG.push_process_config(conf)
     #conf = paste.deploy.appconfig('config:' + global_conf["__file__"])
-    app = ConfigMiddleware(app, config.copy())
+    
+    app = ConfigMiddleware(app, conf.copy())
 
     # app = CgitbMiddleware(app)
     app = ErrorMiddleware(app, debug=True)
