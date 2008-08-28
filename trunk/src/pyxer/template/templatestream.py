@@ -205,14 +205,14 @@ class TemplateSoup(object):
         #)
 
         self.sourcecode = unicode(self.code)
-        if self.debug:
-            print self.code.pretty()
+        #if self.debug:
+        #    print self.code.pretty()
 
     def generateByteCode(self):
         self.bytecode = compile(self.sourcecode, "<string>", "exec")
 
     def generate(self, vars={}):
-        import pprint
+        # import pprint
 
         # For referencing
         if not vars.has_key("top"):
@@ -230,7 +230,7 @@ class TemplateSoup(object):
             exec(self.bytecode, context)
 
             stream = context["main"]()
-            pprint.pprint(list(stream))
+            # pprint.pprint(list(stream))
             context["top"] = stream
 
             # Applying the layouts
@@ -261,7 +261,7 @@ class TemplateSoup(object):
 
     def render(self, encoding="utf8"):
         if self.stream:
-            return self.stream.render("html", strip_whitespace=True)
+            return self.stream.render("xhtml", strip_whitespace=True)
 
     __str__ = render
 
@@ -270,16 +270,17 @@ class TemplateSoup(object):
         value = None
         kind, data, pos = node
         if kind == START:
-            attr = data[1]
-            if name in attr:
-                value = attr.get(name)
-                node[1] = (data[0], attr - name)
-            name = "py:" + name
-            if name in attr:
-                if value is not None:
-                    raise "Attribute %s is defined twice"
-                value = attr.get(name)
-                node[1] = (data[0], attr - name)
+            if not (data[0].lower()=="meta" and name=="content"):
+                attr = data[1]
+                if name in attr:
+                    value = attr.get(name)
+                    node[1] = (data[0], attr - name)
+                name = "py:" + name
+                if name in attr:
+                    if value is not None:
+                        raise "Attribute %s is defined twice"
+                    value = attr.get(name)
+                    node[1] = (data[0], attr - name)
         return value
 
     def checkSyntax(self, value, mode="eval"):
