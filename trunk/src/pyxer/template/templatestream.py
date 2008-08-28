@@ -22,7 +22,8 @@ except:
 
 log = logging.getLogger(__name__)
 
-from BeautifulSoup import *
+from genshi import XML, HTML, Stream, QName, Attrs
+from genshi.core import START, END, TEXT
 
 # _commands = re.compile(u"\&lt;\%(.*?)\%\&gt;", re.M)
 _vars = re.compile(u"""
@@ -47,14 +48,6 @@ class Dict(dict):
 
     def __setattr__(self, name, value):
         self[name] = value
-
-class PyxerSoup(BeautifulSoup):
-
-    def byid(self, name):
-        res = self.findAll(id=name)
-        if len(res)==1:
-            return res[0].contents[:]   # ! makes a copy
-        return None
 
 class CodeGenerator(object):
 
@@ -137,13 +130,13 @@ class TemplateSoup(object):
         self.source = source
 
         # Parse source
-        if self.html5:
+        if 0: # self.html5:
             import html5lib
             import html5lib.treebuilders
             parser = html5lib.HTMLParser(tree=html5lib.treebuilders.getTreeBuilder("beautifulsoup"))
             self.soup = parser.parse(StringIO.StringIO(self.source))
         else:
-            self.soup = PyxerSoup(self.source)
+            self.soup = HTML(self.source)
         return self.soup
 
     def generateCode(self):
@@ -151,13 +144,13 @@ class TemplateSoup(object):
         self.code_line = 1
 
         # Create code
-        #self.code.line(
-            # "from BeautifulSoup import *",
-            # "soup = BeautifulSoup()",
-        #)
+        self.code.line(
+            "from genshi import XML, HTML, Stream, QName, Attrs",
+            "from genshi.core import START, END, TEXT",
+        )
         self.code.start_block("def main():")
         self.code.line(
-            "soup = parent = node = PyxerSoup()",
+            "stream = []",
         )
 
         try:
@@ -170,7 +163,7 @@ class TemplateSoup(object):
             raise
 
         self.code.line(
-            "return soup"
+            "return stream"
         )
 
         self.code.end_block()
@@ -188,6 +181,7 @@ class TemplateSoup(object):
         self.bytecode = compile(self.sourcecode, "<string>", "exec")
 
     def render(self, vars={}, encoding="utf8", parent=None):
+        import pprint
 
         # For referencing
         if not vars.has_key("top"):
@@ -197,57 +191,59 @@ class TemplateSoup(object):
         context = Dict(vars)
         context.update(
             add=add,
-            fromid=fromid,
-            inner=inner,
-            PyxerSoup=PyxerSoup,
-            HTML=PyxerSoup,
-            XML=PyxerSoup,
-            Tag=Tag,
-            CData=CData,
-            Comment=Comment,
-            NavigableString=NavigableString,
-            Declaration=Declaration,
             )
 
         # print context.keys()
-        soup = None
+        stream = None
         try:
             exec(self.bytecode, context)
-            soup = context["main"]()
-            context["top"] = soup
+
+            result = context["main"]()
+            pprint.pprint(list(result))
+
+            stream = Stream(list(result))
+            context["top"] = stream
 
             # Applying the layouts
-            for layout in self.layout:
-                template = eval(layout, context)
-                if isinstance(template, TemplateSoup):
-                    soup = template.render(context, encoding, parent)
+            #for layout in self.layout:
+            #    template = eval(layout, context)
+            #    if isinstance(template, TemplateSoup):
+            #        soup = template.render(context, encoding, parent)
 
         except:
             # XXX must become more Python conform
-            error = inspect.trace()[-1][0].f_locals.get("error", None)
-            if not error:
-                raise
-            exc_info = sys.exc_info()
-            e = exc_info[1]
-            if getattr(e, 'args', None):
-                arg0 = e.args[0]
-            else:
-                arg0 = str(e)
-            msg = arg0 + "\nError in template line %d: %s" % error
-            raise exc_info[0], msg, exc_info[2]
-        return soup
+            #error = inspect.trace()[-1][0].f_locals.get("error", None)
+            #if not error:
+            #    raise
+            #exc_info = sys.exc_info()
+            #e = exc_info[1]
+            #if getattr(e, 'args', None):
+            #    arg0 = e.args[0]
+            #else:
+            #    arg0 = str(e)
+            #msg = arg0 + "\nError in template line %d: %s" % error
+            #raise exc_info[0], msg, exc_info[2]
+            raise
+
+        # pprint.pprint(list(stream))
+
+        return stream.render("html", strip_whitespace=True)
 
     def getAttr(self, node, name):
+        name = unicode(name)
         value = None
-        if node.has_key("py:" + name):
-            value = node["py:" + name]
-            del node["py:" + name]
-        # Only <meta> has an 'content' attribute
-        if node.name != "meta" and name != "content" and node.has_key(name):
-            if value is not None:
-                raise "Attribute %s is defined twice"
-            value = node[name]
-            del node[name]
+        kind, data, pos = node
+        if kind == START:
+            attr = data[1]
+            if name in attr:
+                value = attr.get(name)
+                node[1] = (data[0], attr - name)
+            name = "py:" + name
+            if name in attr:
+                if value is not None:
+                    raise "Attribute %s is defined twice"
+                value = attr.get(name)
+                node[1] = (data[0], attr - name)
         return value
 
     def checkSyntax(self, value, mode="eval"):
@@ -258,14 +254,31 @@ class TemplateSoup(object):
                 raise SyntaxError, str(msg) + " in expression %s" % value
         return value
 
-    def loop(self, nodes, depth=0):
-        for node in nodes:
+    def addElement(self, kind, data, pos):
+        self.code.line("stream.append((%s, %r, %r))" % (kind, data, pos))
+
+    def loop(self, input, depth=0):
+
+        stack = []
+        path = []
+
+        for node in input:
+
+            # Make node changeable
+            node = list(node)
+
+            # Split all informations
+            kind, data, position = node
+
+            # Set some defaults
             indent = 0
             pyDef = None
+            show = not (len(path) and path[-1][2])
 
             # Handle tags
-            if isinstance(node, Tag):
+            if kind == START:
 
+                # Get commands and strip attribute
                 pyDef = self.getAttr(node, "def")
                 pyMatch = self.getAttr(node, "match")                   # XXX todo
                 pyWhen = self.getAttr(node, "when")                     # XXX todo
@@ -283,6 +296,9 @@ class TemplateSoup(object):
                 pyLayout = self.getAttr(node, "layout")
                 pyFromid = self.getAttr(node, "fromid")
 
+                # get modified attributes
+                attr = node[1][1]
+
                 if pyExtends:
                     self.extends.append(pyExtends)
 
@@ -290,17 +306,18 @@ class TemplateSoup(object):
                     self.layout.append(pyLayout)
 
                 if pyDef:
-                    self.code, code_backup = CodeGenerator(), self.code
+                    stack.append(self.code)
+                    self.code = CodeGenerator()
                     if not pyDef.strip().endswith(")"):
                         pyDef += "()"
                     self.code.start_block("def %s:" % pyDef)
                     self.code.line(
-                        "soup = parent = node = PyxerSoup()"
+                        "stream = []"
                     )
 
                 # For error handling
                 self.code.line(
-                    "error = (%d, %r)" % (self.code_line, unicode(node)[:60])
+                    "error = " + repr(position)
                     )
 
                 if pyFor:
@@ -321,7 +338,7 @@ class TemplateSoup(object):
                     pyStrip = True
                 else:
                     attrs = []
-                    for name, value in node.attrs:
+                    for name, value in attr:
                         pos = 0
                         expr = []
                         for m in _vars.finditer(value):
@@ -338,13 +355,20 @@ class TemplateSoup(object):
                             pos = m.end()
                         if value[pos:]:
                             expr.append(repr(unicode(value[pos:])))
-
                         attrs.append("(%r, %s)" % (name, " + ".join(expr) or 'u""'))
 
-                    self.code.line(
-                        "node = Tag(soup, %r, [%s], parent)" % (node.name, ", ".join(attrs)),
-                        "parent.append(node)",
-                    )
+
+                    newattr = "Attrs([%s])" % ", ".join(attrs)
+                    if pyAttrs:
+                        newattr += " | [(QName(k), unicode(v)) for k, v in dict(%s).items()]" % self.checkSyntax(pyAttrs)
+
+                    element = (START, "(%r, %s)" % (data[0], newattr), position)
+                    self.code.line("stream.append((%s, %s, %r))" % element)
+
+                    #self.code.line(
+                    #    "node = Tag(soup, %r, [%s], parent)" % (node, ", ".join(attrs)),
+                    #    "parent.append(node)",
+                    #)
 
                 if pyFromid:
                     pyContent = "fromid(%r, top, soup)" % pyFromid
@@ -355,204 +379,124 @@ class TemplateSoup(object):
 
                 if pyReplace:
                     self.code.line(
-                        "add(parent, %s)" % self.checkSyntax(pyReplace),
+                        "stream += add(%s)" % self.checkSyntax(pyReplace),
                         )
 
                 elif pyContent:
                     self.code.line(
-                        "add(node, %s)" % self.checkSyntax(pyContent),
+                        "stream += add(%s)" % self.checkSyntax(pyContent),
                         # "print '#', type(value)",
                         # "node.append(value)",
                         )
 
-                if pyAttrs and not pyStrip:
+                # Remember usefull states
+                path.append((pyDef, pyStrip, (pyContent or pyReplace), indent))
+
+            elif kind == END:
+
+                # Get states from stack
+                pyDef, pyStrip, pyContent, indent = path.pop()
+
+                if not pyStrip:
+                    self.addElement(kind, data, position)
+
+                for i in range(indent):
+                    self.code.end_block()
+
+                if pyDef:
                     self.code.line(
-                        "attrs = %s" % self.checkSyntax(pyAttrs),
-                        "for key, value in attrs.items(): node[key] = unicode(value)",
-                        )
-
-                # print " " * depth, "<%s> %s" % (node.name, node.attrs)
-
-            # Handle the rest
-            elif isinstance(node, NavigableString):
-
-                # Count line numbers for error reporting
-                self.code_line += unicode(node).count(u'\n')
-
-                if isinstance(node, ProcessingInstruction):
-                    pass
-                elif isinstance(node, Declaration):
-                    self.code.line(
-                        "parent.append(Declaration(%r))" % NavigableString.__str__(node),
+                        "return stream"
                     )
-                elif isinstance(node, CData):
-                    self.code.line(
-                        "parent.append(CData(%r))" % NavigableString.__str__(node),
-                    )
-                elif isinstance(node, Comment):
-                    value = NavigableString.__str__(node)
-                    if not value.startswith("!"):
+                    self.code.end_block()
+                    lines = self.code.code
+                    self.code = stack.pop()
+                    self.code.code = lines + self.code.code
+
+            elif kind == TEXT and show:
+
+                # Handle ${...}
+                pos = 0
+                src = unicode(data)
+                for m in _vars.finditer(src):
+                    if src[pos:m.start()]:
+                        self.addElement(TEXT, unicode(src[pos:m.start()]), position)
+                    cmd = m.group(1)
+                    if cmd == "$":
+                        # Escaped dollar $$ -> $
+                        self.addElement(TEXT, u"$", position)
+                    else:
+                        if cmd.startswith("{"):
+                            cmd = cmd[1:-1].strip()
                         self.code.line(
-                            "parent.append(Comment(%r))" % value,
+                            "stream += add(%s)" % self.checkSyntax(cmd),
                         )
-                else:
+                    pos = m.end()
+                if src[pos:]:
+                    self.addElement(TEXT, unicode(src[pos:]), position)
 
-                    # Handle ${...}
-                    pos = 0
-                    src = unicode(node)
-                    for m in _vars.finditer(src):
-                        if src[pos:m.start()]:
-                            self.code.line(
-                                "parent.append(NavigableString(%r))" % unicode(src[pos:m.start()]),
-                            )
-                        cmd = m.group(1)
-                        if cmd == "$":
-                            # Escaped dollar $$ -> $
-                            self.code.line(
-                                "parent.append(NavigableString(%r))" % u"$",
-                            )
-                        else:
-                            if cmd.startswith("{"):
-                                cmd = cmd[1:-1].strip()
-                            self.code.line(
-                                "add(parent, %s)" % self.checkSyntax(cmd),
-                                # "node = NavigableString(value)",
-                                # "parent.append(value)",
-                            )
-                        pos = m.end()
-                    if src[pos:]:
-                        self.code.line(
-                            "parent.append(NavigableString(%r))" % unicode(src[pos:]),
-                        )
+            elif show:
+                self.addElement(kind, data, position)
 
-            # This must be an error!
-            else:
-                # print "XXX", type(node), repr(node)
-                raise "Unknown element of type %r: %r" % (type(node), node)
-
-            # Next level
-            if hasattr(node, "contents") and not(pyContent or pyReplace):
-                self.code.line(
-                    "parent = node",
-                )
-                self.loop(node, depth + 1)
-                self.code.line(
-                    "parent = parent.parent",
-                )
-
-            for i in range(indent):
-                self.code.end_block()
-
-            if pyDef:
-                self.code.line(
-                    "return soup"
-                )
-                self.code.end_block()
-                lines = self.code.code
-                self.code = code_backup
-                self.code.code = lines + self.code.code
-
-def duplicate(node, soup=None):
-    if soup is None:
-        soup = PyxerSoup()
-    if isinstance(node, Tag):
-        parent = Tag(soup, node.name, node.attrs)
-        soup.append(node)
-    else:
-        soup.append(node)
-    if hasattr(node, "contents"):
-        for subNode in node:
-            duplicate(subNode, parent)
-    return soup
-
-def duplicateInner(node, soup=None):
-    if soup is None:
-        soup = PyxerSoup()
-    if hasattr(node, "contents"):
-        for subNode in node.contents:
-            duplicate(subNode, soup)
-    return soup
-
-def inner(obj):
-    # XXX That's just a workaround becaue we ended in infinite recursion!
-    # print obj.prettify()
-    return duplicate(obj)
-    # return PyxerSoup(unicode(obj)).contents[:]
-
-def fromid(name, *soups):
-    for soup in soups:
-        res = soup.findAll(id=name)
-        if len(res)==1:
-            return res[0].contents
-    return None
-
-def add(parent, value):
+def add(value):
     try:
         if type(value) is types.FunctionType:
             value = value()
         if value is None:
-            return
-        if isList(value):
-            for node in value:
-                print "###", node
-                parent.append(node)
-            return
-        if not isinstance(value, Tag):
-            value = unicode(value)
-        node = NavigableString(value)
-        parent.append(node)
+            return []
+        if isinstance(value, list):
+            return value
+        return [(TEXT, unicode(value), (None, 0, 0))]
     except Exception, e:
         log.exception("element error")
-        node = NavigableString(unicode(e))
-        parent.append(node)
+        return [(TEXT, unicode(e), (None, 0, 0))]
 
 if __name__=="__main__":
 
     if 0:
+        def layout(name):
+            return TemplateSoup("""
+            <html>
+                <head>
+                    <title  data="$add test">Great!</title>
+                </head>
+                <body>
+                    <div content="inner(top.body)"></div>
+                    <hr />
+                </body>
+            </html>
+            """)
+
         ts = TemplateSoup("""
-        <html py:layout1="layout(123)">
-        <div py:with="a=1; b=2">$a $b</div>
-        <div py:def="demo" py:strip="1">Hier ist was drin</div>
-        <hr />
-        $demo
-        <!-- Comment -->
-        <!--! Comment -->
-        <div id="super">
-            Super important
-        </div>
-        End
-        <div py:content="soup.findAll(id='super')[0].contents">Ersetzen!</div>
-        </html>
-        """)
+            <html layout="layout(123)">
+                <body id="test" data="$add test">
+                    Here we go!
+                        <b>Hello</b>
+                    <!-- Comment -->
+                    Ende
+                </body>
+            </html>
+            """)
+        # print ts.code.pretty()
+        soup = ts.render(dict(x=1, layout=layout))
 
-    def layout(name):
-        return TemplateSoup("""
-        <html>
-            <head>
-                <title  data="$add test">Great!</title>
-            </head>
-            <body>
-                <div py:content="inner(top.body)"></div>
-                <hr />
-            </body>
-        </html>
-        """)
-
-    ts = TemplateSoup("""
-        <html py:layout="layout(123)">
-            <body id="test" data="$add test">
-                Here we go!
-                    <b>Hello</b>
-                <!-- Comment -->
-                Ende
-            </body>
-        </html>
-        """)
-    # print ts.code.pretty()
-    soup = ts.render(dict(x=1, layout=layout))
-
-    print 40*"-"
-    print soup.prettify()
+    t = TemplateSoup("""
+    <html xmlns:py="bla">
+        <head>
+            <title>Great!</title>
+        </head>
+        <body>
+            <div py:def="test">Test</div>
+            <hr />
+            <b content="test()" />
+            <i if="1">Good <i if="0">Bad</i></i>
+            <b with="x=123" strip="1">Before $x After</b>
+            <b replace="test">Away?</b>
+            <em for="y in [1,2,3,2,1]" content="y" />
+            <div attrs="{'class': 999}" class="none" />
+        </body>
+    </html>
+    """)
+    print t.render()
 
     if 0:
         mod = TemplateSoup(data2, html5=True)

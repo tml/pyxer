@@ -79,7 +79,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE, DAMMIT.
 from __future__ import generators
 
 __author__ = "Leonard Richardson (leonardr@segfault.org)"
-__version__ = "3.0.7a"
+__version__ = "3.0.7"
 __copyright__ = "Copyright (c) 2004-2008 Leonard Richardson"
 __license__ = "New-style BSD"
 
@@ -93,10 +93,6 @@ try:
   from htmlentitydefs import name2codepoint
 except ImportError:
   name2codepoint = {}
-try:
-    set
-except NameError:
-    from sets import Set as set
 
 #These hacks make Beautiful Soup able to parse XML with namespaces
 sgmllib.tagfind = re.compile('[a-zA-Z][-_.:a-zA-Z0-9]*')

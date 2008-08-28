@@ -17,7 +17,7 @@ def index():
 @controller
 def show():
     c.file = req.params.get("file", os.path.dirname(__file__))
-    c.code = open(c.file, "rb").read()   
+    c.code = open(c.file, "rb").read()    
     try: 
         from pygments import highlight
         from pygments.lexers import get_lexer_for_filename
@@ -29,3 +29,4 @@ def show():
     except:
         c.pretty = None
         c.css = ""
+    log.debug("Code: %r", c.css)   
