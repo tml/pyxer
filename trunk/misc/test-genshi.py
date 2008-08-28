@@ -1,36 +1,47 @@
 from genshi import XML, Stream, QName, Attrs
 from genshi.core import START, END, TEXT
+from genshi.template import Context
 
-stream = XML(
-    '<html xmlns:py="some">'
-    '<p class="intro" py:if="0">Some text and '
-    '<a href="http://example.org/">a link</a>.'
-    '<br/></p></html>')
+#c = Context(a=1)
+#print c.a
 
-for a in stream:
-    print a
+if 0:
+    stream = XML(
+        '<html xmlns:py="some">'
+        '<p class="intro" py:if="0">Some text and '
+        '<a href="http://example.org/">a link</a>.'
+        '<br/></p></html>')
 
-#for output in stream.serialize():
-#    print `output`
+    for a in stream:
+        print a
 
-substream = stream.select('//a')
-print substream
+    #for output in stream.serialize():
+    #    print `output`
 
-#substream = Stream(list(stream.select('a')))
-#print repr(substream)
+    substream = stream.select('//a')
+    print substream
 
-#print stream.render('html')
+    #substream = Stream(list(stream.select('a')))
+    #print repr(substream)
 
-my = Stream([
-    ('START', (QName(u'a'), Attrs([(QName(u'href'), u'http://example.org/')])), (None, 1, 63)),
+    #print stream.render('html')
+
+my = Stream([])
+l = [
+    (START, (QName(u'a'), Attrs([(QName(u'href'), u'http://example.org/')])), (None, 1, 63)),
     (TEXT, u'a link', (None, 1, 93)),
     (END, QName(u'a'), (None, 1, 99)),
     (TEXT, u'.', (None, 1, 103)),
-    ])
+    ]
 
-print "STREAM", repr(my)
+def do(my):
+    for ev in l:
+        my.events.append(ev)
 
-for x in my:
-    print "x", x
+do(my)
+# print "STREAM", repr(my)
 
-print my.render("html")
+#for x in my:
+#    print "x", x
+
+print my.select("//a").render("html")
