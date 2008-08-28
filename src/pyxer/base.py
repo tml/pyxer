@@ -60,6 +60,8 @@ class SoupTemplateManager:
     def load(self, path):        
         import pyxer.template as pyxer_template 
         pyxer_template = reload(pyxer_template)
+        #if path.startswith("/"):
+        #    path = path.lstrip("/")
         path = os.path.abspath(os.path.join(self.root, path))
         # Test if it is in cache and return if found
         mtime = os.path.getmtime(path)
@@ -130,7 +132,7 @@ def render_kid(**kw):
     return template.serialize(**kw)
 
 # Make Kid the default templating language
-render_default = render_kid
+render_default = render_soup
 # render_default = render_pyxer
 
 def render_json():
