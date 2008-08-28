@@ -101,6 +101,33 @@ class CodeGenerator(object):
             out.append("%4d: %s" % (n+1, self.code[n].replace("\t", "    ")))
         return "\n".join(out)
 
+class PyxerStream(Stream):
+
+    def append(self, value):
+        self.events.append(value)
+
+    def add(self, value):
+        try:
+            if type(value) is types.FunctionType:
+                value = value()
+            if value is None:
+                return
+            if isinstance(value, list) or isinstance(value, Stream):
+                self.events += list(value)
+                return
+            self.events.append((TEXT, unicode(value), (None, 0, 0)))
+        except Exception, e:
+            log.exception("element error")
+            self.events.append((TEXT, unicode(e), (None, 0, 0)))
+
+    def inner(self, path):
+        result = list(self.select(path))
+        if result and result[0][0]==START:
+            return result[1:-1]
+        return result
+
+    selectInner = inner
+
 class TemplateSoup(object):
 
     """
@@ -114,6 +141,7 @@ class TemplateSoup(object):
         self.code = None
         self.bytecode = None
         self.sourcecode = u""
+        self.stream = None
         self.layout = []
         self.extends = []
         self.parse(source)
@@ -146,11 +174,14 @@ class TemplateSoup(object):
         # Create code
         self.code.line(
             "from genshi import XML, HTML, Stream, QName, Attrs",
-            "from genshi.core import START, END, TEXT",
+            "from genshi.core import START, END, TEXT, XML_DECL, DOCTYPE, START_NS, END_NS, START_CDATA, END_CDATA, PI, COMMENT",
+            "def select(path):",
+                "\tglobal stream",
+                "\treturn stream.select(path)"
         )
         self.code.start_block("def main():")
         self.code.line(
-            "stream = []",
+            "global stream",
         )
 
         try:
@@ -180,7 +211,7 @@ class TemplateSoup(object):
     def generateByteCode(self):
         self.bytecode = compile(self.sourcecode, "<string>", "exec")
 
-    def render(self, vars={}, encoding="utf8", parent=None):
+    def generate(self, vars={}):
         import pprint
 
         # For referencing
@@ -190,7 +221,7 @@ class TemplateSoup(object):
         # Prepare context
         context = Dict(vars)
         context.update(
-            add=add,
+            stream = PyxerStream([])
             )
 
         # print context.keys()
@@ -198,17 +229,15 @@ class TemplateSoup(object):
         try:
             exec(self.bytecode, context)
 
-            result = context["main"]()
-            pprint.pprint(list(result))
-
-            stream = Stream(list(result))
+            stream = context["main"]()
+            pprint.pprint(list(stream))
             context["top"] = stream
 
             # Applying the layouts
-            #for layout in self.layout:
-            #    template = eval(layout, context)
-            #    if isinstance(template, TemplateSoup):
-            #        soup = template.render(context, encoding, parent)
+            for layout in self.layout:
+                template = eval(layout, context)
+                if isinstance(template, TemplateSoup):
+                    stream = template.generate(context)
 
         except:
             # XXX must become more Python conform
@@ -227,7 +256,14 @@ class TemplateSoup(object):
 
         # pprint.pprint(list(stream))
 
-        return stream.render("html", strip_whitespace=True)
+        self.stream = stream
+        return stream
+
+    def render(self, encoding="utf8"):
+        if self.stream:
+            return self.stream.render("html", strip_whitespace=True)
+
+    __str__ = render
 
     def getAttr(self, node, name):
         name = unicode(name)
@@ -379,12 +415,12 @@ class TemplateSoup(object):
 
                 if pyReplace:
                     self.code.line(
-                        "stream += add(%s)" % self.checkSyntax(pyReplace),
+                        "stream.add(%s)" % self.checkSyntax(pyReplace),
                         )
 
                 elif pyContent:
                     self.code.line(
-                        "stream += add(%s)" % self.checkSyntax(pyContent),
+                        "stream.add(%s)" % self.checkSyntax(pyContent),
                         # "print '#', type(value)",
                         # "node.append(value)",
                         )
@@ -428,7 +464,7 @@ class TemplateSoup(object):
                         if cmd.startswith("{"):
                             cmd = cmd[1:-1].strip()
                         self.code.line(
-                            "stream += add(%s)" % self.checkSyntax(cmd),
+                            "stream.add(%s)" % self.checkSyntax(cmd),
                         )
                     pos = m.end()
                 if src[pos:]:
@@ -437,38 +473,29 @@ class TemplateSoup(object):
             elif show:
                 self.addElement(kind, data, position)
 
-def add(value):
-    try:
-        if type(value) is types.FunctionType:
-            value = value()
-        if value is None:
-            return []
-        if isinstance(value, list):
-            return value
-        return [(TEXT, unicode(value), (None, 0, 0))]
-    except Exception, e:
-        log.exception("element error")
-        return [(TEXT, unicode(e), (None, 0, 0))]
+def select(path):
+    global STREAM
+    return STREAM.select(path)
 
 if __name__=="__main__":
 
-    if 0:
+    if 1:
         def layout(name):
             return TemplateSoup("""
             <html>
                 <head>
-                    <title  data="$add test">Great!</title>
+                    <title  data="$x test">Great!</title>
                 </head>
                 <body>
-                    <div content="inner(top.body)"></div>
+                    <div content="top.selectInner('//body')"></div>
                     <hr />
-                </body>
+                </body>s
             </html>
             """)
 
         ts = TemplateSoup("""
             <html layout="layout(123)">
-                <body id="test" data="$add test">
+                <body id="test" data="$x test">
                     Here we go!
                         <b>Hello</b>
                     <!-- Comment -->
@@ -477,26 +504,30 @@ if __name__=="__main__":
             </html>
             """)
         # print ts.code.pretty()
-        soup = ts.render(dict(x=1, layout=layout))
+        ts.generate(dict(x=1, layout=layout))
+        print ts
 
-    t = TemplateSoup("""
-    <html xmlns:py="bla">
-        <head>
-            <title>Great!</title>
-        </head>
-        <body>
-            <div py:def="test">Test</div>
-            <hr />
-            <b content="test()" />
-            <i if="1">Good <i if="0">Bad</i></i>
-            <b with="x=123" strip="1">Before $x After</b>
-            <b replace="test">Away?</b>
-            <em for="y in [1,2,3,2,1]" content="y" />
-            <div attrs="{'class': 999}" class="none" />
-        </body>
-    </html>
-    """)
-    print t.render()
+    if 0:
+        t = TemplateSoup("""
+        <html xmlns:py="bla">
+            <head>
+                <title>Great!</title>
+            </head>
+            <body>
+                <a href="/top">Some link</a>
+                <div py:def="test">Test</div>
+                <hr />
+                <b content="test()" />
+                <i if="1">Good <i if="0">Bad</i></i>
+                <b with="x=123" strip="1">Before $x After</b>
+                <b replace="test">Away?</b>
+                <em for="y in [1,2,3,2,1]" content="y" />
+                <div attrs="{'class': 999}" class="none" />
+                <div content="select('//a')" />
+            </body>
+        </html>
+        """)
+        print t.generate()
 
     if 0:
         mod = TemplateSoup(data2, html5=True)
