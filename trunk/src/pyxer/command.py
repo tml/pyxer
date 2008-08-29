@@ -6,7 +6,6 @@
 
 from optparse import OptionParser
 from pyxer.app import serve
-from pyxer.configparser import *
 from pyxer.utils import system, call_subprocess, find_root
 from pyxer import VERSION_STR
 

@@ -1,6 +1,5 @@
-from genshi import XML, Stream, QName, Attrs
-from genshi.core import START, END, TEXT
-from genshi.template import Context
+from pyxer.template.genshi import XML, Stream, QName, Attrs
+from pyxer.template.genshi.core import START, END, TEXT
 
 #c = Context(a=1)
 #print c.a
