@@ -167,22 +167,33 @@ try:
     from beaker.middleware import SessionMiddleware       
 except:
     pass
- 
+
 # Make WSGI application, wrapping sessions etc.
 def make_app(global_conf={}, **app_conf):
 
     #pprint.pprint(global_conf)
     #pprint.pprint(app_conf)
 
+    conf = AttrDict(pyxer={
+        "session": "",
+        "debug": False,
+        })
     try:
-        import ConfigParser
-        conf = ConfigParser.SafeConfigParser()
-        conf.read(os.path.join(os.path.dirname(global_conf["__file__"]), "pyxer.ini"))
-        conf = dict(conf.items("pyxer"))        
+        import ConfigParser        
+        filename = global_conf.get("__file__") or "pyxer.ini" 
+        cfile = ConfigParser.SafeConfigParser()
+        cfile.read(filename)
+        for section in cfile.sections():
+            if not conf.has_key(section):
+                conf[section] = AttrDict()
+            try:
+                for name, value in cfile.items(section):
+                    conf[section][name] = value
+            except:
+                log.exception("Config items")
         log.debug("Config: %r", conf)
     except:
         log.exception("Config file not found")
-        conf = {}
         
     base = os.path.join(os.getcwd(), "public")
     # app = App(global_conf=None, root="public", path=None, **app_conf)
