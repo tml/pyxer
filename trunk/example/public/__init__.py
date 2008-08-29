@@ -15,6 +15,17 @@ log = logging.getLogger(__name__)
 here = os.path.dirname(__file__)
 base = os.path.join(here, "data")
 
+db = None
+
+def __init__(app):
+    app.register("wiki/(.*?).html", index)
+    print "Startup", db, here
+    db = "Test"
+
+def __del__(app):
+    print "Shutdown", db, here
+    db = None
+
 @controller
 def index():
     c.isgae =  "google.appengine" in sys.modules
