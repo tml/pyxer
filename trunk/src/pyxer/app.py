@@ -196,13 +196,6 @@ def make_app(global_conf={}, **app_conf):
             app = SessionMiddleware(app, type='dbm', data_dir='./cache')
 
     app = RegistryManager(app)
-
-    # conf = global_conf.copy()
-    # conf.update(app_conf)    
-    #conf.update(dict(app_conf=app_conf, global_conf=global_conf))
-    # CONFIG.push_process_config(conf)
-    #conf = paste.deploy.appconfig('config:' + global_conf["__file__"])
-    
     app = ConfigMiddleware(app, conf.copy())
 
     # app = CgitbMiddleware(app)

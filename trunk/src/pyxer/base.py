@@ -20,34 +20,24 @@ import types
 
 from pyxer.utils import Dict
 from pyxer.utils.jsonhelper import json
-from pyxer.controller import Controller, isController, c, g, h, config, session, response, request, resp, req
+from pyxer.controller import \
+    Controller, isController, c, g, h, config, \
+    session, response, request, resp, req
 
 import logging
 log = logging.getLogger(__file__)
 
-# Abort with error 
 def abort(code=404):
+    " Abort with error "
     raise exc.HTTPNotFound()
 
-# Normalize URL
 def url(url):
+    " Normalize URL "
     return request.relative_url(url)
 
-# Redirect to other page
-def redirect(location, code=301):   
+def redirect(location, code=301):
+    " Redirect to other page "   
     raise exc.HTTPMovedPermanently(location=url(location))
-
-def render_pyxer(*kw):
-    import pyxer.template
-    path = request.template_url
-    # path = os.path.join(os.getcwd(), 'public', path)
-    log.debug("Loading template %r", path)
-    template = pyxer.template.Template(file(path, "r").read(), path=path, html=True)
-    # print template.source.encode("latin1","ignore")
-    return template.render(dict(c=c), encoding="utf8")
-
-    #tmpl = genshi_loader.load(template)
-    #return tmpl.generate(c=c).render('xhtml', doctype='xhtml')
 
 class StreamTemplateManager:
     
@@ -71,66 +61,35 @@ class StreamTemplateManager:
         # Load the template       
         log.debug("Loading template %r in KidTemplateManager", path)
         template = pyxer_template.TemplateSoup(
-            file(path, "r").read())        
+            file(path, "r").read())       
+        template.load = self.load         
         self.cache[path] = (template, mtime)
         return template      
 
-def render_stream(*kw):    
+def template_stream(name=None):
+    " Get the template "    
+    # XXX What to do with dirname? Scenarios?
+    # XXX What to do with absolute url /like/this?
     path = request.template_url
-    # path = os.path.join(os.getcwd(), 'public', path)
+    dirname = os.path.dirname(path)
+    if name is not None:
+        path = os.path.join(dirname, name)
+        dirname = os.path.dirname(path)
     log.debug("Loading template %r", path)
-    soup_manager = StreamTemplateManager(os.path.dirname(path))
-    template = soup_manager.load(path)        
-    # template = pyxer_template.TemplateSoup(file(path, "r").read())
-    # print template.source.encode("latin1","ignore")
-    # log.debug("%s", template.sourcecode)
-    template.generate(dict(c=c, h=Dict(
+    soup_manager = StreamTemplateManager(dirname)    
+    return soup_manager.load(path)
+
+template = template_default = template_stream
+
+def render_stream(*kw):
+    template = template_stream()    
+    template.generate(Dict(c=c, h=Dict(
         url=url,
         redirect=redirect
-        ), load=soup_manager.load))
+        ), load=template.load))
     return template.render()
 
-class KidTemplateManager:
-    
-    cache = {}
-    
-    def __init__(self, root):    
-        self.root = root
-    
-    def load(self, path):
-        import  kid
-        path = os.path.abspath(os.path.join(self.root, path))
-        # Test if it is in cache and return if found
-        mtime = os.path.getmtime(path)
-        if 0 and self.cache.has_key(path):            
-            template, last = self.cache.get(path)            
-            if mtime <= last:                
-                return template
-            else:
-                log.debug("Found a newer file than the one in the cache for %r", path)
-        # Load the template                 
-        log.debug("Loading template %r in KidTemplateManager", path)
-        template = kid.load_template(
-            path, cache=False,
-            ns=dict(load=self.load, c=c))  
-        self.cache[path] = (template, mtime)
-        return template        
-           
-def render_kid(**kw):
-    " 'c' and 'request' are global variables " 
-    # import pyxer.kid as kid
-    path = request.template_url    
-    # Force output to be something that makes sense ;)
-    if "output" not in kw:
-        kw["output"] = "xhtml-strict"
-    log.debug("Loading template %r with Kid and arguments %r", path, kw)
-    template = KidTemplateManager(os.path.dirname(path)).load(path)    
-    # template = kid.Template(source=file(path, "r").read(), c=c, load=kid_loader)
-    return template.serialize(**kw)
-
-# Make Kid the default templating language
 render_default = render_stream
-# render_default = render_pyxer
 
 def render_json():
     " Render output as JSON object "
@@ -182,32 +141,3 @@ class expose(controller):
         " Add arguments "
         log.debug("Call func with params %r", dict(request.params))
         return self.func(**dict(request.params))
-    
-# XXX Parameters
-
-def getparams(*a, **kw):
-    """
-    a, b = getparams("a b")
-    a, b = getparams("a", "b")
-    # a, b = getparams(["a", "b"])
-    # a, b = getparams(a=1, b=2)
-    # a, b = getparams("a", b=2)
-    
-    But not (because of order of elements):
-    a, b = getparams({"a": 1, "b": 2})    
-    """
-    values = []
-    for name in [x.strip().split() for x in a]:
-        request.params.get(name, None)
-
-"""
-from inspect import *
-
-def f(**kw):
-    locals_ = currentframe().f_back.f_locals
-    for k, v in kw.items():
-        locals_[k] = v
-
-f(a=1, b=1, c=1, d=1, x=1, e=2)
-print a,b,c,d,e,x
-"""       
