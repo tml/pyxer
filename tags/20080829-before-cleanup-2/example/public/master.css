@@ -1,0 +1,15 @@
+body {
+   color: black;
+   background: white;
+   margin: 0;   
+}
+
+div.title {
+  color: white;
+  background: black;
+  padding: 1em;
+  font-size: 125%;
+}
+div.content {
+  padding: 1em;
+}

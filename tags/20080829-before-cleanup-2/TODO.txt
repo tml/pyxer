@@ -1,0 +1,20 @@
+TODO
+====
+
+- Introduce "lib" directory for Python modules like "base.py", "globals.py"
+  or "helpers.py" like in Pylons
+- Let the user access the config file
+
+Templating
+- Let the user choose the templating machine
+- CDATA does not work
+- Bug in Genshi
+- "extends" and "match" don't work
+- Internationalization
+
+Marketing
+- Create a video with a simple coding session like "Wiki in 10 minutes" :)
+
+Future
+- Full integration into Eclipse/PyDev
+- Windows/Mac/Linux native tool placed in the Systray/Menu/Dock
