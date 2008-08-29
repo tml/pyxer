@@ -16,7 +16,7 @@
   <p> Generated using the <a href="http://www.htmltopdf.org/">Pisa HTML2PDF Converter</a> </p>
 </div>
 <p class="title"> <em>Pyxer
-  <!--VERSION-->0.5.2<!--VERSION-->
+  <!--VERSION-->0.6.0<!--VERSION-->
   </em> </p>
 <p class="subtitle"> Yet another Python Framework </p>
 <p> (C)opyright by Dirk Holtwick, Germany <br />
@@ -155,7 +155,7 @@ def index():
 <p><em>Pyxer</em> offers yet another templating language that is very close to
   Genshi and Kid. As the former did not work with Google AppEngine at
   the moment of birth of <em>Pyxer</em> the new templating tools had been
-  implemented. It is based on BeautyfulSoup.</p>
+  implemented. </p>
 <h2>Variables and expressions</h2>
 <p>The default templating works similar to most known other
   templating languages. Variables and expressions are realized like <code>$&lt;varname&gt;</code> (where <code>&lt;varname&gt;</code> may
@@ -199,7 +199,7 @@ File &ldquo;b.html&rdquo;
 <pre>&lt;div <strong>py:for=&rdquo;name in sorted(c.listOfNames)&rdquo;</strong>&gt;Welcome $name&lt;/div&gt;</pre>
 <p> xxx</p>
 <h2>XPath Support</h2>
-<p>If you want to use XPath within or on the template you may use bsoupxpath.py from <a href="http://www3.itu.edu.tr/~uyar/bsoupxpath/">http://www3.itu.edu.tr/~uyar/bsoupxpath/</a>.</p>
+<p>XPath is supported like it is in Genshi.</p>
 <h1>Advanced</h1>
 <h2>Python virtual environment </h2>
 <p>To make deployment of GAE projects easy a virtual environment (VM) is created. If you start GAE via <code>xgae</code> or paster via <code>xpaster</code> these virtual environments will automatically be used. Pyxer determines the root of the VM by looking for the <code>app.yaml</code> file. If you have to enter the VM for installing packages or for other reasons you may to it like this:</p>
