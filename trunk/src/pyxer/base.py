@@ -18,7 +18,7 @@ import os
 import os.path
 import types
 
-from pyxer.utils import Dict
+from pyxer.utils import Dict, AttrDict
 from pyxer.utils.jsonhelper import json
 from pyxer.controller import \
     Controller, isController, c, g, h, config, \

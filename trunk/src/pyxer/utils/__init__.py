@@ -30,6 +30,49 @@ class Dict(dict):
     def __setattr__(self, name, value):
         self[name] = value
 
+class AttrDict(dict):
+
+    # __slots__ ?
+
+    def __init__(self, dict=None, **kwargs):
+        if dict is None:
+            dict = kwargs
+        for k, v in dict.items():
+            self[k] = v
+
+    def __getattr__(self, name):
+        try:
+            return dict.__getattr__(self, name)
+        except:
+            return self.get(name, None)
+
+    def __setattr__(self, name, value):
+        if (isinstance(value, dict)) and (not isinstance(value, AttrDict)):
+            value = AttrDict(value)
+        dict.__setitem__(self, name, value)
+
+    def __delattr__(self, name):
+        del self[name]
+
+    __setitem__ = __setattr__
+
+    def __getnext__(self, name, full):
+        try:
+            if "." in name:
+                left, right = name.split(".", 1)
+                value = self.__getnext__(left, full)
+                return value[right]
+            else:
+                return dict.__getitem__(self, name)
+        except:
+            raise KeyError, full
+
+    def __getitem__(self, name):
+        try:
+            return dict.__getitem__(self, name)
+        except:
+            return self.__getnext__(name, name)
+
 def html_escape(value):
     return (value
         .replace("&", "&amp;")
