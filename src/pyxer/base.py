@@ -141,3 +141,44 @@ class expose(controller):
         " Add arguments "
         log.debug("Call func with params %r", dict(request.params))
         return self.func(**dict(request.params))
+
+# Routing
+
+from webob import Request
+from webob import exc
+
+class Router(object):
+
+    def __init__(self):
+        self.routes = []
+
+    def add_route(self, template, controller, **vars):
+        if isinstance(controller, basestring):
+            controller = load_controller(controller)
+        self.routes.append((re.compile(template_to_regex(template)),
+                            controller,
+                            vars))
+
+    def __call__(self, environ, start_response):
+        req = Request(environ)
+        for regex, controller, vars in self.routes:
+            match = regex.match(req.path_info)
+            if match:
+                req.urlvars = match.groupdict()
+                req.urlvars.update(vars)
+                return controller(environ, start_response)
+        return exc.HTTPNotFound()(environ, start_response)
+
+class Permission(object):
+    
+    """
+    @controller(permission=Permission('read'))
+    """
+    
+    def __init__(self, permission):
+        self.permission
+        
+    def __call__(self, permissions):
+        if isinstance(permissions, basestring):
+            permissions = [permissions]        
+        return self.permission in permissions
