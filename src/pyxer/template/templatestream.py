@@ -22,8 +22,8 @@ except:
 
 log = logging.getLogger(__name__)
 
-from genshi import XML, HTML, Stream, QName, Attrs
-from genshi.core import START, END, TEXT
+from pyxer.template.genshi import XML, HTML, Stream, QName, Attrs
+from pyxer.template.genshi.core import START, END, TEXT
 
 # _commands = re.compile(u"\&lt;\%(.*?)\%\&gt;", re.M)
 _vars = re.compile(u"""
@@ -173,8 +173,8 @@ class TemplateSoup(object):
 
         # Create code
         self.code.line(
-            "from genshi import XML, HTML, Stream, QName, Attrs",
-            "from genshi.core import START, END, TEXT, XML_DECL, DOCTYPE, START_NS, END_NS, START_CDATA, END_CDATA, PI, COMMENT",
+            "from pyxer.template.genshi import XML, HTML, Stream, QName, Attrs",
+            "from pyxer.template.genshi.core import START, END, TEXT, XML_DECL, DOCTYPE, START_NS, END_NS, START_CDATA, END_CDATA, PI, COMMENT",
             "def select(path):",
                 "\tglobal stream",
                 "\treturn stream.select(path)"

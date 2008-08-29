@@ -75,7 +75,7 @@ def create(opt, here):
         "--no-site-packages",
         "--unzip-setuptools",
         "--easy-install=webob",
-        "--easy-install=beaker",
+        # "--easy-install=beaker",
         # "--easy-install=beaker==dev",
         ] + app_name + [
         # "--easy-install=pyxer",

@@ -95,7 +95,7 @@ def setup(opt):
             os.path.dirname(pyxer.__file__), 
             os.path.join(os.getcwd(), "lib", "pyxer"))
 
-    if opt.update or (not os.path.isdir("ldib")): 
+    if opt.update or (not os.path.isdir("lib")): 
         copyPyxer(
             os.path.dirname(html5lib.__file__), 
             os.path.join(os.getcwd(), "lib", "html5lib"))
