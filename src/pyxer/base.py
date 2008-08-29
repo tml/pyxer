@@ -49,50 +49,6 @@ def render_pyxer(*kw):
     #tmpl = genshi_loader.load(template)
     #return tmpl.generate(c=c).render('xhtml', doctype='xhtml')
 
-
-class SoupTemplateManager:
-    
-    cache = {}
-    
-    def __init__(self, root):    
-        self.root = root
-    
-    def load(self, path):        
-        import pyxer.template as pyxer_template 
-        pyxer_template = reload(pyxer_template)
-        #if path.startswith("/"):
-        #    path = path.lstrip("/")
-        path = os.path.abspath(os.path.join(self.root, path))
-        # Test if it is in cache and return if found
-        mtime = os.path.getmtime(path)
-        if 0 and self.cache.has_key(path):            
-            template, last = self.cache.get(path)            
-            if mtime <= last:                
-                return template
-            else:
-                log.debug("Found a newer file than the one in the cache for %r", path)
-        # Load the template       
-        log.debug("Loading template %r in KidTemplateManager", path)
-        template = pyxer_template.TemplateSoup(
-            file(path, "r").read())        
-        self.cache[path] = (template, mtime)
-        return template      
-
-def render_soup(*kw):    
-    path = request.template_url
-    # path = os.path.join(os.getcwd(), 'public', path)
-    log.debug("Loading template %r", path)
-    soup_manager = SoupTemplateManager(os.path.dirname(path))
-    template = soup_manager.load(path)        
-    # template = pyxer_template.TemplateSoup(file(path, "r").read())
-    # print template.source.encode("latin1","ignore")
-    # log.debug("%s", template.sourcecode)
-    soup = template.render(dict(c=c, h=Dict(
-        url=url,
-        redirect=redirect
-        ), load=soup_manager.load), encoding="utf8")
-    return str(soup)
-
 class StreamTemplateManager:
     
     cache = {}

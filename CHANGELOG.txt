@@ -8,6 +8,7 @@ Version 0.6.0, 2008-08-xxx
 - NEW: Special method 'default' for handling all
 - NEW: Config file "pyxer.ini"
 - BUG: Many small fixes
+- DEL: pyxer.kid removed, general cleanup
 
 Version 0.5.1, 2008-08-15
 
