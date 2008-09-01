@@ -18,6 +18,8 @@ import os
 import os.path
 import types
 
+GAE = "google.appengine" in sys.modules
+
 from pyxer.utils import Dict, AttrDict
 from pyxer.utils.jsonhelper import json
 from pyxer.controller import \

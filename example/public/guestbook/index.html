@@ -5,13 +5,13 @@
 <title>Guestbook</title>
 </head>
 <body>
-<form action="index">
+<form action="commit">
   Leave your message:
-  <input type="text" value="" size="40" />
+  <input type="message" value="" name="message" size="40" />
 </form>
 <hr />
 <ol>
-  <li py:for="m in c.messages" py:content="m">$m</li>
+  <li py:for="entry in c.messages" py:content="entry.message" />
 </ol>
 </body>
 </html>
