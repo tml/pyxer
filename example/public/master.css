@@ -10,6 +10,9 @@ div.title {
   padding: 1em;
   font-size: 125%;
 }
+div.title a {
+  color: white;
+}
 div.content {
   padding: 1em;
 }
