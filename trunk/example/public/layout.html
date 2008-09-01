@@ -5,13 +5,12 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link href="/master.css" type="text/css" rel="stylesheet" media="all" />
 	<title>Pyxer. ${top.select('//title/text()')}</title>
-	<style py:replace="top.select('//style')"></style>
-	<script py:replace="top.select('//script')"></script>
+	<style py:replace="top.css('style')"></style>
+	<script py:replace="top.css('script')"></script>
 </head>
 <body>
      <div class="title"><a href="/">Pyxer Demo</a> / ${top.select('//title/text()')}</div>	
-     <div class="content" py:content="top.selectInner('//body')">
-	 </div>
+     <div class="content" py:content="top.css('body *')" />	 
 	 <hr>
      <p>(C) Dirk Holtwick 2008</p>
 </body>

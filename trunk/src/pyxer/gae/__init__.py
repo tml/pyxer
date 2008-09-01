@@ -38,7 +38,7 @@ from pyxer.gae import main
 if __name__ == "__main__": main()
 """.lstrip()
 
-def copyPyxer(src, dst, symlinks=False):    
+def copyPyxer(src, dst, symlinks = False):    
     names = os.listdir(src)
     try:
         os.makedirs(dst)
@@ -92,12 +92,12 @@ def setup(opt):
     # Copy Pyxer to working directory
     if opt.update or (not os.path.isdir("lib")): 
         copyPyxer(
-            os.path.dirname(pyxer.__file__), 
+            os.path.dirname(pyxer.__file__),
             os.path.join(os.getcwd(), "lib", "pyxer"))
 
     if opt.update or (not os.path.isdir("lib")): 
         copyPyxer(
-            os.path.dirname(html5lib.__file__), 
+            os.path.dirname(html5lib.__file__),
             os.path.join(os.getcwd(), "lib", "html5lib"))
 
 def fix():
@@ -106,7 +106,7 @@ def fix():
 
 def normalize_py_file(name):
     if name.lower().endswith(".pyc"):
-        return name[:-1]
+        return name[: - 1]
     return name
 
 def serve(opt):
@@ -127,7 +127,7 @@ def serve(opt):
     fix()    
     root = find_root()
     
-    if sys.platform=="win32":
+    if sys.platform == "win32":
         
         try:
             import dev_appserver
@@ -149,7 +149,7 @@ def serve(opt):
         #options = [""] + options + [os.getcwd()]
         #sys.exit(gmain.main(options))
     
-    elif sys.platform=="darwin":
+    elif sys.platform == "darwin":
 
         call_subprocess([
             "dev_appserver.py"] + 
@@ -172,7 +172,7 @@ def upload(opt):
     fix()
     root = find_root()
     
-    if sys.platform=="win32":
+    if sys.platform == "win32":
         
         try:
             import appcfg
@@ -184,7 +184,7 @@ def upload(opt):
             sys.executable,
             normalize_py_file(appcfg.__file__) ] + 
             options + [     
-            "update",       
+            "update",
             root
             ])
         
@@ -194,7 +194,7 @@ def upload(opt):
         #options = [""] + options + [os.getcwd()]
         #sys.exit(gmain.main(options))
     
-    elif sys.platform=="darwin":
+    elif sys.platform == "darwin":
         
         call_subprocess([
             "appcfg.py"] + 
@@ -210,5 +210,5 @@ def upload(opt):
 def main():    
     wsgiref.handlers.CGIHandler().run(make_app())
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()

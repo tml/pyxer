@@ -40,7 +40,7 @@ from pyxer.base import *
 #    c.message = "Welcome"
 """.lstrip()
 
-def self_setup(root=None):
+def self_setup(root = None):
     if not root:
         root = find_root()
     # Get parent directory
@@ -49,8 +49,8 @@ def self_setup(root=None):
     # Do setup
     call_script(
         ["python", os.path.join(dir, "pyxer", "setup.py"), "install", "-f"],
-        cwd=dir,
-        root=root)
+        cwd = dir,
+        root = root)
 
 def create(opt, here):
 

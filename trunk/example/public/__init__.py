@@ -28,7 +28,7 @@ def __del__(app):
 
 @controller
 def index():
-    c.isgae =  "google.appengine" in sys.modules
+    c.isgae = "google.appengine" in sys.modules
     c.ispaster = not c.isgae
     c.pyxerversion = pyxer.__version__
     c.modules = sys.modules
@@ -43,6 +43,6 @@ def index():
                     name + "/",
                     f.read().strip()))
                 f.close()
-                log.debug("Added sample %r", c.samples[-1])
+                log.debug("Added sample %r", c.samples[ - 1])
         except:
             log.exception("Error while collecting samples")

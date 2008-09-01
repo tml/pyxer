@@ -40,7 +40,7 @@ class ContextObj(object):
 # The WSGI application
 class PyxerApp(object):
 
-    def __init__(self, base=["public"]):
+    def __init__(self, base = ["public"]):
         self.base = base
 
     def __call__(self, environ, start_response):
@@ -96,18 +96,18 @@ class PyxerApp(object):
                     # als gäbe es die Datei nicht, das ist allerdings nicht wahr,
                     # daher nochmal dieser Check
                     log.debug("Import error %r for module name %r", msg, module_name)
-                    if module_parts and (not (str(msg).endswith("." + module_parts[-1]) or str(msg).endswith(" " + module_parts[-1]))):
+                    if module_parts and (not (str(msg).endswith("." + module_parts[ - 1]) or str(msg).endswith(" " + module_parts[ - 1]))):
                         log.exception("Error in import")
                         raise
     
                     try:
     
                         # oder eine "Datei"
-                        module_parts = parts[:-1]
+                        module_parts = parts[: - 1]
                         module_name = ".".join(self.base + module_parts)
                         exec("import " + module_name)
                         # __import__(module_name)
-                        action = parts[-1]
+                        action = parts[ - 1]
                     except ImportError, msg:
                         log.debug("Import error %r for module name %r", msg, module_name)
                         abort(404)
@@ -169,12 +169,12 @@ except:
     pass
 
 # Make WSGI application, wrapping sessions etc.
-def make_app(global_conf={}, **app_conf):
+def make_app(global_conf = {}, **app_conf):
 
     #pprint.pprint(global_conf)
     #pprint.pprint(app_conf)
 
-    conf = AttrDict(pyxer={
+    conf = AttrDict(pyxer = {
         "session": "",
         "debug": False,
         })
@@ -199,18 +199,18 @@ def make_app(global_conf={}, **app_conf):
     # app = App(global_conf=None, root="public", path=None, **app_conf)
     app = PyxerApp()
     
-    if SessionMiddleware and (conf.get("session", "beaker")=="beaker"):
+    if SessionMiddleware and (conf.get("session", "beaker") == "beaker"):
         log.debug("Beaker sessions")
         if "google.appengine" in sys.modules:
-            app = SessionMiddleware(app, type='google', table_name='PyxerSession')
+            app = SessionMiddleware(app, type = 'google', table_name = 'PyxerSession')
         else:
-            app = SessionMiddleware(app, type='dbm', data_dir='./cache')
+            app = SessionMiddleware(app, type = 'dbm', data_dir = './cache')
 
     app = RegistryManager(app)
     app = ConfigMiddleware(app, conf.copy())
 
     # app = CgitbMiddleware(app)
-    app = ErrorMiddleware(app, debug=True)
+    app = ErrorMiddleware(app, debug = True)
 
     static = StaticURLParser(base)
     app = Cascade([app, static])
@@ -221,13 +221,13 @@ def app_factory(global_config, **local_conf):
     return make_app(global_config)
 
 # Serve with Python on board WSGI
-def serve(opt={}):
+def serve(opt = {}):
     print "Serving on http://%s:%s" % (opt.host, opt.port)
     from wsgiref.simple_server import make_server
     server = make_server(opt.host, int(opt.port), make_app())
     server.serve_forever()
 
-if __name__=="__main__":
+if __name__ == "__main__":
     class opt:
         host = "127.0.0.1"
         port = 8080

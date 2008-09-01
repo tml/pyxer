@@ -27,8 +27,8 @@ def showlog(debug):
     try:
         LOG_FORMAT_DEBUG = "%(levelname)s [%(name)s] %(pathname)s line %(lineno)d: %(message)s"
         logging.basicConfig(
-            level=level,
-            format=LOG_FORMAT_DEBUG)
+            level = level,
+            format = LOG_FORMAT_DEBUG)
     except:
         logging.basicConfig()
 
@@ -57,9 +57,9 @@ Daemon commands (just for paster):
     #    OptionParser.error(self, msg)
     #    print "Use option --help for complete help"
 
-iswin = (sys.platform=="win32")
+iswin = (sys.platform == "win32")
 
-def command(engine=None):
+def command(engine = None):
 
     parser = OptParser(
         # "usage: %prog [options] command",
@@ -72,10 +72,10 @@ def command(engine=None):
     parser.add_option(
         "-q",
         "--quiet",
-        action="store_false",
-        dest="verbose",
-        default=True,
-        help="don't print status messages to stdout")
+        action = "store_false",
+        dest = "verbose",
+        default = True,
+        help = "don't print status messages to stdout")
     #parser.add_option(
     #    "-f",
     #    "--force",
@@ -86,38 +86,38 @@ def command(engine=None):
     parser.add_option(
         "-d",
         "--debug",
-        action="store_true",
-        dest="debug",
-        default=False,
-        help="activate debug logging")
+        action = "store_true",
+        dest = "debug",
+        default = False,
+        help = "activate debug logging")
     if not engine:
         parser.add_option(
             "--engine",
-            dest="engine",
-            default="",
-            help="engine that will be used (wsgi, gae, paster)")
+            dest = "engine",
+            default = "",
+            help = "engine that will be used (wsgi, gae, paster)")
     parser.add_option(
         "--port",
-        dest="port",
-        default="8080",
-        help="serving on port")
+        dest = "port",
+        default = "8080",
+        help = "serving on port")
     parser.add_option(
         "--host",
-        dest="host",
-        default="127.0.0.1",
-        help="serving on host")
+        dest = "host",
+        default = "127.0.0.1",
+        help = "serving on host")
     parser.add_option(
         "-r",
         "--reload",
-        dest="reload",
-        action="store_true",
-        help="reload on changing files")
+        dest = "reload",
+        action = "store_true",
+        help = "reload on changing files")
     parser.add_option(
         "-u",
         "--update",
-        dest="update",
-        action="store_true",
-        help="update suplementary data and files")
+        dest = "update",
+        action = "store_true",
+        help = "update suplementary data and files")
 
     (opt, args) = parser.parse_args()
 
@@ -141,7 +141,7 @@ def command(engine=None):
     command = args[0].lower()
 
     # Directory argument
-    if len(args)==2:
+    if len(args) == 2:
         here = os.path.abspath(args[1])
     else:
         here = os.getcwd()
@@ -165,13 +165,13 @@ def command(engine=None):
         engine = None
 
     # Serve
-    if command=="serve":
+    if command == "serve":
 
         if engine:
             engine.serve(opt)
         else:
             if opt.debug:
-                logging.basicConfig(level=logging.DEBUG)
+                logging.basicConfig(level = logging.DEBUG)
             serve(opt)
 
     # Setup
@@ -191,10 +191,10 @@ def command(engine=None):
             system("start " + os.path.join(root, "scripts", "activate.bat"))
         else:
             print "IMPORTANT! Leave VM with command 'exit'."
-            call_subprocess(["bash", "--init-file", os.path.join(root, "bin", "activate")], raise_on_returncode=False)
+            call_subprocess(["bash", "--init-file", os.path.join(root, "bin", "activate")], raise_on_returncode = False)
             
     # Deactivate
-    elif (command=="close" or command=="deactivate"):
+    elif (command == "close" or command == "deactivate"):
 
         root = find_root()
         if not root:
@@ -205,25 +205,25 @@ def command(engine=None):
             pass
 
     # Daemon
-    elif command=="start" and opt.engine=="paster":
-        engine.serve(opt, daemon="start")
-    elif command=="stop" and opt.engine=="paster":
-        engine.serve(opt, daemon="stop")
-    elif command=="status" and opt.engine=="paster":
-        engine.serve(opt, daemon="status")
-    elif (command=="reload" or command=="restart") and opt.engine=="paster":
-        engine.serve(opt, daemon="restart")
+    elif command == "start" and opt.engine == "paster":
+        engine.serve(opt, daemon = "start")
+    elif command == "stop" and opt.engine == "paster":
+        engine.serve(opt, daemon = "stop")
+    elif command == "status" and opt.engine == "paster":
+        engine.serve(opt, daemon = "status")
+    elif (command == "reload" or command == "restart") and opt.engine == "paster":
+        engine.serve(opt, daemon = "restart")
 
     # GAE Upload
-    elif (command=="upload" or command=="deploy") and opt.engine=="gae":
+    elif (command == "upload" or command == "deploy") and opt.engine == "gae":
         engine.upload(opt)
 
     # GAE fix
-    elif (command=="fix" or command=="fixup") and opt.engine=="gae":
+    elif (command == "fix" or command == "fixup") and opt.engine == "gae":
         engine.fix()
 
     # Setup Pyxer
-    elif command=="pyxer":
+    elif command == "pyxer":
         
         import pyxer.create
         pyxer.create.self_setup()
