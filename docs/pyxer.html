@@ -19,7 +19,6 @@ window.onload = function() {
 			e1.insert('<a name="id' + counter + '" id="id' + counter + '></a>', { position: "before" })			
 			++counter;
 			e.select('h2').each(function(e2) {
-				console.log(e2)
 				newtoc += '<li><a class="reference" href="#id' + (counter) + '">&nbsp;&nbsp;&nbsp;' + e2.innerHTML + '</a></li>'
 				e2.insert('<a name="id' + counter + '" id="id' + counter + '></a>', { position: "before" })
 				++counter;
@@ -31,6 +30,9 @@ window.onload = function() {
 	})
 	toc += '</ul>'
 	$('autotoc').replace(toc)	
+	$$('pre').each(function(e) {
+		e.wrap('div', { 'class': 'highlight' })
+	})
 }
 </script>
 <style type="text/css" media="screen">
@@ -46,10 +48,10 @@ window.onload = function() {
       <pdf:pagenumber />
     </p>
   </div>
-  <div id="footer-pisa" class="pdf">
+  <div id="footer-pisa">
     <p> Generated using the <a href="http://www.htmltopdf.org/">Pisa HTML2PDF Converter</a> </p>
   </div>
-  <p class="title" class="pdf">
+  <p class="title">
   <em>Pyxer
   <!--VERSION-->
   0.6.0
@@ -84,8 +86,8 @@ window.onload = function() {
       respecting the MVC concept but the files can be mixed in one
       directory. For a high end solution you should consider using Pylons,
       TurboGears, Django and similar. </p>
-    <p> This work is inspired by <a href="http://pythonpaste.org/webob/do-it-yourself.html">&lt;http://pythonpaste.org/webob/do-it-yourself.html&gt;</a>. </p>
-    <h2>Technical background</h2>
+    <p> This work is inspired by <a href="http://pythonpaste.org/webob/do-it-yourself.html">http://pythonpaste.org/webob/do-it-yourself.html</a>. </p>
+    <h3>Technical background</h3>
     <p>The Google App Engine  (GAE) in version 1.1 offers a very restricted Python environment and the developer as to ship arround a lot of problems. Pyxer helps on this point by also providing solutions that work with the great WSGI Framework Paster by Ian Bicking. So you get the best from both sides: GAE and Paster. To achieve this some other great third party tools are used like WebOb and VirtualEnv (also by Ian Bicking) and for templating the html5lib is used.</p>
   </div>
   <div class="section">
@@ -97,7 +99,7 @@ window.onload = function() {
   </div>
   <div class="section">
     <h1>Quick start </h1>
-    <h2>Create a new project </h2>
+    <h3>Create a new project </h3>
     <p>At first set up a new Pyxer project using the Pyxer command line tool like this: </p>
     <pre><em>$</em>  pyxer init myexample</pre>
     <p> In the newly created directory &quot;myexample&quot; you will find a directory structure like this one (under Windows &quot;bin&quot; will be called &quot;Scripts&quot;): </p>
@@ -105,7 +107,7 @@ window.onload = function() {
 public/
 lib/</pre>
     <p> Place your files in the &quot;public&quot; directory. </p>
-    <h2>Start the server </h2>
+    <h3>Start the server </h3>
     <p>To start the server you may choose between the Paster-Engine:</p>
     <pre><em>$</em> xpaster serve</pre>
     <p>or the GAE-Engine:</p>
@@ -124,7 +126,7 @@ lib/</pre>
     <pre>@controller
 def index():
     return &quot;Hello World&quot;</pre>
-    <h2> About controllers</h2>
+    <h2>About controllers</h2>
     <p>Controller, templates and static files are placed in the same
       directory (usually &quot;public&quot;). First <em>Pyxer</em> looks for a matching controller. A controller is defined in the
       &quot;__init__.py&quot; file and decorated by using <code>@controller</code> which is defined in <code>pyxer.base</code>.</p>
@@ -263,7 +265,7 @@ class GuestBook(db.Model):
     <pre><em>$</em> pyxer vm
 <em>(vm)$</em> easy_install html5lib
 <em>(vm)$</em> exit</pre>
-    <p>You may also use the usual functions as described in virtualenv by Ian Bicking &lt;<a href="http://pypi.python.org/pypi/virtualenv/">http://pypi.python.org/pypi/virtualenv/</a>&gt;. </p>
+    <p>You may also use the usual functions as described in virtualenv by Ian Bicking <a href="http://pypi.python.org/pypi/virtualenv/">http://pypi.python.org/pypi/virtualenv/</a>. </p>
     <pre><em>$</em> Scripts\activate.bat<br /><em>$</em> easy_install SomePackageName
 <em>$</em> deactivate</pre>
     <p>And for other Unix like system like this:</p>
@@ -288,7 +290,7 @@ app = TestApp(loadapp('config:%s' % os.path.abspath('development.ini')))
 res = app.get("/")
 assert ('&lt;body' in res)
 </pre>
-    <p>For more informations look here &lt;<a href="http://pythonpaste.org/testing-applications.html">http://pythonpaste.org/testing-applications.html</a>&gt;. </p>
+    <p>For more informations look here <a href="http://pythonpaste.org/testing-applications.html">http://pythonpaste.org/testing-applications.html</a>. </p>
     <h2>Use within Eclipse</h2>
     <p>xxx</p>
     <h2>Use Google App Engine Launcher on Mac OS</h2>
