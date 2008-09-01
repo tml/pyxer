@@ -345,7 +345,9 @@ class TemplateSoup(object):
                 
                 pyExtends = self.getAttr(node, "extends")               # XXX todo
                 pyLayout = self.getAttr(node, "layout")
-                pyFromid = self.getAttr(node, "fromid")
+
+                pyElse = self.getAttr(node, "else")                   # XXX todo
+                pyElif = self.getAttr(node, "elif")                   # XXX todo
 
                 # get modified attributes
                 attr = node[1][1]
@@ -355,6 +357,10 @@ class TemplateSoup(object):
 
                 if pyLayout:
                     self.layout.append(pyLayout)
+
+                if pyMatch:
+                    import uuid
+                    pyDef = "match_%s" % uuid.uuid1().hex
 
                 if pyDef:
                     stack.append(self.code)
@@ -366,6 +372,11 @@ class TemplateSoup(object):
                         "stream = []"
                     )
 
+                #if pyMatch:
+                #    self.code.line(
+                #        pyMatch
+                #    )
+                                        
                 # For error handling
                 self.code.line(
                     "error = " + repr(position)

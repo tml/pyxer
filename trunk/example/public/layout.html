@@ -9,9 +9,11 @@
 	<script py:replace="top.css('script')"></script>
 </head>
 <body>
-     <div class="title"><a href="/">Pyxer Demo</a> / ${top.select('//title/text()')}</div>	
-     <div class="content" py:content="top.css('body *')" />	 
-	 <hr>
-     <p>(C) Dirk Holtwick 2008</p>
+     <div class="title"><a href="/">Pyxer Examples</a> / ${top.select('//title/text()')}</div>	
+     <div class="content">	 
+	 	 ${top.css('body *')}
+		 <hr>
+    	 <p>(C) 2008 <a href="http://www.holtwick.it">Dirk Holtwick</a> </p>
+	</div>
 </body>
 </html>
