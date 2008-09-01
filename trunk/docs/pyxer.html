@@ -200,6 +200,18 @@ File &ldquo;b.html&rdquo;
 <p> xxx</p>
 <h2>XPath Support</h2>
 <p>XPath is supported like it is in Genshi.</p>
+<h1>Databases</h1>
+<p>You are free to use any database model you like. For GAE you have not much choice but for other engines I recommend using Elixir. You should try to separate your controller stuff from your database stuff by creating a Python module called &quot;model.py&quot;. For a GAE project this may look like this:</p>
+<pre>from google.appengine.ext import db
+from google.appengine.api import users
+
+
+class GuestBook(db.Model):
+   name = db.StringProperty() 
+   date = db.DateTimeProperty(auto_now_add=True)</pre>
+<p>While using Elixir you may do like this:</p>
+<pre>xxx</pre>
+<p>XXX See the GuestBook example for a complete demo. </p>
 <h1>Advanced</h1>
 <h2>Python virtual environment </h2>
 <p>To make deployment of GAE projects easy a virtual environment (VM) is created. If you start GAE via <code>xgae</code> or paster via <code>xpaster</code> these virtual environments will automatically be used. Pyxer determines the root of the VM by looking for the <code>app.yaml</code> file. If you have to enter the VM for installing packages or for other reasons you may to it like this:</p>
