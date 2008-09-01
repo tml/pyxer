@@ -26,10 +26,10 @@ except:
     HELP = ""
 HELP = "<!--HELP--><pre>" + HELP + "</pre><!--HELP-->"
 
-rxversion = re.compile("VERSION{.*?}VERSION", re.MULTILINE|re.IGNORECASE|re.DOTALL)
-rxbuild = re.compile("BUILD{.*?}BUILD", re.MULTILINE|re.IGNORECASE|re.DOTALL)
-rxversionhtml = re.compile("\<\!--VERSION--\>.*?\<\!--VERSION--\>", re.MULTILINE|re.IGNORECASE|re.DOTALL)
-rxhelphtml = re.compile("\<\!--HELP--\>.*?\<\!--HELP--\>", re.MULTILINE|re.IGNORECASE|re.DOTALL)
+rxversion = re.compile("VERSION{.*?}VERSION", re.MULTILINE | re.IGNORECASE | re.DOTALL)
+rxbuild = re.compile("BUILD{.*?}BUILD", re.MULTILINE | re.IGNORECASE | re.DOTALL)
+rxversionhtml = re.compile("\<\!--VERSION--\>.*?\<\!--VERSION--\>", re.MULTILINE | re.IGNORECASE | re.DOTALL)
+rxhelphtml = re.compile("\<\!--HELP--\>.*?\<\!--HELP--\>", re.MULTILINE | re.IGNORECASE | re.DOTALL)
 
 for fname in FILES:
     data = open(fname, "rb").read()

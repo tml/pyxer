@@ -34,7 +34,7 @@ _vars = re.compile(u"""
         |
         ([a-z_][a-z_0-9]*)(\.[a-z_][a-z_0-9]*)*
     )
-    """, re.M|re.VERBOSE)
+    """, re.M | re.VERBOSE)
 
 class Dict(dict):
 
@@ -54,7 +54,7 @@ class CodeGenerator(object):
     level = 0
     tab = '\t'
 
-    def __init__(self, code=None, level=0, tab='\t'):
+    def __init__(self, code = None, level = 0, tab = '\t'):
         self.code = code or []
         if level != self.level:
             self.level = level
@@ -71,12 +71,12 @@ class CodeGenerator(object):
         self.level += 1
         self.pad += self.tab
 
-    def end_block(self, nblocks=1, with_pass=False):
+    def end_block(self, nblocks = 1, with_pass = False):
         for n in range(nblocks):
             if with_pass:
                 self.line('pass')
             self.level -= 1
-            self.pad = self.pad[:-len(self.tab)]
+            self.pad = self.pad[: - len(self.tab)]
 
     def insert_block(self, block):
         lines = block.splitlines()
@@ -93,12 +93,12 @@ class CodeGenerator(object):
 
     def debug(self):
         for n in range(0, len(self.code)):
-            print "%4d:" % (n+1), self.code[n]
+            print "%4d:" % (n + 1), self.code[n]
 
     def pretty(self):
         out = []
         for n in range(0, len(self.code)):
-            out.append("%4d: %s" % (n+1, self.code[n].replace("\t", "    ")))
+            out.append("%4d: %s" % (n + 1, self.code[n].replace("\t", "    ")))
         return "\n".join(out)
 
 class PyxerStream(Stream):
@@ -122,7 +122,20 @@ class PyxerStream(Stream):
 
     def inner(self, path):
         result = list(self.select(path))
-        if result and result[0][0]==START:
+        if result and result[0][0] == START:
+            return result[1:-1]
+        return result
+
+    def css(self, selector):
+        import pyxer.template.cssselect as select
+        path = select.css_to_xpath(selector)
+        inner = False
+        if selector.endswith(" *"):
+            selector = selector[:-2]
+            inner = True
+        log.debug("CSS Selector %r -> XPath %r (innerHTML %r)", selector, path, inner)
+        result = list(self.select(path))
+        if inner and result and result[0][0] == START:
             return result[1:-1]
         return result
 
@@ -134,7 +147,7 @@ class TemplateSoup(object):
     Yet another templating system based on BeautyfulSoup
     """
 
-    def __init__(self, source, html5=False, strict=True, debug=True):
+    def __init__(self, source, html5 = False, strict = True, debug = True):
         self.strict = strict
         self.html5 = html5
         self.debug = debug
@@ -161,7 +174,7 @@ class TemplateSoup(object):
         if 0: # self.html5:
             import html5lib
             import html5lib.treebuilders
-            parser = html5lib.HTMLParser(tree=html5lib.treebuilders.getTreeBuilder("beautifulsoup"))
+            parser = html5lib.HTMLParser(tree = html5lib.treebuilders.getTreeBuilder("beautifulsoup"))
             self.soup = parser.parse(StringIO.StringIO(self.source))
         else:
             self.soup = HTML(self.source)
@@ -211,7 +224,7 @@ class TemplateSoup(object):
     def generateByteCode(self):
         self.bytecode = compile(self.sourcecode, "<string>", "exec")
 
-    def generate(self, vars={}):
+    def generate(self, vars = {}):
         # import pprint
 
         # For referencing
@@ -259,9 +272,9 @@ class TemplateSoup(object):
         self.stream = stream
         return stream
 
-    def render(self, encoding="utf8"):
+    def render(self, encoding = "utf8"):
         if self.stream:
-            return self.stream.render("xhtml", strip_whitespace=True)
+            return self.stream.render("xhtml", strip_whitespace = True)
 
     __str__ = render
 
@@ -270,7 +283,7 @@ class TemplateSoup(object):
         value = None
         kind, data, pos = node
         if kind == START:
-            if not (data[0].lower()=="meta" and name=="content"):
+            if not (data[0].lower() == "meta" and name == "content"):
                 attr = data[1]
                 if name in attr:
                     value = attr.get(name)
@@ -283,7 +296,7 @@ class TemplateSoup(object):
                     node[1] = (data[0], attr - name)
         return value
 
-    def checkSyntax(self, value, mode="eval"):
+    def checkSyntax(self, value, mode = "eval"):
         if self.strict:
             try:
                 compile(value, "<string>", mode)
@@ -294,7 +307,7 @@ class TemplateSoup(object):
     def addElement(self, kind, data, pos):
         self.code.line("stream.append((%s, %r, %r))" % (kind, data, pos))
 
-    def loop(self, input, depth=0):
+    def loop(self, input, depth = 0):
 
         stack = []
         path = []
@@ -310,7 +323,7 @@ class TemplateSoup(object):
             # Set some defaults
             indent = 0
             pyDef = None
-            show = not (len(path) and path[-1][2])
+            show = not (len(path) and path[ - 1][2])
 
             # Handle tags
             if kind == START:
@@ -328,7 +341,8 @@ class TemplateSoup(object):
                 pyContent = self.getAttr(node, "content")
                 pyAttrs = self.getAttr(node, "attrs")
                 pyStrip = self.getAttr(node, "strip")
-
+                # pyStrip = self.getAttr(node, "select")
+                
                 pyExtends = self.getAttr(node, "extends")               # XXX todo
                 pyLayout = self.getAttr(node, "layout")
                 pyFromid = self.getAttr(node, "fromid")
@@ -384,7 +398,7 @@ class TemplateSoup(object):
                             cmd = m.group(1)
                             if cmd != "$":
                                 if cmd.startswith("{"):
-                                    cmd = cmd[1:-1].strip()
+                                    cmd = cmd[1: - 1].strip()
                                 expr.append(self.checkSyntax("unicode(%s)" % cmd))
                             else:
                                 expr.append(repr(u"$"))
@@ -463,7 +477,7 @@ class TemplateSoup(object):
                         self.addElement(TEXT, u"$", position)
                     else:
                         if cmd.startswith("{"):
-                            cmd = cmd[1:-1].strip()
+                            cmd = cmd[1: - 1].strip()
                         self.code.line(
                             "stream.add(%s)" % self.checkSyntax(cmd),
                         )
@@ -478,7 +492,7 @@ def select(path):
     global STREAM
     return STREAM.select(path)
 
-if __name__=="__main__":
+if __name__ == "__main__":
 
     if 1:
         def layout(name):
@@ -505,7 +519,7 @@ if __name__=="__main__":
             </html>
             """)
         # print ts.code.pretty()
-        ts.generate(dict(x=1, layout=layout))
+        ts.generate(dict(x = 1, layout = layout))
         print ts
 
     if 0:
@@ -531,11 +545,11 @@ if __name__=="__main__":
         print t.generate()
 
     if 0:
-        mod = TemplateSoup(data2, html5=True)
+        mod = TemplateSoup(data2, html5 = True)
         mod.code.debug()
         exec(str(mod.code), dict(
-            x=1,
-            samples=[
+            x = 1,
+            samples = [
                 ("Home", "/"),
                 ("Developer", "/developer"),
                 ("Contacts", "/legal"),
@@ -543,6 +557,6 @@ if __name__=="__main__":
 
     if 0:
         # t = Template(_test)
-        t = Template(_test3, html=True, path=r"c:\test.html")
+        t = Template(_test3, html = True, path = r"c:\test.html")
         print t.source.encode("latin1", "ignore")
-        print t.render(dict(name='dirk "enzo" holtwick'), encoding="ascii")
+        print t.render(dict(name = 'dirk "enzo" holtwick'), encoding = "ascii")

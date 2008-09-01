@@ -20,17 +20,17 @@ Very liberal Open Source licensing.
 """.strip()
 
 setup(
-    name           = "pyxer",
-    version        = "VERSION{0.6.0}VERSION"[8:-8],
-    description    = "Simple Python Framework and Templating for Paste, Google App Engine (GAE) and WSGI",
-    license        = "MIT",
-    author         = "Dirk Holtwick",
-    author_email   = "dirk.holtwick@gmail.com",
-    url            = "http://code.google.com/p/pyxer/",
-    download_url   = "http://code.google.com/p/pyxer/",
-    keywords       = "Framework, Google App Engine, GAE, appengine, Paster, Server, Templating",
+    name = "pyxer",
+    version = "VERSION{0.6.0}VERSION"[8: - 8],
+    description = "Simple Python Framework and Templating for Paste, Google App Engine (GAE) and WSGI",
+    license = "MIT",
+    author = "Dirk Holtwick",
+    author_email = "dirk.holtwick@gmail.com",
+    url = "http://code.google.com/p/pyxer/",
+    download_url = "http://code.google.com/p/pyxer/",
+    keywords = "Framework, Google App Engine, GAE, appengine, Paster, Server, Templating",
 
-    requires       = [
+    requires = [
         "webob",
         "paste",
         ],
@@ -44,7 +44,7 @@ setup(
         "pyxer.gae",
         "pyxer.paster",
         "pyxer.utils",
-        "pyxer.template",        
+        "pyxer.template",
         ],
 
     # packages = find_packages(exclude=['ez_setup']),
@@ -62,7 +62,7 @@ setup(
     #classifiers = [x.strip() for x in """
     #    """.strip().splitlines()],
 
-    entry_points="""
+    entry_points = """
 [paste.app_factory]
 main = pyxer.app:app_factory
 

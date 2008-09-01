@@ -3,12 +3,14 @@ CHANGELOG
 
 Version 0.6.0, 2008-08-xxx
 
-- NEW: New templating language based on BeautifulSoup
+- NEW: New templating language based on Genshi
+- NEW: Support for CSS selectors in templating language
 - NEW: Additional controller type '@expose'
 - NEW: Special method 'default' for handling all
-- NEW: Config file "pyxer.ini"
+- NEW: Basic config file support, global variable "config"
 - BUG: Many small fixes
 - DEL: pyxer.kid removed, general cleanup
+- DEL: BeautifulSoup based templating language removed
 
 Version 0.5.1, 2008-08-15
 

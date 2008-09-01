@@ -107,7 +107,7 @@ def setup(opt):
         print "create paster.ini"
         open("paster.ini", "w").write(_paster_ini)
 
-def serve(opt, options=[], daemon=""):
+def serve(opt, options = [], daemon = ""):
     root = find_root()
     command = "serve"    
     # setup(opt)    
@@ -121,10 +121,10 @@ def serve(opt, options=[], daemon=""):
     call_script(["paster", command] + options + [ini, daemon])    
 
 def start(opt):
-    serve(opt, options=["--daemon"])
+    serve(opt, options = ["--daemon"])
 
 def stop(opt):
-    serve(opt, options=["--stop-daemon"])
+    serve(opt, options = ["--stop-daemon"])
 
 def status(opt):
-    serve(opt, options=["--status"])
+    serve(opt, options = ["--status"])

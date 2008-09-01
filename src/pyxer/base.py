@@ -27,7 +27,7 @@ from pyxer.controller import \
 import logging
 log = logging.getLogger(__file__)
 
-def abort(code=404):
+def abort(code = 404):
     " Abort with error "
     raise exc.HTTPNotFound()
 
@@ -35,9 +35,9 @@ def url(url):
     " Normalize URL "
     return request.relative_url(url)
 
-def redirect(location, code=301):
+def redirect(location, code = 301):
     " Redirect to other page "   
-    raise exc.HTTPMovedPermanently(location=url(location))
+    raise exc.HTTPMovedPermanently(location = url(location))
 
 class StreamTemplateManager:
     
@@ -66,7 +66,7 @@ class StreamTemplateManager:
         self.cache[path] = (template, mtime)
         return template      
 
-def template_stream(name=None):
+def template_stream(name = None):
     " Get the template "    
     # XXX What to do with dirname? Scenarios?
     # XXX What to do with absolute url /like/this?
@@ -83,10 +83,10 @@ template = template_default = template_stream
 
 def render_stream(*kw):
     template = template_stream()    
-    template.generate(Dict(c=c, h=Dict(
-        url=url,
-        redirect=redirect
-        ), load=template.load))
+    template.generate(Dict(c = c, h = Dict(
+        url = url,
+        redirect = redirect
+        ), load = template.load))
     return template.render()
 
 render_default = render_stream
@@ -100,7 +100,7 @@ def render_json():
 
 class controller(Controller):
  
-    def render(self, result, render=None, **kw):
+    def render(self, result, render = None, **kw):
 
         log.debug("Render called with %r %r %r", repr(result)[:40], render, kw)
         # log.debug("Render called with %r %r", render, kw)
