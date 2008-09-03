@@ -50,9 +50,9 @@ box, but custom transformations can be added easily.
 import re
 import sys
 
-from .builder import Element
-from .core import Stream, Attrs, QName, TEXT, START, END, _ensure, Markup
-from .path import Path
+from pyxer.template.genshi.builder import Element
+from pyxer.template.genshi.core import Stream, Attrs, QName, TEXT, START, END, _ensure, Markup
+from pyxer.template.genshi.path import Path
 
 __all__ = ['Transformer', 'StreamBuffer', 'InjectorTransformation', 'ENTER',
            'EXIT', 'INSIDE', 'OUTSIDE', 'BREAK']

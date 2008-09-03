@@ -25,9 +25,9 @@ import HTMLParser as html
 import htmlentitydefs
 from StringIO import StringIO
 
-from .core import Attrs, QName, Stream, stripentities
-from .core import START, END, XML_DECL, DOCTYPE, TEXT, START_NS, END_NS, \
-                        START_CDATA, END_CDATA, PI, COMMENT
+from pyxer.template.genshi.core import Attrs, QName, Stream, stripentities, \
+    START, END, XML_DECL, DOCTYPE, TEXT, START_NS, END_NS, \
+    START_CDATA, END_CDATA, PI, COMMENT
 
 __all__ = ['ET', 'ParseError', 'XMLParser', 'XML', 'HTMLParser', 'HTML']
 __docformat__ = 'restructuredtext en'

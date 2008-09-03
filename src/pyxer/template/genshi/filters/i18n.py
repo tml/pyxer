@@ -24,10 +24,10 @@ except NameError:
 from gettext import gettext
 import re
 
-from .core import Attrs, Namespace, QName, START, END, TEXT, START_NS, \
+from pyxer.template.genshi.core import Attrs, Namespace, QName, START, END, TEXT, START_NS, \
                         END_NS, XML_NAMESPACE, _ensure
-from .template.base import Template, EXPR, SUB
-from .template.markup import MarkupTemplate, EXEC
+from pyxer.template.genshi.template.base import Template, EXPR, SUB
+from pyxer.template.genshi.template.markup import MarkupTemplate, EXEC
 
 __all__ = ['Translator', 'extract']
 __docformat__ = 'restructuredtext en'

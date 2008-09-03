@@ -42,8 +42,8 @@ from math import ceil, floor
 import operator
 import re
 
-from .core import Stream, Attrs, Namespace, QName
-from .core import START, END, TEXT, START_NS, END_NS, COMMENT, PI, \
+from pyxer.template.genshi.core import Stream, Attrs, Namespace, QName
+from pyxer.template.genshi.core import START, END, TEXT, START_NS, END_NS, COMMENT, PI, \
                         START_CDATA, END_CDATA
 
 __all__ = ['Path', 'PathSyntaxError']

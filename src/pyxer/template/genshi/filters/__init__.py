@@ -13,8 +13,8 @@
 
 """Implementation of a number of stream filters."""
 
-from .filters.html import HTMLFormFiller, HTMLSanitizer
-from .filters.i18n import Translator
-from .filters.transform import Transformer
+from pyxer.template.genshi.filters.html import HTMLFormFiller, HTMLSanitizer
+from pyxer.template.genshi.filters.i18n import Translator
+from pyxer.template.genshi.filters.transform import Transformer
 
 __docformat__ = 'restructuredtext en'

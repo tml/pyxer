@@ -29,17 +29,19 @@ from pyxer.controller import \
 import logging
 log = logging.getLogger(__file__)
 
-def abort(code = 404):
-    " Abort with error "
-    raise exc.HTTPNotFound()
-
 def url(url):
     " Normalize URL "
     return request.relative_url(url)
 
 def redirect(location, code = 301):
     " Redirect to other page "   
-    raise exc.HTTPMovedPermanently(location = url(location))
+    # .exeception for Python 2.3 compatibility
+    raise exc.HTTPMovedPermanently(location = url(location)).exception
+
+def abort(code = 404):
+    " Abort with error "
+    # .exeception for Python 2.3 compatibility
+    raise exc.HTTPNotFound().exception
 
 class StreamTemplateManager:
     

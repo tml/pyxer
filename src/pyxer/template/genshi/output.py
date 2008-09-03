@@ -22,8 +22,8 @@ except NameError:
     from sets import ImmutableSet as frozenset
 import re
 
-from .core import escape, Attrs, Markup, Namespace, QName, StreamEventKind
-from .core import START, END, TEXT, XML_DECL, DOCTYPE, START_NS, END_NS, \
+from pyxer.template.genshi.core import escape, Attrs, Markup, Namespace, QName, StreamEventKind
+from pyxer.template.genshi.core import START, END, TEXT, XML_DECL, DOCTYPE, START_NS, END_NS, \
                         START_CDATA, END_CDATA, PI, COMMENT, XML_NAMESPACE
 
 __all__ = ['encode', 'get_serializer', 'DocType', 'XMLSerializer',

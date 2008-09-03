@@ -432,8 +432,8 @@ class TemplateSoup(object):
                     #    "parent.append(node)",
                     #)
 
-                if pyFromid:
-                    pyContent = "fromid(%r, top, soup)" % pyFromid
+                #if pyFromid:
+                #    pyContent = "fromid(%r, top, soup)" % pyFromid
 
                 if pyStrip and pyContent:
                     pyReplace = pyContent
