@@ -20,8 +20,8 @@ except NameError:
     from sets import Set as set
 import re
 
-from .core import Attrs, QName, stripentities
-from .core import END, START, TEXT, COMMENT
+from pyxer.template.genshi.core import Attrs, QName, stripentities
+from pyxer.template.genshi.core import END, START, TEXT, COMMENT
 
 __all__ = ['HTMLFormFiller', 'HTMLSanitizer']
 __docformat__ = 'restructuredtext en'

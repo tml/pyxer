@@ -19,5 +19,5 @@ in concept to SAX parsing events) which can be processed in a uniform manner
 independently of where or how they are produced.
 """
 
-from .core import Stream, Markup, escape, unescape, Attrs, Namespace, QName
-from .input import ParseError, XML, HTML
+from pyxer.template.genshi.core import Stream, Markup, escape, unescape, Attrs, Namespace, QName
+from pyxer.template.genshi.input import ParseError, XML, HTML

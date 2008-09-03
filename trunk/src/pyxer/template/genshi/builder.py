@@ -73,7 +73,7 @@ try:
 except NameError:
     from sets import Set as set
 
-from .core import Attrs, Markup, Namespace, QName, Stream, \
+from pyxer.template.genshi.core import Attrs, Markup, Namespace, QName, Stream, \
                         START, END, TEXT
 
 __all__ = ['Fragment', 'Element', 'ElementFactory', 'tag']

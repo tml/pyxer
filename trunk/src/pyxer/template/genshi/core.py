@@ -16,7 +16,7 @@
 from itertools import chain
 import operator
 
-from .util import plaintext, stripentities, striptags
+from pyxer.template.genshi.util import plaintext, stripentities, striptags
 
 __all__ = ['Stream', 'Markup', 'escape', 'unescape', 'Attrs', 'Namespace',
            'QName']
@@ -172,7 +172,7 @@ class Stream(object):
         :see: XMLSerializer, XHTMLSerializer, HTMLSerializer, TextSerializer
         :note: Changed in 0.5: added the `out` parameter
         """
-        from .output import encode
+        from pyxer.template.genshi.output import encode
         if method is None:
             method = self.serializer or 'xml'
         generator = self.serialize(method=method, **kwargs)
@@ -211,7 +211,7 @@ class Stream(object):
         :raises PathSyntaxError: if the given path expression is invalid or not
                                  supported
         """
-        from .path import Path
+        from pyxer.template.genshi.path import Path
         return Path(path).select(self, namespaces, variables)
 
     def serialize(self, method='xml', **kwargs):
@@ -234,7 +234,7 @@ class Stream(object):
         :rtype: ``iterator``
         :see: XMLSerializer, XHTMLSerializer, HTMLSerializer, TextSerializer
         """
-        from .output import get_serializer
+        from pyxer.template.genshi.output import get_serializer
         if method is None:
             method = self.serializer or 'xml'
         return get_serializer(method, **kwargs)(_ensure(self))
