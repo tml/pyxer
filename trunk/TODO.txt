@@ -5,6 +5,10 @@ TODO
   or "helpers.py" like in Pylons
 - Let the user access the config file
 
+mod_python:
+- Solution for logging
+- Subpaths are not supported yet
+
 Templating
 - Let the user choose the templating machine
 - CDATA does not work

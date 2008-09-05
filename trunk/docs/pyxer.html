@@ -295,6 +295,9 @@ assert ('&lt;body' in res)
     <p>xxx</p>
     <h2>Use Google App Engine Launcher on Mac OS</h2>
     <p>xxx </p>
+    <h3>Pyxer on Apache</h3>
+    <p>If you have installed mod_python the deployment of your project is as simple as the following five lines. Just copy them to your sites configuration and adjust the absolute path to the &quot;development.ini&quot;: </p>
+    <pre>&lt;Location &quot;/&quot;&gt;<br />  SetHandler python-program<br />  PythonHandler paste.modpython<br />  PythonOption paste.ini /&lt;absolute_path_to_ini_file&gt;/development.ini<br />&lt;/Location&gt;</pre>
     <h2>Configuration</h2>
     <p>Pyxer configuration is placed in the configuration file used by Paster or GAE respectively <code>development.ini</code> or <code>gae.ini</code>. If both are not available Pyxer looks into <code>pyxer.ini</code>. Example: </p>
     <pre>[pyxer]
