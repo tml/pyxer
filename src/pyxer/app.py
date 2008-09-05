@@ -27,6 +27,7 @@ import os
 import os.path
 import types
 import pprint
+import site
 
 import logging
 log = logging.getLogger(__file__)
@@ -54,10 +55,13 @@ class PyxerApp(object):
 
             url = environ["PATH_INFO"]
 
-            environ["MY_PREFIX"] = prefix = environ["SCRIPT_FILENAME"][len(environ['DOCUMENT_ROOT']):]
+            # Mod Python corrections
+            if environ.has_key("SCRIPT_FILENAME"):
+                prefix = environ["SCRIPT_FILENAME"][len(environ['DOCUMENT_ROOT']):]
+                environ["WSGI_PREFIX"] = prefix
+                url = url[len(prefix):]
 
-            url = url[len(prefix):]
-            environ["PATH_INFO"] = url
+            # environ["PATH_INFO"] = url
             #environ["SCRIPT_URL"] = url
             # environ["REQUEST_URI"] = url
 
@@ -70,8 +74,8 @@ class PyxerApp(object):
 
             # URL aufsplitten in seine Bestandteile (ohne Slashes)
             parts = [x for x in url.strip("/").split("/") if x]
-            environ["MY_PARTS"] = repr(parts)
-            environ["MY_SYS_PATH"] = repr(sys.path)
+            # environ["MY_PARTS"] = repr(parts)
+            # environ["MY_SYS_PATH"] = repr(sys.path)
 
             log.debug("Analyzing URL %r with parts %r", url, parts)
 
@@ -217,8 +221,7 @@ def make_app(global_conf = {}, **app_conf):
         log.exception("Config file not found")
 
     # Add current directory to sys path
-    if root not in sys.path:
-        sys.path.insert(0, root)
+    site.addsitedir(root)
 
     # Here we expect all data
     base = os.path.join(root, "public")
