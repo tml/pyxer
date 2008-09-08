@@ -14,6 +14,7 @@ from pyxer.controller import \
 import re
 import urllib
 import copy
+import sys
 
 import paste.fileapp
 
@@ -42,30 +43,6 @@ def template_to_regex(template):
     return regex
 
 '''
-class Router(object):
-
-    def __init__(self):
-        self.routes = []
-
-    def add_route(self, template, controller, **vars):
-        #if isinstance(controller, basestring):
-        #    controller = load_controller(controller)
-        self.routes.append((re.compile(template_to_regex(template)),
-                            controller,
-                            vars))
-
-    def __call__(self, environ, start_response):
-        req = Request(environ)
-        for regex, controller, vars in self.routes:
-            match = regex.match(req.path_info)
-            if match:
-                req.urlvars = match.groupdict()
-                req.urlvars.update(vars)
-                print controller
-                # return controller(environ, start_response)
-                return []
-        return exc.HTTPNotFound()(environ, start_response)
-
 def url(*segments, **vars):
     base_url = get_request().application_url
     path = '/'.join(str(s) for s in segments)
@@ -94,30 +71,64 @@ class RouteObject(object):
 
     def __repr__(self):
         return "<Route '%s'>" % (
-            self.name )
+            self.name)
 
     __str__ = __repr__
 
 class Router(object):
 
-    def __init__(self, module, prefix=""):
-        self.module = module
+    def __init__(self, module = None, prefix=""):
+        self.module = None
+        self.module_name = None
         self.prefix = prefix
         self.routes = []
+        self.set_module(module)
+
+    def set_module(self, module=None):
+        if module is not None:
+            if isinstance(module, basestring):
+                self.module = sys.modules[module]
+            else:
+                self.module = module
+            self.module_name = self.module.__name__
+
+    def load_module(self, module_name):
+        try:
+            __import__(module_name)
+        except:
+            module_name = self.module_name + "." + module_name
+            print "%", module_name
+            __import__(module_name)
+        module = sys.modules[module_name]
+        return module
+        
+#...     module_name, func_name = string.split(':', 1)
+#...     __import__(module_name)
+#...     module = sys.modules[module_name]
+#...     func = getattr(module, func_name)
+#...     return func
 
     def add(self, *a, **kw):
         #if isinstance(controller, basestring):
         #    controller = load_controller(controller)
         self.routes.append(RouteObject(*a, **kw))
 
-    def match(self, path):
+    add_re = add
+
+    def match(self, path, module=None, urlvars={}):
+        # Normalize module infos
+        self.set_module(module)
+        # Search        
         for route in self.routes:
             match = route.template.match(path)
             if match:
-                urlvars = copy.copy(match.groupdict())
-                prefix = path[:match.end()]
+                urlvars.update(copy.copy(match.groupdict()))
+                if urlvars.has_key("module"):
+                    module = self.load_module(urlvars["module"])
+                    tail = path[match.end():].lstrip("/")
+                    return module.router.match(tail, module) #, urlvars)
                 # urlvars.update(route.vars)
-                return (route, urlvars, prefix)
+                return (route, urlvars)
         return None
 
     def __call__(self, environ, start_response):
@@ -125,7 +136,6 @@ class Router(object):
         for regex, controller, vars in self.routes:
             match = regex.match(req.path_info)
             if match:
-
                 req.urlvars = match.groupdict()
                 req.urlvars.update(vars)
                 print controller
@@ -133,6 +143,20 @@ class Router(object):
                 return []
         return exc.HTTPNotFound()(environ, start_response)
 
+"""
+- keine vorgaben für urlvars
+- urlvars nicht bei modulen möglich, oder doch z.B. für sprachen?
+- subdomain ermöglichen, z.b. für sprachwechsel?
+- genaues macthing nicht test -> test/
+- '' oder '*' einführen, steht nur alleine und heisst: der gnaze rest
+- umleitung zu default static oder als parameter? ('', static)
+- url_for equivalent
+- benannte url schemata
+- module, controller, action heissen alle object und können auch strings sein
+- explizite actions in den urlvars {action:*}
+- redirects, auch zu großen domains: ('google', redirect('google.com')
+- auf für fehler error(404)
+"""
 
 if __name__=="__main__":
 
@@ -140,6 +164,7 @@ if __name__=="__main__":
     sys.path.insert(0, "../../example")
 
     import public
+    import public.wiki
 
     '''
     print template_to_regex('/a/static/path')
@@ -158,31 +183,33 @@ if __name__=="__main__":
     static = "*static"
 
     router = Router(public)
-    router.add("^(?P<action>[^\/\.]+?)(\.html?)?$",
+    router.add_re("^(?P<action>[^\/\.]+?)(\.html?)?$",
         name="_action")
-    router.add("^(?P<module>[^\/\.]+?)\/",
+    router.add_re("^(?P<module>[^\/\.]+?)\/",
         name="_module")
-    router.add("^$",
+    router.add_re("^$",
         action="index",
         name="_action_index")
-    router.add("^[^\/\.]+?\.(py[co]?)$",
+    router.add_re("^[^\/\.]+?\.(py[co]?)$",
         name="_ignore_py")
-    router.add("^[^\/\.]+?\.[^\/\.]+?$",
+    router.add_re("^[^\/\.]+?\.[^\/\.]+?$",
         action=static,
         name="_static")
-    router.add(".*",
+    router.add_re(".*",
         action="default",
         name="_action_default")
 
     tests = [
-        "hans",
-        "hans/",
-        "hans/peter",
-        "hans.gif",
-        "hans.htm",
-        "hans.html",
+        #"hans",
+        #"hans/",
+        #"hans/peter",
+        #"hans.gif",
+        #"hans.htm",
+        #"hans.html",
         "",
-        "quatsch.mit.sosse",
+        #"quatsch.mit.sosse",
+        "wiki/content/some",
+        "wiki/commit",
         ]
 
     for path in tests:
