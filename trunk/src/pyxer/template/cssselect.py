@@ -8,6 +8,7 @@ COPYRIGHT INFORMATION!!!
 This file is taken from the lxml package
 """
 
+import sys
 import re
 # from lxml import etree
 

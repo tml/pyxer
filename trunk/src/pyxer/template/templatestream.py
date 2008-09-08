@@ -78,6 +78,7 @@ class CodeGenerator(object):
             self.level -= 1
             self.pad = self.pad[: - len(self.tab)]
 
+    '''
     def insert_block(self, block):
         lines = block.splitlines()
         if len(lines) == 1:
@@ -87,6 +88,7 @@ class CodeGenerator(object):
             # adjust the block
             for line in _adjust_python_block(lines, self.tab):
                 self.line(line)
+    '''
 
     def __str__(self):
         return '\n'.join(self.code + [''])
@@ -498,10 +500,6 @@ class TemplateSoup(object):
 
             elif show:
                 self.addElement(kind, data, position)
-
-def select(path):
-    global STREAM
-    return STREAM.select(path)
 
 if __name__ == "__main__":
 

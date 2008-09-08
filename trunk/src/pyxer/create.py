@@ -5,14 +5,13 @@
 #############################################
 
 import logging
-import os, os.path
+import os.path
 import sys
-import pyxer.gae.monkey
 import pyxer.gae.monkey.boot as boot
 
 log = logging.getLogger(__file__)
 
-from pyxer.utils import call_subprocess, call_script, find_root
+from pyxer.utils import call_script, find_root
 
 INDEX_HTML = """
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
