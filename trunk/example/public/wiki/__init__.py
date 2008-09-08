@@ -5,10 +5,8 @@ import model
 
 log = logging.getLogger(__name__)
 
-from pyxer.route import *
-
-router = Router(__name__)
-router.add("^content\/(?P<name>.*?)", action=index)
+router = Router()
+router.add("^content\/(?P<name>.*?)$", action="index", name="_content")
 
 @controller
 def index():
