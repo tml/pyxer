@@ -210,6 +210,44 @@ def index():
     <pre><em>$</em> xgae fix </pre>
   </div>
   <div class="section">
+    <h1>Routing</h1>
+  <p>The routing in Pyxer is based on some conventions by default but may be extended in a very flexible and easy way. By default all public project data are expected in the folder &quot;public&quot;. If you just put static content there  it will behave like you expect it from a normal webserver. </p>
+  <p>To add controllers to it, start with creating an __init__.py file. This makes the folder a Python package and Pyxer routing will first evaluate this before looking for static content. </p>
+  <h2>Default routes </h2>
+  <p>The easiest controller looks like this:</p>
+  <p>@controller def index(): return &quot;Hello World&quot;</p>
+  <p>This will be called with the following URLs:</p>
+  <ul>
+    <li>http://&lt;domain&gt;/</li>
+    <li>http://&lt;domain&gt;/index</li>
+    <li>http://&lt;domain&gt;/index.html</li>
+    <li>http://&lt;domain&gt;/index.htm</li>
+  </ul>
+  <p>If the controller has another name as &quot;index&quot;, these corresponding URLs will match:</p>
+  <ul>
+    <li>
+      http://&lt;domain&gt;/&lt;controller&gt;    </li>
+    <li>
+      http://&lt;domain&gt;/&lt;controller&gt;.html    </li>
+    <li>http://&lt;domain&gt;/&lt;controller&gt;.htm    </li>
+  </ul>
+  <p>There is one other special controller name &quot;default&quot;. If this one exists all non matching request will be passed to this controller. </p>
+  <p>If you have sub packages in your &quot;public&quot; folder like &quot;foo&quot; and &quot;foo.bar&quot;, these will be matched by the corresponding path and in this package the rules described before will apply:</p>
+  <ul>
+    <li>http://&lt;domain&gt;/foo/bar/...</li>
+    </ul>
+  <p>Everything that does not match will be considered static content. Pyxer tries to match the path relatively to the last matched package.</p>
+  <p><strong>If you are just beginning to use Pyxer and you do not like reading manual - like I do - you may skip the next sub sections and continue with the next main section.</strong></p>
+  <h2>Proprietary routing</h2>
+  <p>If you need more sophisticated routing or want to include external packages that are not placed under the &quot;public&quot; folder you may add your own routing. This is as simple as adding this line to your global space of your module:</p>
+  <pre>router = Router()</pre>
+  <p><strong>Important! The name of this object has to be &quot;router&quot; by convention!</strong></p>
+  <p>To add your own ...   </p>
+  <pre>router.add(&quot;content-{name}&quot;, &quot;content&quot;)</pre>
+  <p>This matches all URL starting with &quot;content-&quot; while the rest will be saved in req.urlvars as &quot;name&quot;. For example the URL /content-myentry will result in a call of the controller &quot;index&quot; where req.urlvars[&quot;name&quot;]==&quot;myentry&quot;.</p>
+  <p>XXX</p>
+  </div>
+  <div class="section">
     <h1>Templating</h1>
     <p><em>Pyxer</em> offers yet another templating language that is very close to
       Genshi and Kid. As the former did not work with Google AppEngine at
@@ -332,8 +370,22 @@ session = beaker </pre>
     <pre><em>$</em> xgae serve</pre>
   </div>
   <div class="section">
-    <h1>Links</h1>
-    <p>Some usfull links:</p>
+    <h1>Appendix</h1>
+    <h2>Reserved names </h2>
+    <ul>
+      <li>index: Name of the root controller</li>
+      <li>default: Name of the collecting controller</li>
+      <li>router: Name of the routing object</li>
+      <li>session: Session </li>
+      <li>req, request</li>
+      <li>resp, response</li>
+      <li>cache</li>
+      <li>c</li>
+      <li>g</li>
+      <li>h</li>
+      <li>config    </li>
+    </ul>
+    <h2>Links</h2>
     <ol>
       <li>XXX</li>
     </ol>

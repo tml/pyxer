@@ -15,6 +15,7 @@ import re
 import urllib
 import copy
 import sys
+import types
 
 import paste.fileapp
 
@@ -57,34 +58,57 @@ class RouteObject(object):
 
     def __init__(self,
             template,
-            module=None,
-            action=None,
-            name=None,
-            vars={}):
+            object = None,
+            name = None,
+            vars = {}):
         self.template = re.compile(template) #template_to_regex
-        self.module = module
-        self.action = action
+        self.object = object
         self.name = name
         self.vars = vars
-        self.vars["module"] = self.module
-        self.vars["action"] = self.action
+        self.vars["object"] = self.object
 
     def __repr__(self):
-        return "<Route '%s'>" % (
-            self.name)
+        return "<RouteObject '%s'; pattern '%s'>" % (
+            self.name, self.template.pattern)
 
     __str__ = __repr__
 
 class Router(object):
 
-    def __init__(self, module = None, prefix=""):
+    def __init__(self, module = None, prefix = "", use_default = True):
         self.module = None
         self.module_name = None
         self.prefix = prefix
         self.routes = []
+        self.routes_default = []
         self.set_module(module)
 
-    def set_module(self, module=None):
+        # Default routings
+        if use_default:
+            # /
+            self.add_default("^$",
+                object = "index",
+                name = "_action_index")
+            # /demo
+            # /demo.html
+            self.add_default("^(?P<object>[^\/\.]+?)(\.html?)?$",
+                name = "_action")
+            # /demo/
+            self.add_default("^(?P<object>[^\/\.]+?)\/",
+                name = "_module")
+            # demo.py
+            self.add_default("^[^\/\.]+?\.(py[co]?)$",
+                name = "_ignore_py")
+            # demo.xyz
+            self.add_default("^[^\/\.]+?\.[^\/\.]+?$",
+                object = static,
+                name = "_static")
+            # demo.xyz.abc
+            self.add_default(".*",
+                object = "default",
+                name = "_action_default")
+
+    def set_module(self, module = None):
         if module is not None:
             if isinstance(module, basestring):
                 self.module = sys.modules[module]
@@ -92,43 +116,63 @@ class Router(object):
                 self.module = module
             self.module_name = self.module.__name__
 
-    def load_module(self, module_name):
+    def load_module(self, name):
+        if sys.modules.has_key(name):
+            return sys.modules[name]
         try:
-            __import__(module_name)
-        except:
-            module_name = self.module_name + "." + module_name
-            print "%", module_name
-            __import__(module_name)
-        module = sys.modules[module_name]
+            __import__(name)
+        except ImportError:
+            return None
+        module = sys.modules[name]
+        return module
+
+    def load_object(self, name):
         return module
         
-#...     module_name, func_name = string.split(':', 1)
-#...     __import__(module_name)
-#...     module = sys.modules[module_name]
+#...     name, func_name = string.split(':', 1)
+#...     __import__(name)
+#...     module = sys.modules[name]
 #...     func = getattr(module, func_name)
 #...     return func
 
-    def add(self, *a, **kw):
+    def add(self, template, **kw):
         #if isinstance(controller, basestring):
         #    controller = load_controller(controller)
-        self.routes.append(RouteObject(*a, **kw))
+        self.routes.append(RouteObject(template_to_regex(template), **kw))
 
-    add_re = add
+    def add_re(self, template, **kw):
+        self.routes.append(RouteObject(template, **kw))
 
-    def match(self, path, module=None, urlvars={}):
+    def add_default(self, template, **kw):
+        self.routes_default.append(RouteObject(template, **kw))
+
+    def match(self, path, module = None, urlvars = {}):
         # Normalize module infos
         self.set_module(module)
         # Search        
-        for route in self.routes:
+        print "path:", path
+        for route in self.routes + self.routes_default:
+            print "?", route
             match = route.template.match(path)
             if match:
                 urlvars.update(copy.copy(match.groupdict()))
-                if urlvars.has_key("module"):
-                    module = self.load_module(urlvars["module"])
-                    tail = path[match.end():].lstrip("/")
-                    return module.router.match(tail, module) #, urlvars)
+                if urlvars.has_key("object"):
+                    obj = urlvars["object"]                    
+                    if isinstance(obj, types.ModuleType):
+                        module = obj
+                    else:
+                        module = (self.load_module(obj) 
+                            or self.load_module(self.module_name + obj))
+                    if module is None:
+                        if hasattr(self.module, obj):
+                            return getattr(self.module, obj), urlvars
+                    else:
+                        if not hasattr(module, "router"):
+                            module.router = Router(module)
+                        tail = path[match.end():].lstrip("/")
+                        return module.router.match(tail, module) #, urlvars)
                 # urlvars.update(route.vars)
-                return (route, urlvars)
+                # return (route, urlvars)
         return None
 
     def __call__(self, environ, start_response):
@@ -158,7 +202,7 @@ class Router(object):
 - auf für fehler error(404)
 """
 
-if __name__=="__main__":
+if __name__ == "__main__":
 
     import sys
     sys.path.insert(0, "../../example")
@@ -183,21 +227,6 @@ if __name__=="__main__":
     static = "*static"
 
     router = Router(public)
-    router.add_re("^(?P<action>[^\/\.]+?)(\.html?)?$",
-        name="_action")
-    router.add_re("^(?P<module>[^\/\.]+?)\/",
-        name="_module")
-    router.add_re("^$",
-        action="index",
-        name="_action_index")
-    router.add_re("^[^\/\.]+?\.(py[co]?)$",
-        name="_ignore_py")
-    router.add_re("^[^\/\.]+?\.[^\/\.]+?$",
-        action=static,
-        name="_static")
-    router.add_re(".*",
-        action="default",
-        name="_action_default")
 
     tests = [
         #"hans",

@@ -6,7 +6,7 @@ import model
 log = logging.getLogger(__name__)
 
 router = Router()
-router.add("^content\/(?P<name>.*?)$", action="index", name="_content")
+router.add("^content\/(?P<name>.*?)$", object="index", name="_content")
 
 @controller
 def index():
