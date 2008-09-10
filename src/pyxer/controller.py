@@ -58,18 +58,18 @@ class Controller(Decorator):
     """
 
     def call(self, *a, **kw):
-        return self.func(*a, **kw) 
+        return self.func(*a, **kw)
 
     def wrapper(self, *a, **kw):
-        
+
         # Execute controller and get its result
-        result = self.call(*a, **kw)        
+        result = self.call(*a, **kw)
         log.debug("Controller call %r (%r %r) = %r", self.func, a, kw, repr(result)[:40])
 
         # Ask render what to do with it
         result = self.render(result, **self.kw)
         log.debug("Render call %r (%r) = %r", self.render, self.kw, repr(result)[:40])
-        
+
         # Publish result
         if isinstance(result, unicode):
             response.charset = 'utf8'
@@ -89,6 +89,17 @@ def isController(obj):
         isinstance(obj, Controller) or
         issubclass(getattr(obj, "im_class", object), Controller))
 
+def getObjectsFullName(obj):
+    import inspect
+    if isController(obj):
+        if isinstance(obj, Controller):
+            obj = obj.func
+        else:
+            obj = obj.im_self.func
+    if hasattr(obj, "__name__"):
+        return inspect.getmodule(obj).__name__ + ":" + obj.__name__
+    return ""
+
 if __name__ == "__main__":
 
     class mycontroller(Controller):
@@ -96,6 +107,9 @@ if __name__ == "__main__":
         def render(self, result, value = None):
             print "RENDER", result, value
             return result
+
+    class my2controller(mycontroller):
+        pass
 
     @mycontroller
     def testa(v, w):
@@ -112,13 +126,24 @@ if __name__ == "__main__":
     def testd(v, w):
         return v
 
+    @my2controller
+    def teste(v, w):
+        return v
+
     assert isController(testa) == True
     assert isController(testb) == True
     assert isController(testc) == True
     assert isController(testd) == False
+    assert isController(teste) == True
 
-    assert testa(111, 111) == 111
-    assert testb(222, 222) == 222
-    assert testc(333, 333) == 333
-    assert testd(444, 444) == 444
+    #assert testa(111, 111) == 111
+    #assert testb(222, 222) == 222
+    #assert testc(333, 333) == 333
+    #assert testd(444, 444) == 444
+
+    assert getObjectsFullName(testa) == "__main__:testa"
+    assert getObjectsFullName(testb) == "__main__:testb"
+    assert getObjectsFullName(testc) == "__main__:testc"
+    assert getObjectsFullName(testd) == "__main__:testd"
+    assert getObjectsFullName(None) == ""
 

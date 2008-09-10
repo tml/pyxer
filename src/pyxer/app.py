@@ -35,6 +35,7 @@ log = logging.getLogger(__file__)
 # XXX Needed?
 # sys.path = [os.getcwd()] + sys.path
 
+'''
 class ContextObj(object):
     pass
 
@@ -44,7 +45,7 @@ class PyxerStatic(StaticURLParser):
     pass
 
 # The WSGI application
-class PyxerApp(object):
+class PyxerApp2(object):
 
     def __init__(self, base = ["public"]):
         self.base = base
@@ -183,6 +184,57 @@ class PyxerApp(object):
         # Handle HTTPException
         except exc.HTTPException, e:
             return e(environ, start_response)
+'''
+
+# The WSGI application
+class PyxerApp(Router):
+
+    def __init__(self, base = "public"):
+        Router.__init__(self, base)
+        self.base = base
+
+    def __call__(self, environ, start_response):
+
+        try:
+
+            path = environ["PATH_INFO"]
+
+            # Mod Python corrections
+            if environ.has_key("SCRIPT_FILENAME"):
+                prefix = environ["SCRIPT_FILENAME"][len(environ['DOCUMENT_ROOT']):]
+                environ["WSGI_PREFIX"] = prefix
+                path = path[len(prefix):]
+
+            log.debug("Try matching %r", path)
+            obj, vars = self.match(path)
+            log.debug("For %r found %r with %r", path, obj, vars)
+
+            # No matching
+            if obj is None:
+                abort(404)
+
+            # Set globals
+            if environ.has_key('paste.registry'):
+                environ['paste.registry'].register(request, Request(environ))
+                environ['paste.registry'].register(response, Response())
+                environ['paste.registry'].register(c, AttrDict())
+                if environ.has_key('beaker.session'):
+                    environ['paste.registry'].register(session, environ['beaker.session'])
+                else:
+                    environ['paste.registry'].register(session, None)
+                environ['paste.registry'].register(config, environ.get("paste.config", {}))
+
+            request.start_response = start_response
+            request.template_url = os.path.join(vars["pyxer.path"], vars["controller"] + ".html")
+            request.urlvars = vars
+            environ['pyxer.urlvars'] = vars
+
+            return obj()
+            # obj(environ, start_response)
+
+        # Handle HTTPException
+        except exc.HTTPException, e:
+            return e(environ, start_response)
 
 # Sessions available?
 SessionMiddleware = None
@@ -200,6 +252,7 @@ def make_app(global_conf = {}, **app_conf):
     conf = AttrDict(pyxer = {
         "session": "",
         "debug": False,
+        "root": "public",
         })
     root = os.getcwd()
     try:
@@ -242,8 +295,9 @@ def make_app(global_conf = {}, **app_conf):
     # app = CgitbMiddleware(app)
     app = ErrorMiddleware(app, debug = True)
 
-    static = PyxerStatic(base)
-    app = Cascade([app, static])
+    #static = PyxerStatic(base)
+    #app = Cascade([app, static])
+
     return app
 
 # Paster EGG factory entry

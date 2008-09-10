@@ -25,7 +25,7 @@ from pyxer.utils.jsonhelper import json
 from pyxer.controller import \
     Controller, isController, c, g, h, config, \
     session, response, request, resp, req
-from pyxer.routing import Router
+from pyxer.routing import Router, static
 
 import logging
 log = logging.getLogger(__file__)
