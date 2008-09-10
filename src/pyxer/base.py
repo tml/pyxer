@@ -64,7 +64,7 @@ class StreamTemplateManager:
             else:
                 log.debug("Found a newer file than the one in the cache for %r", path)
         # Load the template
-        log.debug("Loading template %r in KidTemplateManager", path)
+        log.debug("Loading template %r in StreamTemplateManager", path)
         template = pyxer_template.TemplateSoup(
             file(path, "r").read())
         template.load = self.load
