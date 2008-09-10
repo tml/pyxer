@@ -16,11 +16,16 @@ import urllib
 import copy
 import sys
 import types
+import os
+import os.path
 
 import paste.fileapp
 
-def static(filename):
-    return paste.fileapp.FileApp(filename)
+def static():
+    filename = os.path.join(req.urlvars["pyxer.path"], req.urlvars["static"])
+    return paste.fileapp.FileApp(filename)(request.environ, request.start_response)
+
+static.app = True
 
 var_regex = re.compile(r'''
     \{              # The exact character "{"
@@ -58,14 +63,17 @@ class RouteObject(object):
 
     def __init__(self,
             template,
-            object = None,
+            module = None,
+            controller = None,
             name = None,
             vars = {}):
         self.template = re.compile(template) #template_to_regex
-        self.object = object
+        self.module = module
+        self.controller = controller
         self.name = name
-        self.vars = vars
-        self.vars["object"] = self.object
+        self.vars = copy.copy(vars)
+        self.vars["controller"] = self.controller
+        self.vars["module"] = self.module
 
     def __repr__(self):
         return "<RouteObject '%s'; pattern '%s'>" % (
@@ -87,36 +95,42 @@ class Router(object):
         if use_default:
             # /
             self.add_default("^$",
-                object = "index",
+                controller = "index",
                 name = "_action_index")
             # /demo
             # /demo.html
-            self.add_default("^(?P<object>[^\/\.]+?)(\.html?)?$",
+            self.add_default("^(?P<controller>[^\/\.]+?)(\.html?)?$",
                 name = "_action")
             # /demo/
-            self.add_default("^(?P<object>[^\/\.]+?)\/",
+            self.add_default("^(?P<module>[^\/\.]+?)\/",
                 name = "_module")
             # demo.py
             self.add_default("^[^\/\.]+?\.(py[co]?)$",
                 name = "_ignore_py")
             # demo.xyz
-            self.add_default("^[^\/\.]+?\.[^\/\.]+?$",
-                object = static,
+            self.add_default("^(?P<static>[^\/\.]+?\.[^\/\.]+?)$",
+                controller = "static",
                 name = "_static")
             # demo.xyz.abc
             self.add_default(".*",
-                object = "default",
+                controller = "default",
                 name = "_action_default")
+            # demo.xyz
+            self.add_default("^(?P<static>.*?)$",
+                controller = "static",
+                name = "_static")
 
     def set_module(self, module = None):
         if module is not None:
             if isinstance(module, basestring):
-                self.module = sys.modules[module]
+                self.module = self.load_module(module)
             else:
                 self.module = module
             self.module_name = self.module.__name__
 
-    def load_module(self, name):
+    def load_module(self, *names):
+        name = ".".join(names)
+        # print "load module:", name
         if sys.modules.has_key(name):
             return sys.modules[name]
         try:
@@ -128,7 +142,7 @@ class Router(object):
 
     def load_object(self, name):
         return module
-        
+
 #...     name, func_name = string.split(':', 1)
 #...     __import__(name)
 #...     module = sys.modules[name]
@@ -146,49 +160,68 @@ class Router(object):
     def add_default(self, template, **kw):
         self.routes_default.append(RouteObject(template, **kw))
 
-    def match(self, path, module = None, urlvars = {}):
+    def match(self, path):
+        if path.startswith("/"):
+            path = path[1:]
+        obj, vars = self._match(path)
+        return obj, vars
+
+    def _match(self, path, module = None, urlvars = {}):
         # Normalize module infos
         self.set_module(module)
-        # Search        
-        print "path:", path
+        # Search
         for route in self.routes + self.routes_default:
-            print "?", route
             match = route.template.match(path)
+            # print "  ?", route, match
             if match:
-                urlvars.update(copy.copy(match.groupdict()))
-                if urlvars.has_key("object"):
-                    obj = urlvars["object"]                    
+                urlvars = {}
+                urlvars.update(route.vars)
+                urlvars.update(match.groupdict())
+                tail = path[match.end():].lstrip("/")
+                urlvars["pyxer.tail"] = tail
+                urlvars["pyxer.path"] = os.path.dirname(os.path.abspath(self.module.__file__))
+
+                # print "->", path, route, urlvars, route.vars
+
+                if urlvars["module"] is not None:
+                    obj = urlvars["module"]
+
+                    # If it is a module go ahead
                     if isinstance(obj, types.ModuleType):
                         module = obj
-                    else:
-                        module = (self.load_module(obj) 
-                            or self.load_module(self.module_name + obj))
-                    if module is None:
-                        if hasattr(self.module, obj):
-                            return getattr(self.module, obj), urlvars
-                    else:
-                        if not hasattr(module, "router"):
-                            module.router = Router(module)
-                        tail = path[match.end():].lstrip("/")
-                        return module.router.match(tail, module) #, urlvars)
-                # urlvars.update(route.vars)
-                # return (route, urlvars)
-        return None
 
-    def __call__(self, environ, start_response):
-        req = Request(environ)
-        for regex, controller, vars in self.routes:
-            match = regex.match(req.path_info)
-            if match:
-                req.urlvars = match.groupdict()
-                req.urlvars.update(vars)
-                print controller
-                # return controller(environ, start_response)
-                return []
-        return exc.HTTPNotFound()(environ, start_response)
+                    # If it is a string it could be a module or a
+                    elif isinstance(obj, basestring):
+
+                        # Load module relatively or absolute
+                        module = (
+                            self.load_module(self.module_name, obj)
+                            or self.load_module(obj))
+
+                        if module is None:
+                            continue
+
+                    # If it is anything else, let the caller decide what to do
+                    else:
+                        raise Exception("No module")
+
+                    # Let's see if they need a Router()
+                    if not hasattr(module, "router"):
+                        module.router = Router(module)
+
+                    # The router goes to the next round
+                    return module.router._match(tail, module) #, urlvars)
+
+                # A controller
+                if urlvars["controller"] is not None:
+                    obj = urlvars["controller"]
+                    if hasattr(self.module, obj):
+                        return getattr(self.module, obj), urlvars
+                    continue
+
+        return (None, None)
 
 """
-- keine vorgaben für urlvars
 - urlvars nicht bei modulen möglich, oder doch z.B. für sprachen?
 - subdomain ermöglichen, z.b. für sprachwechsel?
 - genaues macthing nicht test -> test/
@@ -202,13 +235,70 @@ class Router(object):
 - auf für fehler error(404)
 """
 
+def test():
+    from pyxer.controller import getObjectsFullName, isController
+
+    static = "pyxer.routing:static"
+
+    if __name__=="__main__":
+        module = "__main__"
+    else:
+        module = "pyxer.routing"
+
+    data = [
+        ("",                            "public:index"),
+        ("index",                       "public:index"),
+        ("/index",                       "public:index"),
+        ("index.htm",                   "public:index"),
+        ("index.html",                  "public:index"),
+        ("index.gif",                   "pyxer.routing:static", dict(static="index.gif")),
+        ("sub1",                        'pyxer.routing:static', {'static': 'sub1'}),
+        ("sub1/",                       "public.sub1:index"),
+        ("sub1/dummy",                  "public.sub1:dummy"),
+        ("sub1/dummy2",                 "public.sub1:default"),
+        ("sub1/content1",               "public.sub1:content1"),
+        ("sub1/content1/some",          "public.sub1:content1", dict(name="some")),
+        ("sub1/content2/some",          "public.sub1:content2", dict(name="some")),
+        ("sub1/content1/some/more",     "public.sub1:content1", dict(name="some/more")),
+        ("sub1/content2/some/more",     "public.sub1:default", dict()),
+        ("/some/path/index.gif",        "pyxer.routing:static", dict(static="some/path/index.gif")),
+        #"hans/peter",
+        #"hans.gif",
+        #"hans.htm",
+        #"hans.html",
+        #"",
+        #"quatsch.mit.sosse",
+        #"wiki/content/some",
+        #"wiki/commit",
+        ]
+
+    router = Router("public")
+    for sample in data:
+        if len(sample)==3:
+            path, object_name, object_vars = sample
+        else:
+            path, object_name = sample
+            object_vars = dict()
+
+        obj, vars = router.match(path)
+        if vars is None:
+            vars = dict()
+        else:
+            vars.pop("controller")
+            vars.pop("module")
+            vars.pop("pyxer.tail")
+            vars.pop("pyxer.path")
+        name = getObjectsFullName(obj)
+        ct = isController(obj)
+        print "%-35r %r, %r" % (path, name, vars)
+        assert object_name == name
+        assert object_vars == vars
+
 if __name__ == "__main__":
-
     import sys
-    sys.path.insert(0, "../../example")
-
-    import public
-    import public.wiki
+    import os.path
+    sys.path.insert(0, os.path.join(__file__, "..", "..", "..", "tests"))
+    test()
 
     '''
     print template_to_regex('/a/static/path')
@@ -223,23 +313,3 @@ if __name__ == "__main__":
                   controller='controllers:view')
     route('/post', controller='controllers:post')
     '''
-
-    static = "*static"
-
-    router = Router(public)
-
-    tests = [
-        #"hans",
-        #"hans/",
-        #"hans/peter",
-        #"hans.gif",
-        #"hans.htm",
-        #"hans.html",
-        "",
-        #"quatsch.mit.sosse",
-        "wiki/content/some",
-        "wiki/commit",
-        ]
-
-    for path in tests:
-        print "%-20s %s" % (path, router.match(path))

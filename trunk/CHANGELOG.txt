@@ -9,7 +9,9 @@ Version 0.6.0, 2008-08-xxx
 - NEW: Special method 'default' for handling all
 - NEW: Basic config file support, global variable "config"
 - NEW: Support for database usage
+- NEW: Routing
 - UPD: Documentation updated
+- UPD: Extended testing
 - BUG: Many small fixes
 - DEL: pyxer.kid removed, general cleanup
 - DEL: BeautifulSoup based templating language removed
