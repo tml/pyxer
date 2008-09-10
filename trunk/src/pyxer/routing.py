@@ -34,7 +34,7 @@ var_regex = re.compile(r'''
     \}              # The exact character "}"
     ''', re.VERBOSE)
 
-def template_to_regex(template):
+def template_to_regex(template, ismodule=False):
     regex = ''
     last_pos = 0
     for match in var_regex.finditer(template):
@@ -45,7 +45,12 @@ def template_to_regex(template):
         regex += expr
         last_pos = match.end()
     regex += re.escape(template[last_pos:])
-    regex = '^%s$' % regex
+    if ismodule:
+        if not regex.endswith("\/"):
+            regex += "\/"
+        regex = '^%s' % regex
+    else:
+        regex = '^%s$' % regex
     return regex
 
 '''
@@ -67,6 +72,8 @@ class RouteObject(object):
             controller = None,
             name = None,
             vars = {}):
+        if module and controller:
+            raise Exception("Route to module and controller the same time is not allowed")
         self.template = re.compile(template) #template_to_regex
         self.module = module
         self.controller = controller
@@ -115,7 +122,7 @@ class Router(object):
             self.add_default(".*",
                 controller = "default",
                 name = "_action_default")
-            # demo.xyz
+            #
             self.add_default("^(?P<static>.*?)$",
                 controller = "static",
                 name = "_static")
@@ -150,9 +157,7 @@ class Router(object):
 #...     return func
 
     def add(self, template, **kw):
-        #if isinstance(controller, basestring):
-        #    controller = load_controller(controller)
-        self.routes.append(RouteObject(template_to_regex(template), **kw))
+        self.routes.append(RouteObject(template_to_regex(template, kw.get("module", None)), **kw))
 
     def add_re(self, template, **kw):
         self.routes.append(RouteObject(template, **kw))
@@ -181,7 +186,7 @@ class Router(object):
                 urlvars["pyxer.tail"] = tail
                 urlvars["pyxer.path"] = os.path.dirname(os.path.abspath(self.module.__file__))
 
-                # print "->", path, route, urlvars, route.vars
+                print "->", path, route, urlvars, route.vars
 
                 if urlvars["module"] is not None:
                     obj = urlvars["module"]
@@ -248,11 +253,15 @@ def test():
     data = [
         ("",                            "public:index"),
         ("index",                       "public:index"),
-        ("/index",                       "public:index"),
+        ("/index",                      "public:index"), # slash is ignored
         ("index.htm",                   "public:index"),
         ("index.html",                  "public:index"),
         ("index.gif",                   "pyxer.routing:static", dict(static="index.gif")),
+
+        # Without slash a module is not recognized (could be handled by 'static' though)
         ("sub1",                        'pyxer.routing:static', {'static': 'sub1'}),
+
+        # sub1
         ("sub1/",                       "public.sub1:index"),
         ("sub1/dummy",                  "public.sub1:dummy"),
         ("sub1/dummy2",                 "public.sub1:default"),
@@ -261,15 +270,14 @@ def test():
         ("sub1/content2/some",          "public.sub1:content2", dict(name="some")),
         ("sub1/content1/some/more",     "public.sub1:content1", dict(name="some/more")),
         ("sub1/content2/some/more",     "public.sub1:default", dict()),
+
+        # Doesn't match at all and is therefore passed to 'static'
         ("/some/path/index.gif",        "pyxer.routing:static", dict(static="some/path/index.gif")),
-        #"hans/peter",
-        #"hans.gif",
-        #"hans.htm",
-        #"hans.html",
-        #"",
-        #"quatsch.mit.sosse",
-        #"wiki/content/some",
-        #"wiki/commit",
+
+        # Referencing an external module
+        ("sub1/pub2/",                  "public2:index", dict()),
+        ("sub1/pub2/path/index.gif",    "pyxer.routing:static", dict(static="path/index.gif")),
+
         ]
 
     router = Router("public")
