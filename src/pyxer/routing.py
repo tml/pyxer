@@ -12,11 +12,10 @@ from pyxer.controller import \
     session, response, request, resp, req
 
 import re
-import urllib
+# import urllib
 import copy
 import sys
 import types
-import os
 import os.path
 
 import paste.fileapp
@@ -27,11 +26,21 @@ log = logging.getLogger(__name__)
 # Static file handling
 
 def static():
-    " Static file handling "
-    filename = os.path.join(req.urlvars["pyxer.path"], req.urlvars["static"])
-    return paste.fileapp.FileApp(filename)(request.environ, request.start_response)
+    tail = req.urlvars["static"]
+    path = os.path.join(req.urlvars["pyxer.path"], tail)
+    # Is it a folder?
+    if os.path.isdir(path):
+        
+        if tail.endswith("/"):
+            path = os.path.join(path, "index.html")
+        else:
+            location = (req.environ["PATH_INFO"] + "/")
+            raise exc.HTTPMovedPermanently(location = location).exception
+    if not os.path.isfile(path):
+        raise exc.HTTPNotFound().exception
+    return paste.fileapp.FileApp(path)(request.environ, request.start_response)
 
-static.app = True
+static.iscontroller = True
 
 class ModuleHook:
 
@@ -152,7 +161,7 @@ class Router(object):
             #
             self.add_default("^(?P<static>.*?)$",
                 controller = "static",
-                name = "_static")
+                name = "_static_all")
 
     def init_module(self, module, hook =  False):
         " If needed reload a module and apply module hook if needed or forced to "
@@ -217,7 +226,7 @@ class Router(object):
                 urlvars["pyxer.tail"] = tail
                 urlvars["pyxer.path"] = os.path.dirname(os.path.abspath(self.module.__file__))
 
-                # print "->", path, route, urlvars, route.vars
+                log.debug("Matched %r %r %r %r", path, route, urlvars, route.vars)
 
                 if urlvars["module"] is not None:
                     obj = urlvars["module"]
@@ -251,8 +260,11 @@ class Router(object):
                 # A controller
                 if urlvars["controller"] is not None:
                     obj = urlvars["controller"]
-                    if hasattr(self.module, obj):
-                        return getattr(self.module, obj), urlvars
+                    if isinstance(obj, basestring):
+                        if hasattr(self.module, obj):
+                            obj = getattr(self.module, obj)
+                    if hasattr(obj, "iscontroller") or isController(obj):
+                        return obj, urlvars
                     continue
 
         return (None, None)
