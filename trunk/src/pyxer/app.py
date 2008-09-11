@@ -30,7 +30,7 @@ import pprint
 import site
 
 import logging
-log = logging.getLogger(__file__)
+log = logging.getLogger(__name__)
 
 # XXX Needed?
 # sys.path = [os.getcwd()] + sys.path
