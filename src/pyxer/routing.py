@@ -21,11 +21,35 @@ import os.path
 
 import paste.fileapp
 
+import logging
+log = logging.getLogger(__name__)
+
+# Static file handling
+
 def static():
+    " Static file handling "
     filename = os.path.join(req.urlvars["pyxer.path"], req.urlvars["static"])
     return paste.fileapp.FileApp(filename)(request.environ, request.start_response)
 
 static.app = True
+
+class ModuleHook:
+
+    " Constructor and destructor for modules "
+
+    def __init__(self, module):
+        self.module = module
+        try:
+            module.__init__()
+        except:
+            pass
+
+    def __del__(self):
+        try:
+            self.module.__del__()
+        except:
+            pass
+        del self.module
 
 var_regex = re.compile(r'''
     \{              # The exact character "{"
@@ -90,12 +114,15 @@ class RouteObject(object):
 
 class Router(object):
 
-    def __init__(self, module = None, prefix = "", use_default = True):
+    def __init__(self, module = None, prefix = "", use_default = True, do_reload = False):
         self.module = None
         self.module_name = None
         self.prefix = prefix
         self.routes = []
         self.routes_default = []
+        self.do_reload = do_reload
+
+        # Set first module
         self.set_module(module)
 
         # Default routings
@@ -127,34 +154,38 @@ class Router(object):
                 controller = "static",
                 name = "_static")
 
+    def init_module(self, module, hook =  False):
+        " If needed reload a module and apply module hook if needed or forced to "
+        if self.do_reload:
+            module = reload(module)
+            module.__module_hook__ = ModuleHook(module)
+        elif hook:
+            module.__module_hook__ = ModuleHook(module)
+        return module
+
+    def load_module(self, *names):
+        " Load module "
+        name = ".".join(names)
+        if sys.modules.has_key(name):
+            return self.init_module(sys.modules[name])
+        try:
+            __import__(name)
+            return self.init_module(sys.modules[name], True)
+        except ImportError, msg:
+            # Try to filter import errors that are within the loaded module
+            if name and (not (str(msg).endswith("." + names[-1]) or str(msg).endswith(" " + names[-1]))):
+                log.exception("Error while importing module")
+                raise
+        return None
+
     def set_module(self, module = None):
+        " Set module and its name "
         if module is not None:
             if isinstance(module, basestring):
                 self.module = self.load_module(module)
             else:
                 self.module = module
             self.module_name = self.module.__name__
-
-    def load_module(self, *names):
-        name = ".".join(names)
-        # print "load module:", name
-        if sys.modules.has_key(name):
-            return sys.modules[name]
-        try:
-            __import__(name)
-        except ImportError:
-            return None
-        module = sys.modules[name]
-        return module
-
-    def load_object(self, name):
-        return module
-
-#...     name, func_name = string.split(':', 1)
-#...     __import__(name)
-#...     module = sys.modules[name]
-#...     func = getattr(module, func_name)
-#...     return func
 
     def add(self, template, **kw):
         self.routes.append(RouteObject(template_to_regex(template, kw.get("module", None)), **kw))
@@ -186,7 +217,7 @@ class Router(object):
                 urlvars["pyxer.tail"] = tail
                 urlvars["pyxer.path"] = os.path.dirname(os.path.abspath(self.module.__file__))
 
-                print "->", path, route, urlvars, route.vars
+                # print "->", path, route, urlvars, route.vars
 
                 if urlvars["module"] is not None:
                     obj = urlvars["module"]

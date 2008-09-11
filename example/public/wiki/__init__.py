@@ -1,26 +1,30 @@
 # -*- coding: UTF-8 -*-
 
 from pyxer.base import *
+from sqlalchemy import desc
+
 import model
+import datetime
 
 log = logging.getLogger(__name__)
 
 router = Router()
-router.add("^content\/(?P<name>.*?)$", object="index", name="_content")
+router.add("^content\/(?P<title>.*?)$", controller="index", name="_content")
 
-@controller
-def index():
-
-    # Default values
-    c.entry = dict(
-        title = "First Page",
-        body = "Enter your content here"
-        )
-
-    # Get data from database
-    result = model.Wiki.query.all()
-    if result:
-        c.entry = result[0]
+@expose
+def index(title=""):
+    # Get data from databaseel
+    result = None
+    if title:
+        result = model.Wiki.query.filter_by(title=title).order_by(desc(model.Wiki.created)).one()
+    if not result:
+        # Default values
+        result = dict(
+            title = "First Page",
+            body = "Enter your content here"
+            )
+    log.debug("Query: %r", result)
+    c.entry = result
 
 @expose
 def commit(title, body):
@@ -32,7 +36,12 @@ def commit(title, body):
     log.debug("Wiki entry %r %r", title, body)
 
     # Using Elixir
-    model.Wiki(title=title, body=body)
+    try:
+        entry = model.Wiki.query.filter_by(title=title).order_by(desc(model.Wiki.created)).one()
+    except:
+        entry = model.Wiki()
+    entry.title = title
+    entry.body = body
     model.commit()
 
     # Redirect to index

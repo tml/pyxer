@@ -28,7 +28,7 @@ from pyxer.controller import \
 from pyxer.routing import Router, static
 
 import logging
-log = logging.getLogger(__file__)
+log = logging.getLogger(__name__)
 
 def url(url):
     " Normalize URL "
