@@ -29,11 +29,10 @@ def static():
     tail = req.urlvars["static"]
     path = os.path.join(req.urlvars["pyxer.path"], tail)
     # Is it a folder?
-    if os.path.isdir(path):
-        
-        if tail.endswith("/"):
+    if os.path.isdir(path):        
+        if (not tail) or tail.endswith("/"):
             path = os.path.join(path, "index.html")
-        else:
+        elif tail:
             location = (req.environ["PATH_INFO"] + "/")
             raise exc.HTTPMovedPermanently(location = location).exception
     if not os.path.isfile(path):

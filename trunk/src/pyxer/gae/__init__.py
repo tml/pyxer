@@ -38,6 +38,7 @@ from pyxer.gae import main
 if __name__ == "__main__": main()
 """.lstrip()
 
+'''
 def copyPyxer(src, dst, symlinks = False):    
     names = os.listdir(src)
     try:
@@ -99,6 +100,7 @@ def setup(opt):
         copyPyxer(
             os.path.dirname(html5lib.__file__),
             os.path.join(os.getcwd(), "lib", "html5lib"))
+''' 
 
 def fix():
     print "Fix paths"

@@ -14,7 +14,10 @@ import sys
 import os
 import os.path
 
-log = logging.getLogger(__file__)
+try:
+    log = logging.getLogger(__name__)
+except:
+    log = logging.getLogger(__file__)
 
 _description = """
 Yet another Python framework

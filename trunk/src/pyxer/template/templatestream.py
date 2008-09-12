@@ -325,7 +325,9 @@ class TemplateSoup(object):
             # Set some defaults
             indent = 0
             pyDef = None
-            show = not (len(path) and path[ - 1][2])
+            
+            # if in pyContent or pyReplace do not show 
+            show = not (len(path) and path[-1][2])
 
             # Handle tags
             if kind == START:
@@ -453,8 +455,8 @@ class TemplateSoup(object):
                         # "node.append(value)",
                         )
 
-                # Remember usefull states
-                path.append((pyDef, pyStrip, (pyContent or pyReplace), indent))
+                # Remember usefull states, pass "whow" settings
+                path.append((pyDef, pyStrip, (pyContent or pyReplace or (not show)), indent))
 
             elif kind == END:
 

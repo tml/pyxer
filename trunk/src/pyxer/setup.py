@@ -57,4 +57,7 @@ xgae = pyxer.command:command_gae
 xpaster = pyxer.command:command_paster
 """.lstrip(),
 
+    # Important because Pyxer copies itself to a virtual environment
+    zip_safe = False,
+
     )

@@ -14,6 +14,7 @@ from paste.registry import RegistryManager
 from paste.config import ConfigMiddleware #, CONFIG
 from paste.exceptions.errormiddleware import ErrorMiddleware
 from paste.util.import_string import import_module
+
 import paste.deploy
 
 from pyxer.base import *
@@ -309,7 +310,7 @@ def make_app(global_conf = {}, **app_conf):
 
     return app
 
-# Paster EGG factory entry
+# Paster EGG factory entry 
 def app_factory(global_config, **local_conf):
     return make_app(global_config)
 

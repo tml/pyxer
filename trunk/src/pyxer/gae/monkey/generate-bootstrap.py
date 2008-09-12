@@ -75,7 +75,8 @@ def after_install(options, home_dir):
             script_dir = "Scripts"
         else:
             script_dir = "bin"
-        packages = [os.path.dirname(os.path.abspath(__file__))] + list(options.easy_install)
+        # packages = [os.path.dirname(os.path.abspath(__file__))] + list(options.easy_install)
+        packages = list(options.easy_install)
         call_subprocess([os.path.abspath(join(home_dir, script_dir, 'easy_install'))] + packages,
                         cwd=home_dir,
                         filter_stdout=filter_python_develop,
@@ -126,7 +127,7 @@ def install_app_yaml(options, home_dir):
 
 def install_paste_deploy(options, home_dir):
     shutil.copyfile(os.path.join(os.path.dirname(__file__), 'paste-deploy.py'),
-                    os.path.join(home_dir, 'paste-deploy.py'))    
+                    os.path.join(home_dir, 'paste-deploy.py'))
     msg = 'Wrote paste-deploy.py'
     dest = os.path.join(home_dir, 'development.ini')
     if os.path.exists(dest):
