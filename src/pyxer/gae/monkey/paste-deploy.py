@@ -31,18 +31,19 @@ def _test():
     print "]"
 
 try:
-    here = os.path.dirname(__file__)
-
     # Test for correct site-packages directory, because if developed on
     # Windows we have different paths as everywhere else. And this has also
     # to work on the Google machine too!
+    here = os.path.dirname(__file__)
     site_packages = os.path.join(here, 'lib', 'python2.5', 'site-packages')
     if not os.path.isdir(site_packages):
         site_packages = os.path.join(here, 'Lib', 'site-packages')
-
     site.addsitedir(site_packages)
-  
+
+    # In this phase GAE does just be able to load modules on the very first level, is it a bug?
+    site.addsitedir(os.path.join(site_packages, "pyxer", "gae", "monkey"))
     import appengine_monkey
+
     ## If you want to use httplib but get socket errors, you should uncomment this line:
     #appengine_monkey.install_httplib()
 
@@ -53,6 +54,7 @@ try:
     CONF_FILE = 'config:' + os.path.join(here, CONF_FILE)
     from paste.deploy import loadapp
     app = loadapp(CONF_FILE)
+    
 except:
     import traceback
     print 'Content-type: text/plain'
@@ -62,7 +64,6 @@ except:
     exc_value = sys.exc_info()[1]
     if 1: #isinstance(exc_value, ImportError):
         _test()
-
         #print
         #print "PTH files"
         #for fn in os.listdir(site_packages):

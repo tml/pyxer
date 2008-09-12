@@ -10,7 +10,7 @@ import os.path
 import sys
 import types
 import logging
-log = logging.getLogger(__file__)
+log = logging.getLogger(__name__)
 
 try:
     import subprocess
@@ -227,3 +227,42 @@ def call_script(cmd, root=None, cwd=None):
 
 call_bin = call_script
 
+def copy_python(src, dst, symlinks = False):   
+    " Copies just Python source files " 
+    import shutil
+    names = os.listdir(src)
+    try:
+        os.makedirs(dst)
+    except:
+        pass
+    errors = []
+    for name in names:        
+        srcname = os.path.join(src, name)
+        dstname = os.path.join(dst, name)
+        try:
+            if symlinks and os.path.islink(srcname):
+                linkto = os.readlink(srcname)
+                os.symlink(linkto, dstname)
+            elif os.path.isdir(srcname):
+                if not name.startswith("."):
+                    copy_python(srcname, dstname, symlinks)
+            else:
+                if name.endswith(".py"):
+                    print "create", dstname
+                    shutil.copy2(srcname, dstname)
+            # XXX What about devices, sockets etc.?
+        except (IOError, os.error), why:
+            errors.append((srcname, dstname, str(why)))
+        # catch the Error from the recursive copytree so that we can
+        # continue with other files
+        except Error, err:
+            errors.extend(err.args[0])
+    try:
+        shutil.copystat(src, dst)
+    except WindowsError:
+        # can't copy file access times on Windows
+        pass
+    except OSError, why:
+        errors.extend((src, dst, str(why)))
+    if errors:
+        raise shutil.Error, errors

@@ -8,8 +8,9 @@ import logging
 import os.path
 import sys
 import pyxer.gae.monkey.boot as boot
+import pyxer.utils as utils
 
-log = logging.getLogger(__file__)
+log = logging.getLogger(__name__)
 
 from pyxer.utils import call_script, find_root
 
@@ -39,18 +40,57 @@ from pyxer.base import *
 #    c.message = "Welcome"
 """.lstrip()
 
-def self_setup(root = None):
+ENTRY_POINTS_TXT = """\
+[paste.app_factory]
+main = pyxer.app:app_factory
+"""
+
+'''
+def self_setup2(root = None):
     if not root:
         root = find_root()
     # Get parent directory
-    dir = os.path.split(os.path.dirname(__file__))[0]
-    log.debug("Pyxer setup.py dir %r", dir)
+    dir = os.path.dirname(__file__) #Uses setuptools instead?
+    setup_py = os.path.join(dir, "setup.py")
+    log.debug("Pyxer %r in dir %r", setup_py, dir)
     # Do setup
     call_script(
-        ["python", os.path.join(dir, "pyxer", "setup.py"), "install", "-f"],
-        cwd = dir,
+        ["python", setup_py, "install", "-f"],
+        cwd = os.path.join(dir, os.pardir),
         root = root)
+'''
 
+def self_setup(root = None):
+    " Set up Pyxer in the virtual environment "
+    
+    # Find VM
+    if not root:
+        root = find_root()    
+    if not root:
+        raise Error, "VirtualENV not found"
+    here = os.path.dirname(__file__) 
+    
+    # Find site_packages folder
+    site_packages = os.path.join(root, 'lib', 'python2.5', 'site-packages')
+    if not os.path.isdir(site_packages):
+        site_packages = os.path.join(root, 'Lib', 'site-packages')
+    
+    # Remove old installation 
+    pyxer_dir = os.path.join(site_packages, "pyxer")
+    if os.path.isdir(pyxer_dir):
+        # log.info("Remove Pyxer directory %r", pyxer_dir)
+        pass
+    
+    # Copy package
+    log.info("Copy from %r to %r", here, pyxer_dir)
+    utils.copy_python(here, pyxer_dir)
+
+    # This is needed for the paster app
+    egg_dir = os.path.join(site_packages, "pyxer.egg-info")
+    if not os.path.isdir(egg_dir):
+        os.makedirs(egg_dir)
+    open(os.path.join(egg_dir, "entry_points.txt"), "w").write(ENTRY_POINTS_TXT)
+    
 def create(opt, here):
 
     # Change to AppEngine module replacements

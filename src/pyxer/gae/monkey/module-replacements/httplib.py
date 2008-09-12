@@ -73,6 +73,9 @@ class HTTPConnection(object):
         resp = urlfetch.fetch(url, self._body, _method_map[self._method], headers, self.allow_truncated)
         return HTTPResponse(resp)
 
+    def close(self):
+        pass
+
 class HTTPResponse(object):
 
     def __init__(self, fetch_response):
@@ -213,6 +216,31 @@ class HTTP:
         ### do it
         self.file = None
 
+
+class HTTPS(HTTP):
+    """Compatibility with 1.5 httplib interface
+
+    Python 1.5.2 did not have an HTTPS class, but it defined an
+    interface for sending http requests that is also useful for
+    https.
+    """
+
+    _connection_class = HTTPSConnection
+
+    def __init__(self, host='', port=None, key_file=None, cert_file=None,
+                 strict=None):
+        # provide a default host, pass the X509 cert info
+
+        # urf. compensate for bad input.
+        if port == 0:
+            port = None
+        self._setup(self._connection_class(host, port, key_file,
+                                           cert_file, strict))
+
+        # we never actually use these for anything, but we keep them
+        # here for compatibility with post-1.5.2 CVS.
+        self.key_file = key_file
+        self.cert_file = cert_file
 
 
 class HTTPException(Exception):
