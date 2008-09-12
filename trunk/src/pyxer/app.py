@@ -227,15 +227,23 @@ class PyxerApp(Router):
 
             request.start_response = start_response
             
+            # Guess template name     
+            name = None       
             if vars["controller"] == "default":
                 if path.endswith("/"):
                     name = "index"
                 else:
                     name = vars["pyxer.match"]
-            else:
+            elif isinstance(vars["controller"], basestring):
                 name = vars["controller"]
+            
+            # and path
+            request.template_url = None
+            if name is not None:            
+                tpath =  os.path.join(vars["pyxer.path"], name + ".html")
+                if os.path.isfile(tpath):
+                    request.template_url = tpath
                 
-            request.template_url = os.path.join(vars["pyxer.path"], name + ".html")
             request.urlvars = vars
             environ['pyxer.urlvars'] = vars
 

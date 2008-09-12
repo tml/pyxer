@@ -33,8 +33,6 @@ _sample_end = """
 </html>
 """
 
-class Context: pass
-
 class PyxerTemplateTestCase(unittest.TestCase):
 
     rxbody = re.compile(u"\<body.*?\>(.*)\<\/body\>", re.M|re.DOTALL)
