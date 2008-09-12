@@ -29,7 +29,7 @@ def static():
     tail = req.urlvars["static"]
     path = os.path.join(req.urlvars["pyxer.path"], tail)
     # Is it a folder?
-    if os.path.isdir(path):        
+    if os.path.isdir(path):
         if (not tail) or tail.endswith("/"):
             path = os.path.join(path, "index.html")
         elif tail:
@@ -148,18 +148,23 @@ class Router(object):
                 name = "_module")
             # demo.py
             self.add_default("^[^\/\.]+?\.(py[co]?)$",
+                controller = None,
+                module = None,
                 name = "_ignore_py")
             # demo.xyz
-            self.add_default("^(?P<static>[^\/\.]+?\.[^\/\.]+?)$",
-                controller = "static",
-                name = "_static")
-            # demo.xyz.abc
+            #self.add_default("^(?P<static>[^\/\.]+?\.[^\/\.]+?)$",
+            #    controller = "static", # "static"
+            #    name = "_static")
+            # demo-xyz-abc
             self.add_default("^[^\/\.]*?$",
                 controller = "default",
                 name = "_action_default")
             #
             self.add_default("^(?P<static>.*?)$",
                 controller = "static",
+                name = "_static_all")
+            self.add_default("^(?P<static>.*?)$",
+                controller = static,
                 name = "_static_all")
 
     def init_module(self, module, hook =  False):
@@ -228,6 +233,11 @@ class Router(object):
 
                 log.debug("Matched %r %r %r %r", path, route, urlvars, route.vars)
 
+                # Abort matching 
+                if urlvars["module"] is None and urlvars["controller"] is None:
+                    return (None, None)
+                
+                # Handle module
                 if urlvars["module"] is not None:
                     obj = urlvars["module"]
 
@@ -244,6 +254,7 @@ class Router(object):
                             or self.load_module(obj))
 
                         if module is None:
+                            log.debug("Module %r not found", obj)
                             continue
 
                     # If it is anything else, let the caller decide what to do
@@ -257,14 +268,19 @@ class Router(object):
                     # The router goes to the next round
                     return module.router._match(tail, module) #, urlvars)
 
-                # A controller
+                # Handle controller
                 if urlvars["controller"] is not None:
                     obj = urlvars["controller"]
+                    
                     if isinstance(obj, basestring):
                         if hasattr(self.module, obj):
                             obj = getattr(self.module, obj)
+                                                
                     if hasattr(obj, "iscontroller") or isController(obj):
                         return obj, urlvars
+                    else:
+                        log.debug("Object %r is not a controller", obj)
+
                     continue
 
         return (None, None)
@@ -283,7 +299,7 @@ class Router(object):
 - auf für fehler error(404)
 """
 
-def test():
+def testing():
     from pyxer.controller import getObjectsFullName, isController
 
     static = "pyxer.routing:static"
@@ -295,6 +311,7 @@ def test():
 
     data = [
         ("",                            "public:index"),
+        ("/",                           "public:index"),
         ("index",                       "public:index"),
         ("/index",                      "public:index"), # slash is ignored
         ("index.htm",                   "public:index"),
@@ -312,7 +329,7 @@ def test():
         ("sub1/content1/some",          "public.sub1:content1", dict(name="some")),
         ("sub1/content2/some",          "public.sub1:content2", dict(name="some")),
         ("sub1/content1/some/more",     "public.sub1:content1", dict(name="some/more")),
-        ("sub1/content2/some/more",     "public.sub1:default", dict()),
+        ("sub1/content2/some/more",     'pyxer.routing:static', {'static': 'content2/some/more'}),
 
         # Doesn't match at all and is therefore passed to 'static'
         ("/some/path/index.gif",        "pyxer.routing:static", dict(static="some/path/index.gif")),
@@ -337,11 +354,12 @@ def test():
         else:
             vars.pop("controller")
             vars.pop("module")
-            vars.pop("pyxer.tail")
-            vars.pop("pyxer.path")
+            for k in vars.keys():
+                if k.startswith("pyxer."):
+                    del vars[k]
         name = getObjectsFullName(obj)
         ct = isController(obj)
-        print "%-35r %r, %r" % (path, name, vars)
+        # print "%-35r %r, %r" % (path, name, vars)
         assert object_name == name
         assert object_vars == vars
 
@@ -349,7 +367,7 @@ if __name__ == "__main__":
     import sys
     import os.path
     sys.path.insert(0, os.path.join(__file__, "..", "..", "..", "tests"))
-    test()
+    testing()
 
     '''
     print template_to_regex('/a/static/path')

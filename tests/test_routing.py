@@ -1,15 +1,15 @@
 # -*- coding: UTF-8 -*-
 
 import unittest
-from pyxer.routing import *
+import pyxer.routing
 
 class PyxerRoutingTestCase(unittest.TestCase):
 
     def cmp(self, a, b):
         self.assertEqual(a.strip(), b.strip())
 
-    def testPublicRouting(self):
-       pass
+    def testRouting(self):
+       pyxer.routing.testing()
 
 def buildTestSuite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)
