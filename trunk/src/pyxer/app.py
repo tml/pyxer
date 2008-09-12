@@ -225,7 +225,16 @@ class PyxerApp(Router):
                 environ['paste.registry'].register(config, environ.get("paste.config", {}))
 
             request.start_response = start_response
-            request.template_url = os.path.join(vars["pyxer.path"], vars["controller"] + ".html")
+            
+            if vars["controller"] == "default":
+                if path.endswith("/"):
+                    name = "index"
+                else:
+                    name = vars["pyxer.match"]
+            else:
+                name = vars["controller"]
+                
+            request.template_url = os.path.join(vars["pyxer.path"], name + ".html")
             request.urlvars = vars
             environ['pyxer.urlvars'] = vars
 
