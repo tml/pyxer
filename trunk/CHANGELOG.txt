@@ -12,6 +12,7 @@ Version 0.6.0, 2008-08-xxx
 - NEW: Routing
 - UPD: Documentation updated
 - UPD: Extended testing
+- UPD: app.yaml skip_files optimized
 - BUG: Many small fixes
 - DEL: pyxer.kid removed, general cleanup
 - DEL: BeautifulSoup based templating language removed
