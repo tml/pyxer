@@ -139,8 +139,7 @@ class Router(object):
             self.add_default("^$",
                 controller = "index",
                 name = "_action_index")
-            # /demo
-            # /demo.html
+            # /demo, /demo.html
             self.add_default("^(?P<controller>[^\/\.]+?)(\.html?)?$",
                 name = "_action")
             # /demo/
