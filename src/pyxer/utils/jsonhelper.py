@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 
 
 class _StringGenerator(object):
-    
+
     def __init__(self, string):
         self.string = string
         self.index = - 1
@@ -34,14 +34,14 @@ class _StringGenerator(object):
             return self.string[i]
         else:
             return None
-    
+
     def next(self):
         self.index += 1
         if self.index < len(self.string):
             return self.string[self.index]
         else:
             raise StopIteration
-    
+
     def all(self):
         return self.string
 
@@ -68,7 +68,7 @@ class JsonReader(object):
         if peek == '{':
             return self._readObject()
         elif peek == '[':
-            return self._readArray()            
+            return self._readArray()
         elif peek == '"':
             return self._readString()
         elif peek == '-' or peek.isdigit():
@@ -145,8 +145,8 @@ class JsonReader(object):
                         n = 4096 * self._hexDigitToInt(ch4096)
                         n += 256 * self._hexDigitToInt(ch256)
                         n += 16 * self._hexDigitToInt(ch16)
-			            n += self._hexDigitToInt(ch1)
-			            ch = unichr(n)
+                        n += self._hexDigitToInt(ch1)
+                        ch = unichr(n)
                     elif ch not in '"/\\':
                         raise ReadException, "Not a valid escaped JSON character: '%s' in %s" % (ch, self._generator.all())
                 result = result + ch
@@ -161,8 +161,8 @@ class JsonReader(object):
         except KeyError:
             try:
                 result = int(ch)
-        except ValueError:
-             raise ReadException, "The character %s is not a hex digit." % ch
+            except ValueError:
+                raise ReadException, "The character %s is not a hex digit." % ch
         return result
 
     def _readComment(self):
@@ -232,7 +232,7 @@ class JsonReader(object):
                 ch = self._next()
                 if ch != ",":
                     raise ReadException, "Not a valid JSON array: '%s' due to: '%s'" % (self._generator.all(), ch)
-    assert self._next() == "}"
+        assert self._next() == "}"
         return result
 
     def _eatWhitespace(self):
@@ -251,11 +251,11 @@ class JsonReader(object):
         return self._generator.next()
 
 class JsonWriter(object):
-        
+
     def _append(self, s):
         self._results.append(s)
 
-    def write(self, obj, escaped_forward_slash = False):
+    def write(self, obj, escaped_forward_slash=False):
         self._escaped_forward_slash = escaped_forward_slash
         self._results = []
         self._write(obj)
@@ -285,15 +285,15 @@ class JsonWriter(object):
             self._append("]")
         elif ty is types.StringType or ty is types.UnicodeType:
             self._append('"')
-        obj = obj.replace('\\', r'\\')
+            obj = obj.replace('\\', r'\\')
             if self._escaped_forward_slash:
                 obj = obj.replace('/', r'\/')
-        obj = obj.replace('"', r'\"')
-        obj = obj.replace('\b', r'\b')
-        obj = obj.replace('\f', r'\f')
-        obj = obj.replace('\n', r'\n')
-        obj = obj.replace('\r', r'\r')
-        obj = obj.replace('\t', r'\t')
+                obj = obj.replace('"', r'\"')
+                obj = obj.replace('\b', r'\b')
+                obj = obj.replace('\f', r'\f')
+                obj = obj.replace('\n', r'\n')
+                obj = obj.replace('\r', r'\r')
+                obj = obj.replace('\t', r'\t')
             self._append(obj)
             self._append('"')
         elif ty is types.IntType or ty is types.LongType:
@@ -309,7 +309,7 @@ class JsonWriter(object):
         else:
             raise WriteException, "Cannot write in JSON: %s" % repr(obj)
 
-def write(obj, escaped_forward_slash = False):
+def write(obj, escaped_forward_slash=False):
     return JsonWriter().write(obj, escaped_forward_slash)
 
 def read(s):
@@ -338,7 +338,7 @@ try:
     log.debug("Using JSON module %r", simplejson)
 except ImportError:
     log.debug("Using JSON module %r", __file__)
-    
+
 def json(*a, **kw):
     if len(a) == 1:
         return write(a[0])
