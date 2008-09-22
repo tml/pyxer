@@ -4,4 +4,4 @@
 ## All rights reserved                     ##
 #############################################
 
-from pyxer.sling import *
+from pyxer.sling.sling import *

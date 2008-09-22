@@ -29,8 +29,8 @@ RMI //localhost:1099/jackrabbit Default
 import base64
 import urllib2
 
-from  urllib import quote_plus, urlencode
-quote = quote_plus
+from  urllib import quote_plus, quote, urlencode
+# quote = quote_plus
 
 import simplejson
 json_encode = simplejson.dumps
@@ -110,18 +110,25 @@ class Sling(object):
         log.info("SESSION INFO")
         return self.callJSON("/system/sling/info.sessionInfo.json")
 
-    def get(self, path):
+    def get(self, path, maxlevels=None):
+        if isinstance(path, SlingObject):
+            path = path["jcr:path"]
+        if maxlevels is not None and isinstance(maxlevels, int):
+            path = path + "." + str(maxlevels)
         log.info("GET %r", path)
         return self.callJSON(path + ".json")
 
     def query(self, statement, mode="sql", offset=None, rows=None, property=None):
         log.info("QUERY %r, mode: %s", statement, mode)
         assert mode in ["sql", "xpath"]
+        params = dict(queryType=mode, statement=statement)
+        if offset is not None and isinstance(offset, int):
+            params["offset"] = offset
+        if rows is not None and isinstance(rows, int):
+            params["rows"] = rows
         # The filename is not relevant
         return self.callJSON(
-            "/.query.json?queryType=%s&statement=%s" % (
-            mode,
-            quote(statement)))
+            "/.query.json?" + urlencode(params))
 
     def xpath(self, statement, **kw):
         return self.query(statement, mode="xpath", **kw)
@@ -157,6 +164,11 @@ class Sling(object):
     def copy(self, from_, to):
         pass
 
+    def getNodes(self, path, offset=None, rows=None):
+        path = path.strip("/")
+        path += "/descendant::*"
+        return self.xpath(path, offset=offset, rows=rows)
+
 def testing():
     import pprint
     sling = Sling("127.0.0.1", 7777)
@@ -181,9 +193,11 @@ def testing():
     success = sling.create("/testing", dict(title="Test2", body="Lorem ipsum2"))
     assert success == False
 
+    # dict(created="", lastModified="", createdBy="", lastModifiedBy="")
+
     # Trailing Slash indicates sub entries
     sling.create("/testing/", dict(title="sub1", body="Lorem ipsum sub1"))
-    sling.create("/testing/", dict(title="sub2", body="Lorem ipsum sub2"))
+    sling.create("/testing/", dict(title="Sub \' 2", body="Lorem ipsum sub2", created="", lastModified="", createdBy="", lastModifiedBy=""))
     sling.create("/testing/", dict(title="sub3", body="Lorem ipsum sub3"))
 
     # Content
@@ -194,8 +208,19 @@ def testing():
 
     # raw_input("WAIT")
 
-    obj = sling.get("/testing/*")
-    assert dict(obj) == dict()
+    # obj = sling.get("/testing/", 1)
+    # obj = sling.xpath("testing/descendant-or-self::*")
+    # obj = sling.getNodes("/testing", rows=1)
+    obj = sling.xpath('testing/*[@title="%s"]' % "Sub \'\' 2", rows=1)
+
+    print "###"
+    if obj:
+        for o in obj:
+            # pprint.pprint(dict(o))
+            pprint.pprint(dict(sling.get(o)))
+    print "###"
+
+    # assert dict(obj) == dict()
 
     obj = sling.get("/testing/title")
     assert obj.title == "Test2"
@@ -222,6 +247,14 @@ def testing():
 
     #    pprint.pprint(obj)
     # print sling.call("/content.query.json?queryType=xpath&statement=//*").read()
+
+def xpath_escape_quot(value):
+    return value.replace('"', '""')
+
+def xpath_escape_apos(value):
+    return value.replace("'", "''")
+
+xpath_escape = xpath_escape_quot
 
 if __name__=="__main__":
     level = logging.DEBUG
