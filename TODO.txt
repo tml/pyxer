@@ -10,11 +10,14 @@ mod_python:
 - Subpaths are not supported yet
 
 Templating
-- Let the user choose the templating machine
+- Let the user easier choose the templating machine
 - CDATA does not work
 - Bug in Genshi
 - "extends" and "match" don't work
 - Internationalization
+- <!DOCTYPE 
+- <script><!-- comments do not escape the right way
+- <!--! has to be stripped
 
 Marketing
 - Create a video with a simple coding session like "Wiki in 10 minutes" :)

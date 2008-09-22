@@ -77,12 +77,14 @@ def html_escape(value):
     return (value
         .replace("&", "&amp;")
         .replace('"', "&quot;")
+        .replace("'", "&apos;")
         .replace('<', "&lt;")
         .replace('>', "&gt;"))
 
 def html_unescape(value):
     return (value
         .replace("&quot;", '"')
+        .replace("&apos;", "'")
         .replace("&lt;", '<')
         .replace("&gt;", '>')
         .replace("&amp;", '&'))
@@ -227,8 +229,8 @@ def call_script(cmd, root=None, cwd=None):
 
 call_bin = call_script
 
-def copy_python(src, dst, symlinks = False):   
-    " Copies just Python source files " 
+def copy_python(src, dst, symlinks = False):
+    " Copies just Python source files "
     import shutil
     names = os.listdir(src)
     try:
@@ -236,7 +238,7 @@ def copy_python(src, dst, symlinks = False):
     except:
         pass
     errors = []
-    for name in names:        
+    for name in names:
         srcname = os.path.join(src, name)
         dstname = os.path.join(dst, name)
         try:

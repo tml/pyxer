@@ -426,7 +426,7 @@ class TemplateSoup(object):
 
                     newattr = "Attrs([%s])" % ", ".join(attrs)
                     if pyAttrs:
-                        newattr += " | [(QName(k), unicode(v)) for k, v in dict(%s).items()]" % self.checkSyntax(pyAttrs)
+                        newattr += " | [(QName(k), unicode(v)) for k, v in dict(%s).items() if v is not None]" % self.checkSyntax(pyAttrs)
 
                     element = (START, "(%r, %s)" % (data[0], newattr), position)
                     self.code.line("stream.append((%s, %s, %r))" % element)
