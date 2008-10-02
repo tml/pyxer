@@ -23,7 +23,7 @@ except:
 log = logging.getLogger(__name__)
 
 from pyxer.template.genshi import XML, HTML, Stream, QName, Attrs
-from pyxer.template.genshi.core import START, END, TEXT
+from pyxer.template.genshi.core import START, END, TEXT, COMMENT, DOCTYPE
 
 # _commands = re.compile(u"\&lt;\%(.*?)\%\&gt;", re.M)
 _vars = re.compile(u"""
@@ -108,7 +108,7 @@ class PyxerStream(Stream):
     def append(self, value):
         self.events.append(value)
 
-    def add(self, value):
+    def add(self, value, encoding="utf8"):
         try:
             if type(value) is types.FunctionType:
                 value = value()
@@ -117,7 +117,9 @@ class PyxerStream(Stream):
             if isinstance(value, list) or isinstance(value, Stream):
                 self.events += list(value)
                 return
-            self.events.append((TEXT, unicode(value), (None, 0, 0)))
+            if not isinstance(value, unicode):
+                value = unicode(str(value), 'utf8')
+            self.events.append((TEXT, value, (None, 0, 0)))
         except Exception, e:
             log.exception("element error")
             self.events.append((TEXT, unicode(e), (None, 0, 0)))
@@ -188,8 +190,12 @@ class TemplateSoup(object):
 
         # Create code
         self.code.line(
+            # "# -*- coding: UTF-8 -*-",
             "from pyxer.template.genshi import XML, HTML, Stream, QName, Attrs",
             "from pyxer.template.genshi.core import START, END, TEXT, XML_DECL, DOCTYPE, START_NS, END_NS, START_CDATA, END_CDATA, PI, COMMENT",
+            "def _forceUnicode(value):",
+                "\tif isinstance(value, unicode): return value",
+                "\treturn unicode(str(value), 'utf8')",
             "def select(path):",
                 "\tglobal stream",
                 "\treturn stream.select(path)"
@@ -226,8 +232,11 @@ class TemplateSoup(object):
     def generateByteCode(self):
         self.bytecode = compile(self.sourcecode, "<string>", "exec")
 
-    def generate(self, vars = {}):
+    def generate(self, __vars__={}, **kw):
         # import pprint
+
+        vars = __vars__
+        vars.update(kw)
 
         # For referencing
         if not vars.has_key("top"):
@@ -274,9 +283,12 @@ class TemplateSoup(object):
         self.stream = stream
         return stream
 
-    def render(self, encoding = "utf8"):
+    def render(self, method="xhtml", encoding = "utf8", doctype="xhtml", strip_whitespace=True, **kw):
         if self.stream:
-            return self.stream.render("xhtml", strip_whitespace = True)
+            return self.stream.render(method,
+                strip_whitespace=strip_whitespace,
+                doctype=doctype,
+                **kw)
 
     __str__ = render
 
@@ -325,8 +337,8 @@ class TemplateSoup(object):
             # Set some defaults
             indent = 0
             pyDef = None
-            
-            # if in pyContent or pyReplace do not show 
+
+            # if in pyContent or pyReplace do not show
             show = not (len(path) and path[-1][2])
 
             # Handle tags
@@ -346,7 +358,7 @@ class TemplateSoup(object):
                 pyAttrs = self.getAttr(node, "attrs")
                 pyStrip = self.getAttr(node, "strip")
                 # pyStrip = self.getAttr(node, "select")
-                
+
                 pyExtends = self.getAttr(node, "extends")               # XXX todo
                 pyLayout = self.getAttr(node, "layout")
 
@@ -380,7 +392,7 @@ class TemplateSoup(object):
                 #    self.code.line(
                 #        pyMatch
                 #    )
-                                        
+
                 # For error handling
                 self.code.line(
                     "error = " + repr(position)
@@ -414,7 +426,7 @@ class TemplateSoup(object):
                             if cmd != "$":
                                 if cmd.startswith("{"):
                                     cmd = cmd[1: - 1].strip()
-                                expr.append(self.checkSyntax("unicode(%s)" % cmd))
+                                expr.append(self.checkSyntax("_forceUnicode(%s)" % cmd))
                             else:
                                 expr.append(repr(u"$"))
                                 # Escaped dollar $$ -> $
@@ -426,7 +438,7 @@ class TemplateSoup(object):
 
                     newattr = "Attrs([%s])" % ", ".join(attrs)
                     if pyAttrs:
-                        newattr += " | [(QName(k), unicode(v)) for k, v in dict(%s).items() if v is not None]" % self.checkSyntax(pyAttrs)
+                        newattr += " | [(QName(k), _forceUnicode(v)) for k, v in dict(%s).items() if v is not None]" % self.checkSyntax(pyAttrs)
 
                     element = (START, "(%r, %s)" % (data[0], newattr), position)
                     self.code.line("stream.append((%s, %s, %r))" % element)
@@ -500,10 +512,27 @@ class TemplateSoup(object):
                 if src[pos:]:
                     self.addElement(TEXT, unicode(src[pos:]), position)
 
+            elif kind==COMMENT:
+
+                if not data.startswith("!"):
+                    self.addElement(kind, data, position)
+
             elif show:
+                # print kind, data, position
                 self.addElement(kind, data, position)
 
+def testing():
+
+    # ts = TemplateSoup("#$x")
+    # print ts.code.pretty()
+
+    # Variables
+    value = TemplateSoup("#$x").generate(x=1)
+    assert unicode(value) == u"#1"
+
 if __name__ == "__main__":
+
+    testing()
 
     if 1:
         def layout(name):
@@ -519,18 +548,19 @@ if __name__ == "__main__":
             </html>
             """)
 
-        ts = TemplateSoup("""
+        ts = TemplateSoup("""<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
             <html layout="layout(123)">
-                <body id="test" data="$x test">
+                <body id="test" data="$x $y test">
                     Here we go!
                         <b>Hello</b>
-                    <!-- Comment -->
+                        $x $y
+                    <!-- Comment --> <!--! invisible -->
                     Ende
                 </body>
             </html>
             """)
         # print ts.code.pretty()
-        ts.generate(dict(x = 1, layout = layout))
+        ts.generate(dict(x = "äöü", y=str, layout = layout))
         print ts
 
     if 0:

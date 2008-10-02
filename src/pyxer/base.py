@@ -110,6 +110,12 @@ class controller(Controller):
         log.debug("Render called with %r %r %r", repr(result)[:40], render, kw)
         # log.debug("Render called with %r %r", render, kw)
 
+        if response.body:
+            log.debug("Render: Body is already present")
+            return response.body
+
+        # log.debug("Response %r %r", response.body_file, response.body)
+
         # Choose a renderer
         render_func = None
 
