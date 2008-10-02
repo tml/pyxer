@@ -147,8 +147,12 @@ class Sling(object):
             data[":order"] = order
         conn = self.call(path, data)
         # Status "created"?
-        return conn.code == 201
-
+        result = (
+            conn.code == 201, 
+            conn.info().get("location", path))
+        log.info("CREATE new %r on URL %r", *result)
+        return result
+        
     update = create
 
     def delete(self, path):
@@ -188,10 +192,10 @@ def testing():
 
     # Creating test Data
     success = sling.create("/testing", dict(title="Test", body="Lorem ipsum", footer="Subit"))
-    assert success == True
+    assert success == (True, "/testing")
 
     success = sling.create("/testing", dict(title="Test2", body="Lorem ipsum2"))
-    assert success == False
+    assert success == (False, "/testing")
 
     # dict(created="", lastModified="", createdBy="", lastModifiedBy="")
 
