@@ -6,10 +6,9 @@
     </head>
     <body>
     	
-		<a href="edit?path=$c.entry.path">Edit</a>
-|
-		<a py:attrs="dict(href=c.url('edit', path=c.entry.path))" href="#">Edit2</a>
-		<a href="edit">New</a>
+		<a py:attrs="dict(href=c.url('edit', path=c.entry.path))" href="#">Edit</a>
+		|
+		<a py:attrs="dict(href=c.url('edit'))" href="#">New</a>
 		
 		<hr />
 		
@@ -19,5 +18,13 @@
 		 	Body 
 		</div>
         
+		<hr />
+		
+		<p><strong>All entries:</strong></p>
+		
+		<ol>
+			<li py:for="path in c.all"><a href="${c.url('content', path)}">$path</a></li>
+		</ol>
+		
     </body>
 </html>
