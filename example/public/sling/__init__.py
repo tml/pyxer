@@ -11,6 +11,8 @@ router.add_re("^content/(?P<path>.*?)$", controller="index", name="_content")
 @expose
 def index(path=None):
     log.debug("Show path %r", path)
+    all = sling.getNodes("wiki")
+    c.all = [e["jcr:path"].split("/")[-1] for e in all]
     if path:
         c.entry = sling.get("/wiki/" + path)
         c.entry.path = path
@@ -45,7 +47,7 @@ def commit(title, body, path):
     if title:
         if not path:
             path = "*"
-        created, url = sling.update("/wiki/" + path, dict(
+        created, path = sling.update("/wiki/" + path, dict(
             title=title,
             body=body,
             created="",
@@ -55,6 +57,6 @@ def commit(title, body, path):
 
         # Redirect to index
         # return '<a href=".">Index</a>'
-        redirect("content-" + url.split("/")[-1])
+        redirect(url("content" , path.split("/")[-1]))
     else:
         return "Title is obligatory!"

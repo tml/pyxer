@@ -17,11 +17,19 @@
         }
 
         </script>
+		<style>
+			#title {
+				width: 100%;
+				font-size: 24px;
+				font-weight: bold;
+			}
+		</style>
+		
     </head>
     <body>
         <form action="commit" method="post">
             <div>
-                <input type="text" name="title" value="$c.entry.title" />
+                <input type="text" name="title" id="title" value="$c.entry.title" />
             </div>
             <div style="height: 400px">
                 <textarea name="body" rows="10" cols="80" py:content="c.entry.body">
