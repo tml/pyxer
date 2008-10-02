@@ -10,7 +10,7 @@ import os.path
 import sys
 from shutil import * 
 import wsgiref.handlers
-from pyxer.app import make_app
+# from pyxer.app import make_app
 
 from pyxer.utils import find_root, call_script, call_subprocess
 
@@ -209,8 +209,8 @@ def upload(opt):
         
         print "Please launch Google AppEngine directly"
 
-def main():    
-    wsgiref.handlers.CGIHandler().run(make_app())
+#def main():    
+#    wsgiref.handlers.CGIHandler().run(make_app())
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+#    main()

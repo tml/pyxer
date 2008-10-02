@@ -5,7 +5,6 @@
 #############################################
 
 from optparse import OptionParser
-from pyxer.app import serve
 from pyxer.utils import system, call_subprocess, find_root
 from pyxer import VERSION_STR
 
@@ -169,17 +168,16 @@ def command(engine = None):
 
     # Serve
     if command == "serve":
-
         if engine:
             engine.serve(opt)
         else:
             if opt.debug:
                 logging.basicConfig(level = logging.DEBUG)
-            serve(opt)
+            import pyxer.app
+            pyxer.app.serve(opt)
 
     # Setup
     elif (command in ("setup", "create", "init")):
-
         import pyxer.create
         pyxer.create.create(opt, here)
 
@@ -226,8 +224,7 @@ def command(engine = None):
         engine.fix()
 
     # Setup Pyxer
-    elif command == "pyxer":
-        
+    elif command == "pyxer":        
         import pyxer.create
         pyxer.create.self_setup()
         
@@ -243,3 +240,6 @@ def command_gae():
 
 def command_paster():
     command("paster")
+    
+if __name__=="__main__":
+    command()
