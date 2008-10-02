@@ -110,7 +110,7 @@ def patch_modules():
     repl_dir = get_file_dir('module-replacements')
     if repl_dir not in sys.path:
         sys.path.insert(0, repl_dir)
-    for module in ['httplib', 'subprocess', 'zipimport', 'cookielib', 'urllib', 'urllib2']:
+    for module in ['httplib', 'subprocess', 'cookielib', 'urllib', 'urllib2']:
         if (module in sys.modules
             and 'module-replacements' not in (getattr(sys.modules[module], '__file__', None) or '')):
             del sys.modules[module]

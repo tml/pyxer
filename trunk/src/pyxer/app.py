@@ -29,6 +29,7 @@ import os.path
 import types
 import pprint
 import site
+import zipimport
 
 import logging
 log = logging.getLogger(__name__)
@@ -258,8 +259,9 @@ class PyxerApp(Router):
 SessionMiddleware = None
 try:
     from beaker.middleware import SessionMiddleware
-except:
-    pass
+    log.debug("Beaker successfully loaded")
+except ImportError:
+    log.debug("Beaker NOT loaded")
 
 # Make WSGI application, wrapping sessions etc.
 def make_app(global_conf = {}, **app_conf):
@@ -300,7 +302,7 @@ def make_app(global_conf = {}, **app_conf):
     # app = App(global_conf=None, root="public", path=None, **app_conf)
     app = PyxerApp()
 
-    if SessionMiddleware and (conf.get("session", "beaker") == "beaker"):
+    if SessionMiddleware and (conf.get("pyxer.session", "beaker") == "beaker"):
         log.debug("Beaker sessions")
         if "google.appengine" in sys.modules:
             app = SessionMiddleware(app, type = 'google', table_name = 'PyxerSession')
