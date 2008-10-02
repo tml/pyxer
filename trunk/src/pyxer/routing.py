@@ -227,7 +227,7 @@ class Router(object):
                 urlvars.update(match.groupdict())
                 tail = path[match.end():].lstrip("/")
                 urlvars["pyxer.tail"] = tail
-                urlvars["pyxer.match"] = path[match.start():match.end():]
+                urlvars["pyxer.match"] = path[match.start():match.end()]
                 urlvars["pyxer.path"] = os.path.dirname(os.path.abspath(self.module.__file__))
 
                 log.debug("Matched %r %r %r %r", path, route, urlvars, route.vars)

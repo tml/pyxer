@@ -247,6 +247,9 @@ class PyxerApp(Router):
                 
             request.urlvars = vars
             environ['pyxer.urlvars'] = vars
+            
+            environ['pyxer.urlbase'] = path[:-(len(vars["pyxer.match"]) + len(vars["pyxer.tail"]))]
+            # log.info("******* %r %r %r", path, vars["pyxer.match"],  environ['pyxer.urlbase'])
 
             return obj()
             # obj(environ, start_response)

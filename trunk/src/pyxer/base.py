@@ -8,6 +8,7 @@
 # import pyxer.model as model
 
 from webob import exc
+import urllib
 
 import sys
 import logging
@@ -17,6 +18,8 @@ import imp
 import os
 import os.path
 import types
+import urllib 
+import urlparse
 
 GAE = "google.appengine" in sys.modules
 
@@ -30,9 +33,16 @@ from pyxer.routing import Router, static
 import logging
 log = logging.getLogger(__name__)
 
-def url(url):
+def url(url, *parts, **params):
     " Normalize URL "
-    return request.relative_url(url)
+    if len(parts):
+        url += "/" + "/".join(parts)
+    url = urlparse.urljoin(request.environ["pyxer.urlbase"], url)
+    query = urllib.urlencode(params)
+    # url = request.relative_url(url)
+    obj = list(urlparse.urlparse(url))
+    obj[4] = query
+    return urlparse.urlunparse(obj)
 
 def redirect(location, code = 301):
     " Redirect to other page "
@@ -150,8 +160,13 @@ class expose(controller):
 
     def call(self, *a, **kw):
         " Add arguments "
-        log.debug("Call func with params %r", dict(request.params))
-        return self.func(**dict(request.params))
+        data = {}
+        for k, v in dict(request.urlvars).items():
+            if not (k.startswith("pyxer.") or k in ("controller", "module")):
+                data[k] = v
+        data.update(dict(request.params))        
+        log.debug("Call func with params %r and urlvars %r", dict(request.params), dict(request.urlvars))
+        return self.func(**data)
 
 class Permission(object):
 

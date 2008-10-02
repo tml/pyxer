@@ -3,33 +3,21 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title>Wiki</title>
-        <script type="text/javascript" src="/res/fckeditor/fckeditor.js">
-        </script>
-        <script type="text/javascript">
-
-        window.onload = function(){
-            var oFCKeditor = new FCKeditor('body')
-            oFCKeditor.BasePath = '/res/fckeditor/'
-            // oFCKeditor.ToolbarSet = "Basic"
-            oFCKeditor.Height = "400"
-            oFCKeditor.Config['FullPage'] = true
-            oFCKeditor.ReplaceTextarea()
-        }
-
-        </script>
     </head>
     <body>
-        <form action="commit" method="post">
-            <div>
-                <input type="text" name="title" value="$c.entry.title" />
-            </div>
-            <div style="height: 400px">
-                <textarea name="body" rows="10" cols="80" py:content="c.entry.body">
-                </textarea>
-            </div>
-            <br/>
-            <input type="hidden" name="path" value="$c.entry.path"  />
-            <input type="submit" value="submit" />
-        </form>
+    	
+		<a href="edit?path=$c.entry.path">Edit</a>
+|
+		<a py:attrs="dict(href=c.url('edit', path=c.entry.path))" href="#">Edit2</a>
+		<a href="edit">New</a>
+		
+		<hr />
+		
+		<h1 py:content="c.entry.title">Title</h1>
+		
+		<div py:content="HTML(c.entry.body)">
+		 	Body 
+		</div>
+        
     </body>
 </html>

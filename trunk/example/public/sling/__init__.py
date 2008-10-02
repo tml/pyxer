@@ -6,30 +6,33 @@ from pyxer.sling import Sling, quote
 sling = Sling("127.0.0.1", 7777)
 
 router = Router()
-router.add_re("^content-(?P<title>.*?)$", controller="index", name="_content")
+router.add_re("^content/(?P<path>.*?)$", controller="index", name="_content")
 
 @expose
-def index(title=None):
-    result = None
-    if title:
+def index(path=None):
+    log.debug("Show path %r", path)
+    if path:
+        c.entry = sling.get("/wiki/" + path)
+        c.entry.path = path
         # Get all entries with the correct title
-        result = sling.xpath('wiki/*[@title="%s"]' % xpath_escape(title))
-    elif title is None:
+        # result = sling.xpath('wiki/*[@title="%s"]' % xpath_escape(title))
+    else:
         # Get first entry
         result = sling.getNodes("wiki", rows=1)
+        c.entry = sling.get(result[0])
+        c.entry.path = result[0]["jcr:path"].split("/")[-1]
+    c.url = url
 
-    # New entry
-    if not result:
+@expose
+def edit(path=None):
+    if not path:
         c.entry = dict(
             title = "",
             body = "",
             path = "")
     else:
-        # Get content
-        c.entry = sling.get(result[0])
-        c.entry.path = result[0]["jcr:path"].split("/")[-1]
-
-    log.debug("Query: %r", c.entry)
+        c.entry = sling.get("/wiki/" + path)
+        c.entry.path = path
 
 @expose
 def commit(title, body, path):
@@ -42,7 +45,7 @@ def commit(title, body, path):
     if title:
         if not path:
             path = "*"
-        sling.update("/wiki/" + path, dict(
+        created, url = sling.update("/wiki/" + path, dict(
             title=title,
             body=body,
             created="",
@@ -52,6 +55,6 @@ def commit(title, body, path):
 
         # Redirect to index
         # return '<a href=".">Index</a>'
-        redirect(".")
+        redirect("content-" + url.split("/")[-1])
     else:
         return "Title is obligatory!"

@@ -194,6 +194,7 @@ class TemplateSoup(object):
             "from pyxer.template.genshi import XML, HTML, Stream, QName, Attrs",
             "from pyxer.template.genshi.core import START, END, TEXT, XML_DECL, DOCTYPE, START_NS, END_NS, START_CDATA, END_CDATA, PI, COMMENT",
             "def _forceUnicode(value):",
+                "\tif value is None: return ''",
                 "\tif isinstance(value, unicode): return value",
                 "\treturn unicode(str(value), 'utf8')",
             "def select(path):",
