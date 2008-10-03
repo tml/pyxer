@@ -6,9 +6,10 @@
     <link href="/master.css" type="text/css" rel="stylesheet" media="all" />
 	<title>Pyxer. ${top.select('//title/text()')}</title>
 	<style py:replace="top.css('style')"></style>
+	<link py:replace="top.css('link')" />
 	<script py:replace="top.css('script')"></script>
 </head>
-<body>
+<body class="yui-skin-sam">
      <div class="title"><a href="/">Pyxer Examples</a> / ${top.select('//title/text()')}</div>	
      <div class="content">	 
 	 	 ${top.css('body *')}
