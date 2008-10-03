@@ -199,7 +199,7 @@ def index():
       </li>
       <li>Looks for the template (foo/bar.html) </li>
     </ol>
-    <h2>Publishing</h2>
+    <h2>Deployment</h2>
     <p>To publish your project to GAE you may also use the Pyxer command line tool. First check if your &quot;app.yaml&quot; file contains the right informations like the project name and version infos. Then just do like this:</p>
     <pre><em>$</em> xgae upload</pre>
     <p>Be aware that Pyxer first needs to fix the paths to be relative instead of absolute to make them work on the GAE environment. If you choose not to use Pyxer for uploading you have to do this fix up explicitly <strong>before</strong> you upload your applikation, like this:</p>
@@ -209,7 +209,7 @@ def index():
     <h1>Routing</h1>
   <p>The routing in Pyxer is based on some conventions by default but may be extended in a very flexible and easy way. By default all public project data are expected in the folder <code>public</code>. If you just put static content there  it will behave like you expect it from a normal webserver. </p>
   <p>To add controllers to it, start with creating an <code>__init__.py</code> file. This makes the folder a Python package and Pyxer routing will first evaluate this before looking for static content. </p>
-  <h2>Default</h2>
+  <h2>Default behaviour </h2>
   <p>The easiest controller looks like this:</p>
   <pre>@controller 
 def index(): 
@@ -236,14 +236,26 @@ def index():
     </ul>
   <p>Everything that does not match will be considered static content. Pyxer tries to match the path relatively to the last matched package.</p>
   <p><strong>If you are just beginning to use Pyxer and you do not like reading manual - like I do - you may skip the next sub sections and continue with the next main section.</strong></p>
-  <h2>Custom</h2>
+  <h2>Custom routes </h2>
   <p>If you need more sophisticated routing or want to include external packages that are not placed under the <code>public</code> folder you may add your own routing. This is as simple as adding this line to your global space of your module:</p>
   <pre>router = Router()</pre>
   <p><strong>Important! The name of this object has to be <code>router</code> by convention!</strong></p>
   <p>To add your own ...   </p>
   <pre>router.add(&quot;content-{name}&quot;, &quot;content&quot;)</pre>
   <p>This matches all URL starting with <code>content-</code> while the rest will be saved in <code>req.urlvars</code> as <code>name</code>. For example the URL <code>/content-myentry</code> will result in a call of the controller <code>index</code> where <code>req.urlvars[&quot;name&quot;]==&quot;myentry&quot;</code>.</p>
-  <p>XXX</p>
+  <p>For more complicated routes you may also use the <code>add_re</code> method, which offers more flexibility. Here is an example that matches the rest of the path after &quot;content/&quot; and passes the value to the controller via <code>req.urlvars[&quot;path&quot;]</code>: </p>
+  <pre>router.add_re(&quot;^content/(?P&lt;path&gt;.*?)$&quot;, 
+  controller=&quot;index&quot;, name=&quot;_content&quot;)</pre>
+  <h2>Relative URL
+  </h2>
+  <p>In your templates you should try to often use the <code>h.url()</code> helper. It calculates a URL relative to the matched routes base. For example if we take a look at the <code>add_re</code> routing example we can see that the <code>path</code> component is under the content component. Let's say we have a controller called <code>edit</code> we like to call from the page created by <code>index</code>, then we can not write it like this:</p>
+  <pre>&lt;a href=&quot;edit?path=$c.path&quot;&gt;Edit&lt;/a&gt;</pre>
+  <p>That does not always work because this page could have been called via &quot;index?path=xyz&quot; or via &quot;content/xyz&quot;. To make sure we are get the URL corresponding to our modules controller we could write it like this:</p>
+  <pre>&lt;a href=&quot;${h.url('edit?path=' + c.path)}&gt;Edit&lt;/a&gt;</pre>
+  <p>Or even better using the feature of <code>h.url</code> that   lets you append GET parameters as named arguments of the helper function:</p>
+  <pre>&lt;a href=&quot;${h.url('edit', path=c.path)}&gt;Edit&lt;/a&gt;</pre>
+  <p>If you use <code>redirect</code> it will call the <code>url</code> helper too so that relative parts will be translated to absolute ones. 
+  </p>
   </div>
   <div class="section">
     <h1>Templating</h1>
@@ -257,24 +269,28 @@ def index():
       contain dots!) and <code>${&lt;expression&gt;}</code>:</p>
     <pre>Hello <strong>${name.capitalize()}</strong>, you won <strong>$price</strong>.
 <strong>$item.amount</strong> times <strong>$item.name</strong>.</pre>
-    <h2>HTML Attributes</h2>
-    <p>These are also known form many templating languages like Genshi.
+    <h2>Commands</h2>
+    <p>These are also known form  templating languages like Genshi and Kid.
       They are used like this:</p>
     <pre>&lt;div <strong>py:if=&rdquo;name.startswith('tom ')&rdquo;</strong>&gt;Welcome $name&lt;/div&gt;</pre>
-    <p> xxx</p>
+    <p> Or this: </p>
     <pre>&lt;div <strong>py:for=&rdquo;name in sorted(c.listOfNames)&rdquo;</strong>&gt;Welcome $name&lt;/div&gt;</pre>
-    <p> xxx</p>
-    <h2>Commands</h2>
-    <p>py:if ... py:else ... py:elif</p>
-    <p>py:for ... py:else</p>
-    <p>py:def</p>
-    <p>py:match</p>
-    <p>py:layout / py:extends </p>
-    <p>py:with</p>
-    <p>py:content</p>
-    <p>py:replace</p>
-    <p>py:strip</p>
-    <p>py:attrs</p>
+    <p>These are the available commands. They behave like the Genshi equivalents: </p>
+    <ul>
+      <li>py:if <del>... py:else ... py:elif</del>/li>
+      <li>py:for <del>... py:else</del></li>
+      <li>py:def</li>
+      <li>py:match</li>
+      <li>py:layout <del> / py:extends</del></li>
+      <li><del>py:with</del></li>
+      <li>py:content</li>
+      <li>py:replace</li>
+      <li>py:strip</li>
+      <li>py:attrs</li>
+    </ul>
+    <h2>Comments</h2>
+    <p>If HTML comments start with &quot;!&quot; they are ignored form the output:</p>
+    <pre>&lt;!--! Invisible --&gt; &lt;!-- Visible in browsers --&gt; </pre>
     <h2>XPath </h2>
     <p>XPath is supported like it is in Genshi.</p>
     <h2>CSS Selectors</h2>
@@ -347,7 +363,7 @@ session = beaker </pre>
       prepare environment to work fine. These are very specific to each of
       these engines and <em>Pyxer</em> tries to make the setup as easy as
       possible</p>
-    <h3>Common options:</h3>
+    <p>Common options:</p>
     <ul>
       <li><code>--host=HOST</code> (default: 127.0.0.1) </li>
       <li><code>--port=PORT</code> (default: 8080) </li>
@@ -355,7 +371,7 @@ session = beaker </pre>
     <h2>WSGI</h2>
     <pre><em>$</em> pyxer serve </pre>
     <h2>Paster</h2>
-    <h3>Options:</h3>
+    <p>Options:</p>
     <ul>
       <li><code>--reload</code> XXX</li>
     </ul>
