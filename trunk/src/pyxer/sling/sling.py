@@ -39,6 +39,9 @@ json_decode = simplejson.loads
 import logging
 log = logging.getLogger(__name__)
 
+class SlingException(Exception):
+    pass
+
 class SlingObject(dict):
 
     def __getattr__(self, name):
@@ -75,6 +78,9 @@ class Sling(object):
     def call(self, path, post=None):
         try:
             conn = None
+            if not path.startswith("/"):
+                raise SlingException("Need absolute path instead of %r" % path)
+            #    path = "/" + path
             url = self.baseurl + path
             log.debug("Sling request %r with params %r", url, post)
             if isinstance(post, dict):
@@ -97,6 +103,8 @@ class Sling(object):
 
     def callJSON(self, path, post=None):
         conn = self.call(path, post)
+        if not conn.code==200:
+            return None
         data = conn.read()
         log.info("Request result %r", data)
         data = json_decode(data)
@@ -137,6 +145,9 @@ class Sling(object):
 
     def create(self, path="/", data={}, order=None):
         log.info("CREATE %r, data: %r", path, data)
+        for k, v in data.items():
+            if isinstance(v, unicode):
+                data[k] = v.encode("utf8")
         #if not data.has_key("jcr:primaryType"):
         #    data["jcr:primaryType"] = "nt:unstructured"
         # Check for valid order argument
@@ -148,11 +159,11 @@ class Sling(object):
         conn = self.call(path, data)
         # Status "created"?
         result = (
-            conn.code == 201, 
+            conn.code == 201,
             conn.info().get("location", path))
         log.info("CREATE new %r on URL %r", *result)
         return result
-        
+
     update = create
 
     def delete(self, path):
