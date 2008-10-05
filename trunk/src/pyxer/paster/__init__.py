@@ -18,7 +18,6 @@ import os
 import os.path
 import sys
 from shutil import * 
-import wsgiref.handlers
 from pyxer.app import make_app
 from pyxer.utils import call_virtual, find_name, find_root, call_script
 

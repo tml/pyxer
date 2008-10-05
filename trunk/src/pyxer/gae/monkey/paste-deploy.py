@@ -14,7 +14,6 @@ if os.environ.get('PYTHONPATH'):
         "$PYTHONPATH is set.  This may cause import problems; it is best to unset PYTHONPATH before starting the appserver")
 
 import site
-import wsgiref.handlers
 
 def _test():
     print "sys.path = ["
@@ -72,6 +71,7 @@ except:
 else:
     def main():
         ## FIXME: set multiprocess based on whether this is the dev/SDK server
+        import wsgiref.handlers
         wsgiref.handlers.BaseCGIHandler(sys.stdin, sys.stdout, sys.stderr, os.environ,
                                         multithread=False, multiprocess=False).run(app)
 
