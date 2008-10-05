@@ -38,11 +38,11 @@ def url(url, *parts, **params):
     if len(parts):
         url += "/" + "/".join(parts)
 
-    log.debug("URL (1) %r", url)
+    #log.debug("URL (1) %r", url)
 
     url = urlparse.urljoin(request.environ["pyxer.urlbase"], url)
 
-    log.debug("URL (2) %r", url)
+    #log.debug("URL (2) %r", url)
 
     query = urllib.urlencode(params)
     # url = request.relative_url(url)
@@ -51,14 +51,14 @@ def url(url, *parts, **params):
 
     # If you live behind an Apache proxy
     # XXX Maybe has to go in pyxer.app?
-    if request.environ.has_key("HTTP_X_FORWARDED_HOST"):
-        log.debug("URL (x) %r %r", obj, request.environ["HTTP_X_FORWARDED_HOST"])
-        obj[1] = request.environ["HTTP_X_FORWARDED_HOST"]
-        if not obj[0]:
-            obj[0] = "http"
+    #if request.environ.has_key("HTTP_X_FORWARDED_HOST"):
+    #    log.debug("URL (x) %r %r", obj, request.environ["HTTP_X_FORWARDED_HOST"])
+    #    obj[1] = request.environ["HTTP_X_FORWARDED_HOST"]
+    #    if not obj[0]:
+    #        obj[0] = "http"
 
     url = urlparse.urlunparse(obj)
-    log.debug("URL (3) %r", url)
+    #log.debug("URL (3) %r", url)
     return url
 
 def redirect(location, code = 301):
