@@ -34,6 +34,12 @@ def static():
             path = os.path.join(path, "index.html")
         elif tail:
             location = (req.environ["PATH_INFO"] + "/")
+
+            # XXX not tested!
+            if request.environ.has_key("HTTP_X_FORWARDED_HOST"):
+                # log.debug("URL (x) %r %r", obj, request.environ["HTTP_X_FORWARDED_HOST"])
+                location = "http://" + request.environ["HTTP_X_FORWARDED_HOST"]
+
             raise exc.HTTPMovedPermanently(location = location).exception
     if not os.path.isfile(path):
         raise exc.HTTPNotFound().exception
@@ -232,10 +238,10 @@ class Router(object):
 
                 log.debug("Matched %r %r %r %r", path, route, urlvars, route.vars)
 
-                # Abort matching 
+                # Abort matching
                 if urlvars["module"] is None and urlvars["controller"] is None:
                     return (None, None)
-                
+
                 # Handle module
                 if urlvars["module"] is not None:
                     obj = urlvars["module"]
@@ -270,11 +276,11 @@ class Router(object):
                 # Handle controller
                 if urlvars["controller"] is not None:
                     obj = urlvars["controller"]
-                    
+
                     if isinstance(obj, basestring):
                         if hasattr(self.module, obj):
                             obj = getattr(self.module, obj)
-                                                
+
                     if hasattr(obj, "iscontroller") or isController(obj):
                         return obj, urlvars
                     else:
