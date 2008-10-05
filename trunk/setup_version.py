@@ -15,7 +15,6 @@ VERSION = open("VERSION.txt", "r").read().strip()
 BUILD = time.strftime("%Y-%m-%d")
 FILES = [
     "setup.py",
-    "src/pyxer/setup.py",
     "src/pyxer/__init__.py",
     "docs/pyxer.html",
     ]
