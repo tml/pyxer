@@ -18,7 +18,7 @@ import imp
 import os
 import os.path
 import types
-import urllib 
+import urllib
 import urlparse
 
 GAE = "google.appengine" in sys.modules
@@ -37,11 +37,20 @@ def url(url, *parts, **params):
     " Normalize URL "
     if len(parts):
         url += "/" + "/".join(parts)
+
     url = urlparse.urljoin(request.environ["pyxer.urlbase"], url)
     query = urllib.urlencode(params)
     # url = request.relative_url(url)
     obj = list(urlparse.urlparse(url))
     obj[4] = query
+
+    # If you live behind an Apache proxy
+    # XXX Maybe has to go in pyxer.app?
+    if request.environ.has_key("HTTP_X_FORWARDED_HOST"):
+        obj[1] = request.environ["HTTP_X_FORWARDED_HOST"]
+        if not obj[0]:
+            obj[0] = "http"
+
     return urlparse.urlunparse(obj)
 
 def redirect(location, code = 301):
@@ -164,7 +173,7 @@ class expose(controller):
         for k, v in dict(request.urlvars).items():
             if not (k.startswith("pyxer.") or k in ("controller", "module")):
                 data[k] = v
-        data.update(dict(request.params))        
+        data.update(dict(request.params))
         log.debug("Call func with params %r and urlvars %r", dict(request.params), dict(request.urlvars))
         return self.func(**data)
 

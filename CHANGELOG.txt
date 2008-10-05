@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-Version 0.6.0, 2008-08-xxx
+Version 0.6.0, 2008-10-05
 
 - NEW: New templating language based on Genshi
 - NEW: Support for CSS selectors in templating language
