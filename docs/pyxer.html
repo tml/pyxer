@@ -119,7 +119,7 @@ lib/</pre>
     <p> This works just like a static server. To use a controller put a file
       &quot;__init__.py&quot; into that directory with the following
       content:</p>
-    <pre>@controller
+    <pre name="code" class="python">@controller
 def index():
     return &quot;Hello World&quot;</pre>
     <h2>Controllers</h2>
@@ -277,7 +277,8 @@ def index():
     <pre>&lt;div <strong>py:for=&rdquo;name in sorted(c.listOfNames)&rdquo;</strong>&gt;Welcome $name&lt;/div&gt;</pre>
     <p>These are the available commands. They behave like the Genshi equivalents: </p>
     <ul>
-      <li>py:if <del>... py:else ... py:elif</del>/li>
+      <li>py:if <del>... py:else ... py:elif</del>
+      
       <li>py:for <del>... py:else</del></li>
       <li>py:def</li>
       <li>py:match</li>
@@ -291,9 +292,25 @@ def index():
     <h2>Comments</h2>
     <p>If HTML comments start with &quot;!&quot; they are ignored form the output:</p>
     <pre>&lt;!--! Invisible --&gt; &lt;!-- Visible in browsers --&gt; </pre>
-    <h2>XPath </h2>
+    <h2>Layout templates</h2>
+    <p>The implementation of layout templates is quite easy. Place the <code>py:layout</code> command in the <code>&lt;html&gt;</code> tag and pass a Template object. For loading you may use the convenience function <code>load()</code>. </p>
+    <pre>&lt;html py:layout=&quot;load('layout.html')&quot;&gt;
+  ...
+&lt;/html&gt;</pre>
+    <p>In the template file you may then access the original template stream with the global variable <code>top</code>. Use CSS selection or XPATH to access elements. Example: </p>
+    <pre>&lt;html&gt;
+  &lt;title py:content=&quot;top.css('title')&quot;&gt;&lt;/title&gt;
+  &lt;body&gt;
+    &lt;h1&gt;&lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt; 
+        / ${top.select('//title/text()')}&lt;/h1&gt; 
+    &lt;div class=&quot;content&quot;&gt;	 <br />      ${top.css('body *')}
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+    <p><strong>XPath</strong> </p>
     <p>XPath is supported like it is in Genshi.</p>
-    <h2>CSS Selectors</h2>
+    <p><strong>CSS Selectors</strong></p>
     <p>CSS Selectors ending with &quot; *&quot; return just the inner texts and elements of the matched pattern. </p>
   </div>
   <div class="section">
@@ -301,7 +318,6 @@ def index():
     <p>You are free to use any database model you like. For GAE you have not much choice but for other engines I recommend using Elixir. You should try to separate your controller stuff from your database stuff by creating a Python module called &quot;model.py&quot;. For a GAE project this may look like this:</p>
     <pre>from google.appengine.ext import db
 from google.appengine.api import users
-
 
 class GuestBook(db.Model):
    name = db.StringProperty()

@@ -151,7 +151,7 @@ class TemplateSoup(object):
     Yet another templating system based on BeautyfulSoup
     """
 
-    def __init__(self, source, html5 = False, strict = True, debug = True):
+    def __init__(self, source, html5 = False, strict = True, debug = False):
         self.strict = strict
         self.html5 = html5
         self.debug = debug
@@ -168,7 +168,6 @@ class TemplateSoup(object):
         # Save memory
         if not self.debug:
             self.code = None
-            self.sourcecode = None
             self.sourcecode = None
 
     def parse(self, source):
@@ -231,6 +230,8 @@ class TemplateSoup(object):
         #    print self.code.pretty()
 
     def generateByteCode(self):
+        if self.debug:
+            log.debug("Sourcecode:\n%s", self.code.pretty())
         self.bytecode = compile(self.sourcecode, "<string>", "exec")
 
     def generate(self, __vars__={}, **kw):
@@ -284,7 +285,7 @@ class TemplateSoup(object):
         self.stream = stream
         return stream
 
-    def render(self, method="xhtml", encoding = "utf8", doctype="xhtml", strip_whitespace=True, **kw):
+    def render(self, method="html", encoding = "utf8", doctype="html", strip_whitespace=True, **kw):
         if self.stream:
             return self.stream.render(method,
                 strip_whitespace=strip_whitespace,
@@ -298,17 +299,18 @@ class TemplateSoup(object):
         value = None
         kind, data, pos = node
         if kind == START:
-            if not (data[0].lower() == "meta" and name == "content"):
-                attr = data[1]
-                if name in attr:
-                    value = attr.get(name)
-                    node[1] = (data[0], attr - name)
-                name = "py:" + name
-                if name in attr:
-                    if value is not None:
-                        raise "Attribute %s is defined twice"
-                    value = attr.get(name)
-                    node[1] = (data[0], attr - name)
+            attr = data[1]
+            # XXX <label for...> problem
+            #if not (data[0].lower() == "meta" and name == "content"):
+            #    if name in attr:
+            #        value = attr.get(name)
+            #        node[1] = (data[0], attr - name)
+            name = "py:" + name
+            if name in attr:
+                if value is not None:
+                    raise "Attribute %s is defined twice"
+                value = attr.get(name)
+                node[1] = (data[0], attr - name)
         return value
 
     def checkSyntax(self, value, mode = "eval"):
@@ -415,7 +417,7 @@ class TemplateSoup(object):
 
                 if (pyReplace) or pyStrip:
                     pyStrip = True
-                else:
+                elif show:
                     attrs = []
                     for name, value in attr:
                         pos = 0
@@ -476,7 +478,11 @@ class TemplateSoup(object):
                 # Get states from stack
                 pyDef, pyStrip, pyContent, indent = path.pop()
 
-                if not pyStrip:
+                # Recalc show because path is shorter now!
+                show = not (len(path) and path[-1][2])
+
+                # print data, pyStrip, indent, show
+                if not pyStrip and show:
                     self.addElement(kind, data, position)
 
                 for i in range(indent):
@@ -519,7 +525,8 @@ class TemplateSoup(object):
                     self.addElement(kind, data, position)
 
             elif show:
-                # print kind, data, position
+
+                # log.debug("Unhandled stream element: %r %r %r", kind, data, position)
                 self.addElement(kind, data, position)
 
 def testing():
@@ -533,9 +540,21 @@ def testing():
 
 if __name__ == "__main__":
 
+    if 1:
+        level = logging.DEBUG
+        try:
+            LOG_FORMAT_DEBUG = "%(levelname)s [%(name)s] %(pathname)s line %(lineno)d: %(message)s"
+            logging.basicConfig(
+                level = level,
+                format = LOG_FORMAT_DEBUG)
+        except:
+            logging.basicConfig()
+
+    log.info("Logging enabled")
+
     testing()
 
-    if 1:
+    if 0:
         def layout(name):
             return TemplateSoup("""
             <html>
@@ -543,7 +562,10 @@ if __name__ == "__main__":
                     <title  data="$x test">Great!</title>
                 </head>
                 <body>
-                    <div content="top.selectInner('//body')"></div>
+                    <div content="top.selectInner('//body')">
+                      <h2>Header </h2>
+                      <p>Lorem ipsum</p>
+                    </div>
                     <hr />
                 </body>s
             </html>
@@ -552,11 +574,12 @@ if __name__ == "__main__":
         ts = TemplateSoup("""<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
             <html layout="layout(123)">
                 <body id="test" data="$x $y test">
-                    Here we go!
+                    <p>
+                        Here we go!
                         <b>Hello</b>
                         $x $y
-                    <!-- Comment --> <!--! invisible -->
-                    Ende
+                        <!-- Comment --> <!--! invisible -->
+                        Ende
                 </body>
             </html>
             """)
@@ -586,6 +609,35 @@ if __name__ == "__main__":
         """)
         print t.generate()
 
+    if 1:
+        TEST = """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html layout="c.layout">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Python HTML/CSS to PDF converter</title>
+</head>
+<body>
+<p>XXX</p>
+<p class="error" py:if="c.error" py:content="c.error">
+	ERROR
+</p>
+<form action="message">
+	<p>
+		<label for="email">Your email address</label>
+		<input type="text" id="email" name="email" value="$c.email">
+	</p>
+	<p>
+		<label for="message">Your message</label>
+		<textarea name="message" id="message">$c.message</textarea>
+	</p>
+	<p>
+		<input type="submit" value="Send message to XHTML2PDF">
+	</p>
+</form>
+</body>
+</html>
+"""
+
     if 0:
         mod = TemplateSoup(data2, html5 = True)
         mod.code.debug()
@@ -602,3 +654,13 @@ if __name__ == "__main__":
         t = Template(_test3, html = True, path = r"c:\test.html")
         print t.source.encode("latin1", "ignore")
         print t.render(dict(name = 'dirk "enzo" holtwick'), encoding = "ascii")
+
+
+    if 1:
+        try:
+            ts = TemplateSoup(TEST, debug=1)
+            print ts.code.pretty()
+            ts.generate(dict(x = "äöü", y=str, layout = layout))
+            print ts
+        except:
+            log.exception("Template")
