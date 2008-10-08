@@ -28,8 +28,8 @@ log = logging.getLogger(__name__)
 def static():
     tail = req.urlvars["static"]
     path = os.path.join(req.urlvars["pyxer.path"], tail)
-    # Is it a folder?
-    if os.path.isdir(path):
+    # Is it a folder? Or a link?
+    if os.path.isdir(path) or os.path.islink(path):
         if (not tail) or tail.endswith("/"):
             path = os.path.join(path, "index.html")
         elif tail:
