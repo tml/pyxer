@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+Version 0.6.1, 2008-12-XXX
+
+- UPD: Updated to latest SVN version of appmonkey
+- FIX: Bug in paste-deplay about "import site"
+
 Version 0.6.0, 2008-10-05
 
 - NEW: New templating language based on Genshi

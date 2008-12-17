@@ -63,6 +63,11 @@ def find_module(subname, path):
 def get_magic():
     return '\xb3\xf2\r\n'
 
+@patch(imp)
+def load_dynamic(name, pathname, file=None):
+    # On GAE you can't load .so files, so this always just fails
+    raise ImportError('You cannot import a dynamic library')
+
 @patch(os)
 def readlink(path):
     return path
@@ -144,3 +149,16 @@ def _fileobject(socket_obj, mode='rb', bufsize=-1, close=False):
     ## FIXME: this is a fix for urllib2:1096, where for some reason it does this
     ## Why?  No idea.
     return socket_obj
+
+import zipimport
+
+class ZipDirectoryCache(object):
+    ## This is purely for setuptools/pkg_resources
+    def __getitem__(self, path):
+        # This must return something, but its contents will only be
+        # inspected when pkg_resources tries to extract a resource
+        # (e.g., when using resource_filename), which can't happen on
+        # GAE.
+        return {}
+
+zipimport._zip_directory_cache = ZipDirectoryCache()
