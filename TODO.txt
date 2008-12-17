@@ -15,7 +15,7 @@ Templating
 - Bug in Genshi
 - "extends" and "match" don't work
 - Internationalization
-- <!DOCTYPE 
+- <!DOCTYPE
 - <script><!-- comments do not escape the right way
 - <!--! has to be stripped
 
@@ -25,3 +25,6 @@ Marketing
 Future
 - Full integration into Eclipse/PyDev
 - Windows/Mac/Linux native tool placed in the Systray/Menu/Dock
+
+- h.url should also work in layout templates
+- Fallback for not existent variables in templates

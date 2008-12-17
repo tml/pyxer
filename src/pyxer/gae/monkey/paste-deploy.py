@@ -13,8 +13,6 @@ if os.environ.get('PYTHONPATH'):
     print >> sys.stderr, (
         "$PYTHONPATH is set.  This may cause import problems; it is best to unset PYTHONPATH before starting the appserver")
 
-import site
-
 def _test():
     print "sys.path = ["
     for dir in sys.path:
@@ -30,10 +28,16 @@ def _test():
     print "]"
 
 try:
+    here = os.path.dirname(__file__)
+    site_lib = os.path.join(here, 'lib', 'python2.5')
+    if not os.path.isdir(site_lib):
+        site_lib = os.path.join(here, 'Lib')
+    sys.path.append(0, site_lib)
+    import site
+
     # Test for correct site-packages directory, because if developed on
     # Windows we have different paths as everywhere else. And this has also
     # to work on the Google machine too!
-    here = os.path.dirname(__file__)
     site_packages = os.path.join(here, 'lib', 'python2.5', 'site-packages')
     if not os.path.isdir(site_packages):
         site_packages = os.path.join(here, 'Lib', 'site-packages')
@@ -53,7 +57,7 @@ try:
     CONF_FILE = 'config:' + os.path.join(here, CONF_FILE)
     from paste.deploy import loadapp
     app = loadapp(CONF_FILE)
-    
+
 except:
     import traceback
     print 'Content-type: text/plain'

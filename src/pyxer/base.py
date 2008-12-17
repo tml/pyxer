@@ -113,13 +113,13 @@ def template_stream(name = None):
 
 template = template_default = template_stream
 
-def render_stream(*kw):
+def render_stream(**kw):
     template = template_stream()
     template.generate(Dict(c = c, h = Dict(
         url = url,
         redirect = redirect
         ), load = template.load))
-    return template.render()
+    return template.render(**kw)
 
 render_default = render_stream
 
