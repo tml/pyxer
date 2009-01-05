@@ -32,7 +32,7 @@ try:
     site_lib = os.path.join(here, 'lib', 'python2.5')
     if not os.path.isdir(site_lib):
         site_lib = os.path.join(here, 'Lib')
-    sys.path.append(0, site_lib)
+    sys.path.insert(0, site_lib)
     import site
 
     # Test for correct site-packages directory, because if developed on
