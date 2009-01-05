@@ -204,15 +204,19 @@ class Router(object):
             else:
                 self.module = module
             self.module_name = self.module.__name__
+        return self
 
     def add(self, template, **kw):
         self.routes.append(RouteObject(template_to_regex(template, kw.get("module", None)), **kw))
-
+        return self
+    
     def add_re(self, template, **kw):
         self.routes.append(RouteObject(template, **kw))
-
+        return self
+    
     def add_default(self, template, **kw):
         self.routes_default.append(RouteObject(template, **kw))
+        return self
 
     def match(self, path):
         if path.startswith("/"):
