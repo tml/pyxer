@@ -17,7 +17,7 @@ code {
 	font-weight: bold;
 	color: #333;
 	/* text-decoration: underline; */
-	font-size: 8pt;	
+	font-size: 8pt;
 }
 
 .del {
@@ -103,7 +103,7 @@ h3 {
 		font-weight: bold;
 		src: url(DejaVuSansMono-Bold.ttf);
 	}
-	
+
 	/*
 	@font-face {
 		font-family: "Segoe UI", SegoeUI;
@@ -156,14 +156,14 @@ h3 {
 		margin-right: 2cm;
 		margin-bottom: 3cm;
 
-		@frame footer {
-			-pdf-frame-content: footer;
+		@frame footer-number {
+			-pdf-frame-content: footer-number;
 			bottom: 2cm;
 			left: 4cm;
 			right: 2cm;
 			height: 1cm;
 		}
-				
+
 		@frame footer-pisa {
 			-pdf-frame-content: footer-pisa;
 			bottom: 2cm;
@@ -175,4 +175,8 @@ h3 {
 
 	}
 
+}
+
+#footer, #navcontainer {
+	display:none;
 }

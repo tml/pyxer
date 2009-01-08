@@ -16,7 +16,7 @@ window.onload = function() {
 		e.select('h1').each(function(e1) {
 			var newtoc = ""
 			toc += '<li><a class="reference" href="#id' + (counter) + '">' + e1.innerHTML + '</a></li>'
-			e1.insert('<a name="id' + counter + '" id="id' + counter + '></a>', { position: "before" })			
+			e1.insert('<a name="id' + counter + '" id="id' + counter + '></a>', { position: "before" })
 			++counter;
 			e.select('h2').each(function(e2) {
 				newtoc += '<li><a class="reference" href="#id' + (counter) + '">&nbsp;&nbsp;&nbsp;' + e2.innerHTML + '</a></li>'
@@ -29,7 +29,7 @@ window.onload = function() {
 		})
 	})
 	toc += '</ul>'
-	$('autotoc').replace(toc)	
+	$('autotoc').replace(toc)
 	$$('pre').each(function(e) {
 		e.wrap('div', { 'class': 'highlight' })
 	})
@@ -43,7 +43,7 @@ window.onload = function() {
 </head>
 <body>
 <div class="pdf">
-  <div id="footer">
+  <div id="footer-number">
     <p align="right"> Page
       <pdf:pagenumber />
     </p>
@@ -53,7 +53,7 @@ window.onload = function() {
   </div>
   <p class="title">
   <em>Pyxer
-  <!--VERSION-->0.6.0<!--VERSION-->
+  <!--VERSION-->0.6.1<!--VERSION-->
   </em>
   </p>
   <p class="subtitle"> Yet another Python Framework </p>
@@ -61,20 +61,21 @@ window.onload = function() {
     <a href="mailto:dirk.holtwick@gmail.com">dirk.holtwick@gmail.com</a> <br />
     <a href="http://www.pyxer.net/">http://www.pyxer.net</a> </p>
   <pdf:nexttemplate name="regular"/>
-  <h1 style="-pdf-outline: false;" class="pdf">Table of Contents</h1>
+  <!-- h1 style="-pdf-outline: false;" class="pdf">Table of Contents</h1>
   <div class="pdf">
     <pdf:toc />
-  </div>
+  </div -->
 </div>
 <div class="document" id="genshi-templating-basics">
+  <div id="navcontainer">
   <div id="navigation"> <span class="projinfo">Pyxer
-    <!--VERSION-->0.6.0<!--VERSION-->
+    <!--VERSION-->0.6.1<!--VERSION-->
     </span> <a href="#">&nbsp;</a> </div>
   <h1 class="title">Pyxer Python Framework</h1>
   <div class="contents topic">
     <p class="topic-title first"><a id="contents" name="contents">Contents</a></p>
     <div id="autotoc"></div>
-  </div>
+  </div></div>
   <div class="section">
     <h1>Introduction</h1>
     <p> The <em>Pyxer</em> Server is a very simple Python Web Framework that aims
@@ -211,8 +212,8 @@ def index():
   <p>To add controllers to it, start with creating an <code>__init__.py</code> file. This makes the folder a Python package and Pyxer routing will first evaluate this before looking for static content. </p>
   <h2>Default behaviour </h2>
   <p>The easiest controller looks like this:</p>
-  <pre>@controller 
-def index(): 
+  <pre>@controller
+def index():
     return &quot;Hello World&quot;</pre>
   <p>This will be called with the following URLs:</p>
   <ul>
@@ -244,7 +245,7 @@ def index():
   <pre>router.add(&quot;content-{name}&quot;, &quot;content&quot;)</pre>
   <p>This matches all URL starting with <code>content-</code> while the rest will be saved in <code>req.urlvars</code> as <code>name</code>. For example the URL <code>/content-myentry</code> will result in a call of the controller <code>index</code> where <code>req.urlvars[&quot;name&quot;]==&quot;myentry&quot;</code>.</p>
   <p>For more complicated routes you may also use the <code>add_re</code> method, which offers more flexibility. Here is an example that matches the rest of the path after &quot;content/&quot; and passes the value to the controller via <code>req.urlvars[&quot;path&quot;]</code>: </p>
-  <pre>router.add_re(&quot;^content/(?P&lt;path&gt;.*?)$&quot;, 
+  <pre>router.add_re(&quot;^content/(?P&lt;path&gt;.*?)$&quot;,
   controller=&quot;index&quot;, name=&quot;_content&quot;)</pre>
   <h2>Relative URL
   </h2>
@@ -254,7 +255,7 @@ def index():
   <pre>&lt;a href=&quot;${h.url('edit?path=' + c.path)}&gt;Edit&lt;/a&gt;</pre>
   <p>Or even better using the feature of <code>h.url</code> that   lets you append GET parameters as named arguments of the helper function:</p>
   <pre>&lt;a href=&quot;${h.url('edit', path=c.path)}&gt;Edit&lt;/a&gt;</pre>
-  <p>If you use <code>redirect</code> it will call the <code>url</code> helper too so that relative parts will be translated to absolute ones. 
+  <p>If you use <code>redirect</code> it will call the <code>url</code> helper too so that relative parts will be translated to absolute ones.
   </p>
   </div>
   <div class="section">
@@ -278,7 +279,7 @@ def index():
     <p>These are the available commands. They behave like the Genshi equivalents: </p>
     <ul>
       <li>py:if <del>... py:else ... py:elif</del>
-      
+
       <li>py:for <del>... py:else</del></li>
       <li>py:def</li>
       <li>py:match</li>
@@ -301,8 +302,8 @@ def index():
     <pre>&lt;html&gt;
   &lt;title py:content=&quot;top.css('title')&quot;&gt;&lt;/title&gt;
   &lt;body&gt;
-    &lt;h1&gt;&lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt; 
-        / ${top.select('//title/text()')}&lt;/h1&gt; 
+    &lt;h1&gt;&lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;
+        / ${top.select('//title/text()')}&lt;/h1&gt;
     &lt;div class=&quot;content&quot;&gt;	 <br />      ${top.css('body *')}
     &lt;/div&gt;
   &lt;/body&gt;

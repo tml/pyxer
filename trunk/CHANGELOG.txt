@@ -1,9 +1,10 @@
 CHANGELOG
 =========
 
-Version 0.6.1, 2008-12-XXX
+Version 0.6.1, 20001-08
 
 - UPD: Updated to latest SVN version of appmonkey
+- UPD: Modified app.yaml 
 - FIX: Bug in paste-deplay about "import site"
 
 Version 0.6.0, 2008-10-05
