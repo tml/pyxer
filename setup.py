@@ -18,7 +18,6 @@ The command line tool makes creating GAE projects as easy as possible.
 Projects may also be used with Paster or other WSGI frameworks.
 Also provides an interface to Apache Sling to access JCR/ Jackrabbit
 structures and datas.
-Very liberal Open Source licensing.
 """.strip()
 
 setup(

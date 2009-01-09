@@ -4,17 +4,14 @@ CONF_FILE = 'gae.ini'
 
 import sys
 import os
-if getattr(sys, 'real_prefix', None):
-    # This is a sign that a virtualenv python is being used, and that causes problems
-    print >> sys.stderr, (
-        "This appears to be a virtualenv python; please start dev_appserver.py with the system python interpreter")
-    sys.exit(2)
+##if getattr(sys, 'real_prefix', None):
+##    # This is a sign that a virtualenv python is being used, and that causes problems
+##    print >> sys.stderr, (
+##        "This appears to be a virtualenv python; please start dev_appserver.py with the system python interpreter")
+##    sys.exit(2)
 if os.environ.get('PYTHONPATH'):
     print >> sys.stderr, (
         "$PYTHONPATH is set.  This may cause import problems; it is best to unset PYTHONPATH before starting the appserver")
-
-import site
-import wsgiref.handlers
 
 def _test():
     print "sys.path = ["
@@ -31,10 +28,16 @@ def _test():
     print "]"
 
 try:
+    here = os.path.dirname(__file__)
+    site_lib = os.path.join(here, 'lib', 'python2.5')
+    if not os.path.isdir(site_lib):
+        site_lib = os.path.join(here, 'Lib')
+    sys.path.insert(0, site_lib)
+    import site
+
     # Test for correct site-packages directory, because if developed on
     # Windows we have different paths as everywhere else. And this has also
     # to work on the Google machine too!
-    here = os.path.dirname(__file__)
     site_packages = os.path.join(here, 'lib', 'python2.5', 'site-packages')
     if not os.path.isdir(site_packages):
         site_packages = os.path.join(here, 'Lib', 'site-packages')
@@ -54,7 +57,7 @@ try:
     CONF_FILE = 'config:' + os.path.join(here, CONF_FILE)
     from paste.deploy import loadapp
     app = loadapp(CONF_FILE)
-    
+
 except:
     import traceback
     print 'Content-type: text/plain'
@@ -72,6 +75,7 @@ except:
 else:
     def main():
         ## FIXME: set multiprocess based on whether this is the dev/SDK server
+        import wsgiref.handlers
         wsgiref.handlers.BaseCGIHandler(sys.stdin, sys.stdout, sys.stderr, os.environ,
                                         multithread=False, multiprocess=False).run(app)
 

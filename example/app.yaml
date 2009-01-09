@@ -6,11 +6,16 @@ api_version: 1
 handlers:
 #- url: /res/.*
 #  script: $PYTHON_LIB/google/appengine/ext/zipserve
+- url: /docs/(.*)
+  static_files: docs/\1
+  upload: docs/(.*)
 - url: .*
   script: paste-deploy.py
 
 skip_files: |
- ^(.*/)?(
+ ^(
+ ((utils|bin|cache|tests|include|Scripts|tmp)/.*)|
+ (.*/)?(
  (.*\.exe)|
  (.*\.bat)|
  (.*\.pyd)|
@@ -22,13 +27,8 @@ skip_files: |
  (.*~)|
  (.*\.py[co])|
  (.*/RCS/.*)|
- (Scripts/.*)|
- (bin/.*)|
  ([Ll]ib/encodings/.*)|
  (Lib/[^/]+\.py)|
- ([Ll]ib/.+?/webob-.+?\.egg/.*)|
- (cache/.*)|
- (tests/.*)|
- (include/.*)|
+ ([Ll]ib/.+?/[Ww]eb[Oo]b-.+?\.egg/.*)|
  (\..*)|
- )$
+ ))$
