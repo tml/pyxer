@@ -107,6 +107,13 @@ def create(opt, here):
         name = raw_input("Name of project: ")
         app_name = ["--app-name=" + name]
 
+    # Create public dir
+    path = os.path.join(here, "public")
+    if not os.path.exists(path):
+        os.makedirs(path)
+        open(os.path.join(path, "index.html"), "w").write(INDEX_HTML)
+        open(os.path.join(path, "__init__.py"), "w").write(INIT_PY)
+
     # Start appengine-boot.py
     sys.argv = ["XXXDUMMYXXX",
         "--paste-deploy",
@@ -131,13 +138,6 @@ def create(opt, here):
 
     # Install pyxer
     self_setup(here)
-
-    # Create public dir
-    path = os.path.join(here, "public")
-    if not os.path.exists(path):
-        os.makedirs(path)
-        open(os.path.join(path, "index.html"), "w").write(INDEX_HTML)
-        open(os.path.join(path, "__init__.py"), "w").write(INIT_PY)
 
     print "Initialization completed!"
 
