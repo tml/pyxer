@@ -42,12 +42,13 @@ def url(url, *parts, **params):
 
     url = urlparse.urljoin(request.environ["pyxer.urlbase"], url)
 
-    #log.debug("URL (2) %r", url)
+    log.debug("URL (2) %r", url)
 
-    query = urllib.urlencode(params)
-    # url = request.relative_url(url)
-    obj = list(urlparse.urlparse(url))
-    obj[4] = query
+    obj = list(urlparse.urlparse(url))    
+    if params:
+        query = urllib.urlencode(params)
+        # url = request.relative_url(url)
+        obj[4] = query
 
     # If you live behind an Apache proxy
     # XXX Maybe has to go in pyxer.app?
@@ -58,7 +59,7 @@ def url(url, *parts, **params):
     #        obj[0] = "http"
 
     url = urlparse.urlunparse(obj)
-    #log.debug("URL (3) %r", url)
+    log.debug("URL (3) %r", url)
     return url
 
 def redirect(location, code = 301):

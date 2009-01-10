@@ -118,12 +118,15 @@ def serve(opt):
     #return
     
     options = []
+    options.append("--show_mail_body")
     if opt.debug:
         options.append("--debug")
     if opt.host:
         options.append("--address=%s" % opt.host)
     if opt.port:
         options.append("--port=%s" % opt.port)
+    if opt.clear:
+        options.append("--clear_datastore")
     
     fix()    
     root = find_root()
