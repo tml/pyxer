@@ -1,7 +1,14 @@
 CHANGELOG
 =========
 
-Version 0.6.1, 20001-08
+Version 0.6.2, 2008-01-xx
+
+- NEW: Support for reCaptcha
+- NEW: New option "-U" which updates pyxer for the virtual environment
+- UPD: More documentation
+- UPD: Removed "-u" option
+
+Version 0.6.1, 2008-01-08
 
 - UPD: Updated to latest SVN version of appmonkey
 - UPD: Modified app.yaml 
