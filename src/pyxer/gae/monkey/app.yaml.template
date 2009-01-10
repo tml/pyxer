@@ -24,6 +24,8 @@ skip_files: |
  (#.*#)|
  (.*~)|
  (.*\.py[co])|
+ (.*\.so)|
+ (.*\.a)|
  (.*/RCS/.*)|
  ([Ll]ib/encodings/.*)|
  (Lib/[^/]+\.py)|
