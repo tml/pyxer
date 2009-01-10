@@ -70,7 +70,7 @@ def submit (recaptcha_challenge_field,
     if not (recaptcha_response_field and recaptcha_challenge_field and
             len (recaptcha_response_field) and len (recaptcha_challenge_field)):
         return RecaptchaResponse (is_valid = False, error_code = 'incorrect-captcha-sol')
-    
+
 
     def encode_if_necessary(s):
         if isinstance(s, unicode):
@@ -92,7 +92,7 @@ def submit (recaptcha_challenge_field,
             "User-agent": "reCAPTCHA Python"
             }
         )
-    
+
     httpresp = urllib2.urlopen (request)
 
     return_values = httpresp.read ().splitlines ();
@@ -122,12 +122,12 @@ def submit_gae (recaptcha_challenge_field,
     if not (recaptcha_response_field and recaptcha_challenge_field and
             len (recaptcha_response_field) and len (recaptcha_challenge_field)):
         return RecaptchaResponse (is_valid = False, error_code = 'incorrect-captcha-sol')
-    
+
     headers = {
                'Content-type':  'application/x-www-form-urlencoded',
                "User-agent"  :  "reCAPTCHA GAE Python"
-               }         
-    
+               }
+
     params = urllib.urlencode ({
         'privatekey': private_key,
         'remoteip' : remoteip,
@@ -140,17 +140,17 @@ def submit_gae (recaptcha_challenge_field,
                    payload  = params,
                    method   = urlfetch.POST,
                    headers  = headers
-                    )     
-    
+                    )
+
     if httpresp.status_code == 200:
         # response was fine
-        
+
         # get the return values
         return_values = httpresp.content.splitlines();
-        
+
         # get the return code (true/false)
         return_code = return_values[0]
-        
+
         if return_code == "true":
             # yep, filled perfectly
             return RecaptchaResponse (is_valid=True)
@@ -166,13 +166,21 @@ if GAE:
 
 from pyxer.template.genshi import HTML
 
-def html(pub_key, use_ssl=False):    
+# Default keys for *.appspot.com
+_pub_key = "6LcrngQAAAAAAC1iVJGsWhkkpu4Fx3Z_pDCKkbvF"
+_private_key = "6LcrngQAAAAAAFtRJVKFZ6d-BJxZK-40BAdURQ30"
+
+def html(pub_key=_pub_key, use_ssl=False):
+    if pub_key == _pub_key:
+        log.warn("PLEASE GET YOUR OWN RECAPTCHA KEYS ON http://www.recaptcha.net!")
     return HTML(displayhtml(
         pub_key,
         use_ssl = use_ssl,
         error = req.params.get("error")))
 
-def test(private_key):
+def test(private_key=_private_key):
+    if private_key == _private_key:
+        log.warn("PLEASE GET YOUR OWN RECAPTCHA KEYS ON http://www.recaptcha.net!")
     remoteip = req.environ['REMOTE_ADDR']
     cResponse = submit(
         req.params.get('recaptcha_challenge_field'),
