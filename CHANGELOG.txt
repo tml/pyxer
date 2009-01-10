@@ -5,8 +5,11 @@ Version 0.6.2, 2008-01-xx
 
 - NEW: Support for reCaptcha
 - NEW: New option "-U" which updates pyxer for the virtual environment
+- NEW: New option "-c" to clear datastore on start of GAE
+- UPD: GAE now always shows emails in log
 - UPD: More documentation
 - UPD: Removed "-u" option
+- FIX: url() dropped query data from URL
 
 Version 0.6.1, 2008-01-08
 

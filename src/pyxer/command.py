@@ -126,6 +126,13 @@ def command(engine = None):
         dest = "develop",
         action = "store_true",
         help = "update pyxer version in VM")
+    parser.add_option(
+        "-c",
+        "--clear",
+        dest = "clear",
+        action = "store_true",
+        help = "clear GAE datastore")
+    
     (opt, args) = parser.parse_args()
 
     showlog(opt.debug)
