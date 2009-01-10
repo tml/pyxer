@@ -1,5 +1,10 @@
-import urllib
-from google.appengine.api import urlfetch
+from pyxer.base import *
+
+if GAE:
+    import urllib
+    from google.appengine.api import urlfetch
+else:
+    import urllib2, urllib
 
 """
     Adapted from http://pypi.python.org/pypi/recaptcha-client
@@ -14,7 +19,7 @@ VERIFY_SERVER   ="api-verify.recaptcha.net"
 
 class RecaptchaResponse(object):
     def __init__(self, is_valid, error_code=None):
-        self.is_valid   = is_valid
+        self.is_valid = is_valid
         self.error_code = error_code
 
 def displayhtml (public_key,
@@ -48,8 +53,59 @@ def displayhtml (public_key,
         'ErrorParam' : error_param,
         }
 
-
 def submit (recaptcha_challenge_field,
+            recaptcha_response_field,
+            private_key,
+            remoteip):
+    """
+    Submits a reCAPTCHA request for verification. Returns RecaptchaResponse
+    for the request
+
+    recaptcha_challenge_field -- The value of recaptcha_challenge_field from the form
+    recaptcha_response_field -- The value of recaptcha_response_field from the form
+    private_key -- your reCAPTCHA private key
+    remoteip -- the user's ip address
+    """
+
+    if not (recaptcha_response_field and recaptcha_challenge_field and
+            len (recaptcha_response_field) and len (recaptcha_challenge_field)):
+        return RecaptchaResponse (is_valid = False, error_code = 'incorrect-captcha-sol')
+    
+
+    def encode_if_necessary(s):
+        if isinstance(s, unicode):
+            return s.encode('utf-8')
+        return s
+
+    params = urllib.urlencode ({
+            'privatekey': encode_if_necessary(private_key),
+            'remoteip' :  encode_if_necessary(remoteip),
+            'challenge':  encode_if_necessary(recaptcha_challenge_field),
+            'response' :  encode_if_necessary(recaptcha_response_field),
+            })
+
+    request = urllib2.Request (
+        url = "http://%s/verify" % VERIFY_SERVER,
+        data = params,
+        headers = {
+            "Content-type": "application/x-www-form-urlencoded",
+            "User-agent": "reCAPTCHA Python"
+            }
+        )
+    
+    httpresp = urllib2.urlopen (request)
+
+    return_values = httpresp.read ().splitlines ();
+    httpresp.close();
+
+    return_code = return_values [0]
+
+    if (return_code == "true"):
+        return RecaptchaResponse (is_valid=True)
+    else:
+        return RecaptchaResponse (is_valid=False, error_code = return_values [1])
+
+def submit_gae (recaptcha_challenge_field,
             recaptcha_response_field,
             private_key,
             remoteip):
@@ -104,4 +160,24 @@ def submit (recaptcha_challenge_field,
     else:
         # recaptcha server was not reachable
         return RecaptchaResponse (is_valid=False, error_code = "recaptcha-not-reachable")
-    
+
+if GAE:
+    submit = submit_gae
+
+from pyxer.template.genshi import HTML
+
+def html(pub_key, use_ssl=False):    
+    return HTML(displayhtml(
+        pub_key,
+        use_ssl = use_ssl,
+        error = req.params.get("error")))
+
+def test(private_key):
+    remoteip = req.environ['REMOTE_ADDR']
+    cResponse = submit(
+        req.params.get('recaptcha_challenge_field'),
+        req.params.get('recaptcha_response_field'),
+        private_key,
+        remoteip)
+    req.captcha_error = cResponse.error_code
+    return cResponse.is_valid

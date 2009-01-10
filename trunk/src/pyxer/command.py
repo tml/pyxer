@@ -45,10 +45,10 @@ class OptParser(OptionParser):
 Commands:
   serve              Serves the project
   setup, create      Create a new project
-  upload, deploy     Upload project (only gae)
-  open, activate     Activate context for installs etc.
+  upload, deploy     Upload project (only GAE)
+  vm, open, activate Activate context for installs etc.
 
-Daemon commands (just for paster):
+Daemon commands (only paster):
   start              Start
   stop               Stop
   status             Status
@@ -114,13 +114,18 @@ def command(engine = None):
         dest = "reload",
         action = "store_true",
         help = "reload on changing files")
+    #parser.add_option(
+    #    "-u",
+    #    "--update",
+    #    dest = "update",
+    #    action = "store_true",
+    #    help = "update suplementary data and files")
     parser.add_option(
-        "-u",
-        "--update",
-        dest = "update",
+        "-U",
+        "--develop",
+        dest = "develop",
         action = "store_true",
-        help = "update suplementary data and files")
-
+        help = "update pyxer version in VM")
     (opt, args) = parser.parse_args()
 
     showlog(opt.debug)
@@ -165,6 +170,11 @@ def command(engine = None):
     else:
         print "Python WSGI"
         engine = None
+
+    # Update version
+    if opt.develop and command not in ("setup", "create", "init", "pyxer"):
+        import pyxer.create
+        pyxer.create.self_setup()
 
     # Serve
     if command == "serve":

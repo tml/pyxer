@@ -7,6 +7,7 @@
 import logging
 import os.path
 import sys
+import shutil
 import pyxer.gae.monkey.boot as boot
 import pyxer.utils as utils
 
@@ -90,7 +91,13 @@ def self_setup(root = None):
     if not os.path.isdir(egg_dir):
         os.makedirs(egg_dir)
     open(os.path.join(egg_dir, "entry_points.txt"), "w").write(ENTRY_POINTS_TXT)
-    
+
+    # Copy paste-deploy.py
+    deploy_from = os.path.join(os.path.dirname(boot.__file__), 'paste-deploy.py')
+    deploy_to = os.path.join(root, 'paste-deploy.py')
+    log.info("Copy from %r to %r", deploy_from, deploy_to)
+    shutil.copyfile(deploy_from, deploy_to)
+        
 def create(opt, here):
 
     # Change to AppEngine module replacements

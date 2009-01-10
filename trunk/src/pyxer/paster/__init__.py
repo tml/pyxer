@@ -102,7 +102,7 @@ def system(cmd):
 
 def setup(opt):
     # Create paster.ini
-    if opt.update or (not os.path.isfile("paster.ini")):
+    if not os.path.isfile("paster.ini"): #opt.update or
         print "create paster.ini"
         open("paster.ini", "w").write(_paster_ini)
 
