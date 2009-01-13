@@ -396,6 +396,40 @@ session = beaker </pre>
     <h2>Google App Engine</h2>
     <pre><em>$</em> xgae serve</pre>
   </div>
+   <div class="section">
+    <h1>Utilities</h1>
+    <h2>Captchas</h2>
+    <p>To make websites safe against abuse Pyxer integrates support for reCaptcha &lt;<a href="http://www.recaptcha.net">http://www.recaptcha.net</a>&gt;. You have to register your web sites URL for free there to get a private and public key. To use them see the following demo: </p>
+    <pre>from pyxer import recaptcha
+	
+CAPTCHA_PUBLIC = "XXX"
+CAPTCHA_PRIVATE = "XXX"
+
+@expose
+def myform(**kw):
+    # This creates the HTML code for the captcha input field
+    c.captcha = recaptcha.html(CAPTCHA_PUBLIC)
+    # Do some more form stuff here
+    pass
+    # Test if the captcha has been correct
+    if recaptcha.test(CAPTCHA_PRIVATE):
+        # Do something like storing the data into the database
+        pass
+        # After success jump to another page
+        return redirect("success_info")</pre>
+    <p>The corresponding template <code>myform.html</code> could look like this:</p>
+    <pre>&lt;form action=&quot;&quot;&gt;
+  &lt;!-- add more input fields here --&gt;
+  $c.captcha
+  &lt;input type=&quot;submit&quot; /&gt;
+&lt;/form&gt;</pre>
+<h2>Date and time handling/ Timezones</h2>
+<p>Handling of timezones is tricky in Python and on GAE. Therefore I will give a little introduction how this can be done quite easy. First you should install <code>pytz</code> like this: </p>
+<pre>$ pyxer vm
+(vm)$ easy_install pytz</pre>
+<p>If you want to show a datetime from  Googles datastore you can now do like this in your templates:</p>
+<pre>Local time ${h.strftime(entry.added, '%H:%M', 'Europe/Berlin')}</pre>
+   </div>
   <div class="section">
     <h1>Appendix</h1>
     <h2>Reserved names </h2>

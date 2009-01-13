@@ -29,6 +29,7 @@ from pyxer.controller import \
     Controller, isController, c, g, h, config, \
     session, response, request, resp, req
 from pyxer.routing import Router, static
+from pyxer import helpers
 
 import logging
 log = logging.getLogger(__name__)
@@ -118,7 +119,8 @@ def render_stream(**kw):
     template = template_stream()
     template.generate(Dict(c = c, h = Dict(
         url = url,
-        redirect = redirect
+        redirect = redirect,
+        strftime = helpers.strftime,
         ), load = template.load))
     return template.render(**kw)
 

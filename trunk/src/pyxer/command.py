@@ -106,7 +106,7 @@ def command(engine = None):
     parser.add_option(
         "--host",
         dest = "host",
-        default = "127.0.0.1",
+        default = "0.0.0.0",
         help = "serving on host")
     parser.add_option(
         "-r",
