@@ -27,3 +27,19 @@ def wrap_helpers(localdict):
 
 wrap_helpers(locals())
 '''
+
+try:
+    import pytz
+except:
+    pytz = None
+    
+_tz_cache = {}
+    
+def strftime(value, fmt, tzname=None):
+    global _tz_cache
+    if isinstance(tzname, basestring):
+        if tzname not in _tz_cache.keys():
+            _tz_cache[tzname] = pytz.timezone(tzname)
+        tz = _tz_cache[tzname]
+        value = value.replace(tzinfo=pytz.utc).astimezone(tz)  
+    return value.strftime(fmt)

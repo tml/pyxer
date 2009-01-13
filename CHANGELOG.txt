@@ -6,9 +6,11 @@ Version 0.6.2, 2008-01-xx
 - NEW: Support for reCaptcha
 - NEW: New option "-U" which updates pyxer for the virtual environment
 - NEW: New option "-c" to clear datastore on start of GAE
+- NEW: Little helper for time zone specific strftime
 - UPD: GAE now always shows emails in log
 - UPD: More documentation
 - UPD: Removed "-u" option
+- UPD: Default host is 0.0.0.0 now
 - FIX: url() dropped query data from URL
 
 Version 0.6.1, 2008-01-08
