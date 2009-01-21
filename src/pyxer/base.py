@@ -63,10 +63,16 @@ def url(url, *parts, **params):
     log.debug("URL (3) %r", url)
     return url
 
-def redirect(location, code = 301):
+def redirect(location=None, permanent=False):
     " Redirect to other page "
     # .exeception for Python 2.3 compatibility
-    raise exc.HTTPMovedPermanently(location = url(location)).exception
+    # 307 
+    if location is None:
+        location = req.environ["PATH_INFO"]
+    if permanent:
+        raise exc.HTTPMovedPermanently(location = url(location)).exception
+    else:
+        raise exc.HTTPSeeOther(location = url(location)).exception
 
 def abort(code = 404):
     " Abort with error "

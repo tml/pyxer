@@ -11,6 +11,8 @@ Version 0.6.2, 2008-01-xx
 - UPD: More documentation
 - UPD: Removed "-u" option
 - UPD: Default host is 0.0.0.0 now
+- UPD: Redirect now uses code 303 "See other" by default, location can be
+       empty then the current path is used which results in a kind of reload
 - FIX: url() dropped query data from URL
 
 Version 0.6.1, 2008-01-08
