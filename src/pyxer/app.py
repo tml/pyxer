@@ -157,7 +157,8 @@ def make_app(global_conf = {}, **app_conf):
     if SessionMiddleware and (conf.get("pyxer.session", "beaker") == "beaker"):
         log.debug("Beaker sessions")
         if "google.appengine" in sys.modules:
-            app = SessionMiddleware(app, type = 'google', table_name = 'PyxerSession')
+            # server = SessionMiddleware(server, type='ext:google', table_name="beaker_session", cookie_expires=False)
+            app = SessionMiddleware(app, type = 'ext:google', table_name = 'PyxerSession')
         else:
             app = SessionMiddleware(app, type = 'dbm', data_dir =  os.path.join(root, 'cache'))
 
