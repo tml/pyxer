@@ -8,6 +8,7 @@
 # import pyxer.model as model
 
 from webob import exc
+# from formencode.htmlfill import render
 import urllib
 
 import sys
@@ -110,10 +111,11 @@ def template_stream(name = None):
     " Get the template "
     # XXX What to do with dirname? Scenarios?
     # XXX What to do with absolute url /like/this?
-    path = request.template_url
-    dirname = os.path.dirname(path)
     if name is not None:
-        path = os.path.join(dirname, name)
+        path = os.path.join(request.urlvars["pyxer.path"], name)
+        dirname = os.path.dirname(path)
+    else:
+        path = request.template_url
         dirname = os.path.dirname(path)
     log.debug("Loading template %r", path)
     soup_manager = StreamTemplateManager(dirname)
@@ -121,8 +123,9 @@ def template_stream(name = None):
 
 template = template_default = template_stream
 
-def render_stream(**kw):
-    template = template_stream()
+def render_stream(template=None, **kw):
+    template = template_stream(name=template)
+    kw.pop
     template.generate(Dict(c = c, h = Dict(
         url = url,
         redirect = redirect,
@@ -139,48 +142,60 @@ def render_json():
     # log.debug("JSON: %r", result)
     return result
 
+def render(result=None, render=None, **kw):
+    log.debug("Render called with %r %r %r", repr(result)[:40], render, kw)
+    # log.debug("Render called with %r %r", render, kw)
+
+    # log.debug("Response %r %r", response.body_file, response.body)
+
+    # Choose a renderer
+    render_func = None
+
+    # Render is explicitly defined by @controller
+    if render is not None:
+        render_func = render
+
+    # If the result is None (same as no return in function at all)
+    # then apply the corresponding template
+    # XXX Maybe better test if response.body/body_file is also empty
+    elif result is None:
+        render_func = render_default
+
+    # Consider dict and list as JSON data
+    elif isinstance(result, dict) or isinstance(result, list):
+        render_func = render_json
+
+    # Execute render function
+    log.debug("Render func %r", render_func)
+    if render_func is not None:
+        request.result = result
+        log.debug("Render with func %r", render_func)
+        result = render_func(**kw)
+
+        # Normalize output
+        # if (not None) and (not isinstance(result, str)) and (not isinstance(result, str)):
+        #    result = str(result)
+
+    # Publish result
+    if isinstance(result, unicode):
+        response.charset = 'utf8'
+        response.unicode_body = result
+    elif isinstance(result, str):
+        response.body = result
+
+    return  response.body
+
+_render = render
+
 class controller(Controller):
 
     def render(self, result, render = None, **kw):
-
-        log.debug("Render called with %r %r %r", repr(result)[:40], render, kw)
-        # log.debug("Render called with %r %r", render, kw)
-
+        
         if response.body:
             log.debug("Render: Body is already present")
             return response.body
-
-        # log.debug("Response %r %r", response.body_file, response.body)
-
-        # Choose a renderer
-        render_func = None
-
-        # Render is explicitly defined by @controller
-        if render is not None:
-            render_func = render
-
-        # If the result is None (same as no return in function at all)
-        # then apply the corresponding template
-        # XXX Maybe better test if response.body/body_file is also empty
-        elif result is None:
-            render_func = render_default
-
-        # Consider dict and list as JSON data
-        elif isinstance(result, dict) or isinstance(result, list):
-            render_func = render_json
-
-        # Execute render function
-        log.debug("Render func %r", render_func)
-        if render_func is not None:
-            request.result = result
-            log.debug("Render with func %r", render_func)
-            result = render_func(**kw)
-
-            # Normalize output
-            # if (not None) and (not isinstance(result, str)) and (not isinstance(result, str)):
-            #    result = str(result)
-
-        return result
+        
+        return _render(result, render, **kw)
 
 class expose(controller):
 
@@ -197,6 +212,8 @@ class expose(controller):
 class Permission(object):
 
     """
+    XXX
+    
     @controller(permission=Permission('read'))
     """
 

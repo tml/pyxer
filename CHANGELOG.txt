@@ -7,6 +7,7 @@ Version 0.6.2, 2008-01-xx
 - NEW: New option "-U" which updates pyxer for the virtual environment
 - NEW: New option "-c" to clear datastore on start of GAE
 - NEW: Little helper for time zone specific strftime
+- NEW: Function render(template=XXX) can now be called directly from controller
 - UPD: GAE now always shows emails in log
 - UPD: More documentation
 - UPD: Removed "-u" option
