@@ -4,9 +4,25 @@ runtime: python
 api_version: 1
 
 handlers:
+# *** BEGIN: EXAMPLE CONFIGURATIONS ***
+#
 #- url: /res/(.*)
 #  static_files: public/res/\1
 #  upload: public/res/(.*)
+#
+# *** To make the following work place file in ./res.zip ***
+#- url: /res/.*
+#  script: $PYTHON_LIB/google/appengine/ext/zipserve
+#
+#- url: /favicon.ico
+#  static_files: public/favicon.ico
+#  upload: public/favicon.ico  
+#
+#- url: /robots.txt
+#  static_files: public/robots.txt
+#  upload: public/robots.txt     
+#
+# *** END: EXAMPLE CONFIGURATIONS ***
 - url: .*
   script: __APP_SCRIPT__
 
