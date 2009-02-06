@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+Version 0.6.3, 2008-XXX
+
+XXX
+
 Version 0.6.2, 2008-02-06
 
 - NEW: Support for reCaptcha
@@ -22,7 +26,7 @@ Version 0.6.2, 2008-02-06
 Version 0.6.1, 2008-01-08
 
 - UPD: Updated to latest SVN version of appmonkey
-- UPD: Modified app.yaml 
+- UPD: Modified app.yaml
 - FIX: Bug in paste-deplay about "import site"
 
 Version 0.6.0, 2008-10-05
