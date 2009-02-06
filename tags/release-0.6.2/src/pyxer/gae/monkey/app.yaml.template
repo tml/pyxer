@@ -1,0 +1,34 @@
+application: __APP_NAME__
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+#- url: /res/(.*)
+#  static_files: public/res/\1
+#  upload: public/res/(.*)
+- url: .*
+  script: __APP_SCRIPT__
+
+skip_files: |
+ ^(
+ ((utils|bin|cache|tests|include|Scripts|tmp)/.*)|
+ (.*/)?(
+ (.*\.exe)|
+ (.*\.bat)|
+ (.*\.pyd)|
+ (app\.yaml)|
+ (app\.yml)|
+ (index\.yaml)|
+ (index\.yml)|
+ (#.*#)|
+ (.*~)|
+ (.*\.py[co])|
+ (.*\.so)|
+ (.*\.a)|
+ (.*/RCS/.*)|
+ ([Ll]ib/encodings/.*)|
+ (Lib/[^/]+\.py)|
+ ([Ll]ib/.+?/[Ww]eb[Oo]b-.+?\.egg/.*)|
+ (\..*)|
+ ))$
