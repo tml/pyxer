@@ -9,8 +9,6 @@
 
 from webob import exc
 # from formencode.htmlfill import render
-import urllib
-
 import sys
 import logging
 import string

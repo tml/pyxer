@@ -2,6 +2,7 @@
 
 import unittest
 from pyxer.template import *
+from pyxer.utils import Dict, AttrDict
 
 import re
 import sys
@@ -15,7 +16,7 @@ _data = """<!DOCTYPE html>
  </head>
 <body>
  BODY
- <br>
+ <br />
 </body>
 </html>
 """
@@ -52,9 +53,9 @@ class PyxerTemplateTestCase(unittest.TestCase):
     def cmpRender(self, input, output, data={}):
         if "<body" not in input:
             input = _sample_begin + input + _sample_end
-        result = HTMLTemplate(input).render(data)
+        result = HTMLTemplate(input).generate(data).render("xhtml")
         # print HTMLTemplate(input).source.encode("latin1","ignore")
-        print "? %r => %r " % (self.stripMeta(input), self.stripMeta(result))
+        # print "? %r => %r " % (self.stripMeta(input), self.stripMeta(result))
         self.cmpHTML(output, result)
 
     def testSample(self):
@@ -66,16 +67,30 @@ class PyxerTemplateTestCase(unittest.TestCase):
             "Value $a",
             "Value 999",
             dict(a=999))
+        
+        # Dotted variables
+        c = Dict()
+        c.a = Dict()
+        c.a.a = 999
+        self.cmpRender(
+            "Value ${a.a}. And $a.a",
+            "Value 999. And 999",
+            c)
 
         # Dotted variables
-        #c = Context()
-        #c.a = Context()
-        #c.a.a = 999
-        #self.cmpRender(
-        #    "Value ${a.a}. And ${a.a}",
-        #    "Value 999. And 999",
-        #    c)
-
+        c = Dict(v=(1,2,3))        
+        self.cmpRender(
+            'A <span py:for="x in v" py:strip>$x</span> Z',
+            "A 123 Z",
+            c)
+        
+        # Dotted variables
+        c = Dict(v=(1,2,3))        
+        self.cmpRender(
+            'A <span py:for="x in v">$x</span> Z',
+            "A <span>1</span><span>2</span><span>3</span> Z",
+            c)
+        
 def buildTestSuite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)
 

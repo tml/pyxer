@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-Version 0.6.2, 2008-01-xx
+Version 0.6.2, 2008-02-06
 
 - NEW: Support for reCaptcha
 - NEW: New option "-U" which updates pyxer for the virtual environment
@@ -14,6 +14,8 @@ Version 0.6.2, 2008-01-xx
 - UPD: Default host is 0.0.0.0 now
 - UPD: Redirect now uses code 303 "See other" by default, location can be
        empty then the current path is used which results in a kind of reload
+- UPD: GAE demo on pyxer.appspot.com is working again
+- FIX: The template unit test did fail
 - FIX: url() dropped query data from URL
 - FIX: Beaker sessions now working again on GAE
 

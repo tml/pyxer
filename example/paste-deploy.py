@@ -29,11 +29,15 @@ def _test():
 
 try:
     here = os.path.dirname(__file__)
-    site_lib = os.path.join(here, 'lib', 'python2.5')
-    if not os.path.isdir(site_lib):
-        site_lib = os.path.join(here, 'Lib')
-    sys.path.insert(0, site_lib)
-    import site
+    
+    try:
+        import site
+    except:
+        site_lib = os.path.join(here, 'lib', 'python2.5')
+        if not os.path.isdir(site_lib):
+            site_lib = os.path.join(here, 'Lib')
+        sys.path.insert(0, site_lib)
+        import site
 
     # Test for correct site-packages directory, because if developed on
     # Windows we have different paths as everywhere else. And this has also
@@ -64,9 +68,11 @@ except:
     print
     print 'Error loading application:'
     traceback.print_exc(file=sys.stdout)
-    exc_value = sys.exc_info()[1]
+    print
+    # exc_value = sys.exc_info()[1]
     if 1: #isinstance(exc_value, ImportError):
         _test()
+        print        
         #print
         #print "PTH files"
         #for fn in os.listdir(site_packages):
