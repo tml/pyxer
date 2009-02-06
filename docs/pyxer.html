@@ -414,7 +414,7 @@ session = beaker </pre>
     <h2>Google App Engine</h2>
     <pre><em>$</em> xgae serve</pre>
   </div>
-   <div class="section">
+  <div class="section">
     <h1>Utilities</h1>
     <h2>Using reCaptcha</h2>
     <p>To make websites safe against abuse Pyxer integrates support for <a href="http://www.recaptcha.net" target="_blank">reCaptcha</a>. You have to register your web sites URL for free there to get a private and public key. To use them see the following demo: </p>
@@ -447,7 +447,16 @@ def myform(**kw):
 (vm)$ easy_install pytz</pre>
 <p>If you want to show a datetime from  Googles datastore you can now do like this in your templates:</p>
 <pre>Local time ${h.strftime(entry.added, '%H:%M', 'Europe/Berlin')}</pre>
-   </div>
+   <h2>Image upload</h2>
+   <p>Simple upload GAE:</p>
+   <pre>@expose<br />def upload(image=None):
+    if image is not None:
+        Images(image=db.Blob(image.file.read())).put()</pre>
+   <p>Simple out:</p>
+   <pre>@expose
+def show():
+    image = Images.all().get() #???<br />    if image.image:<br />        response.headers['Content-Type'] = 'image/jpeg'<br />        response.body_file.write(image.image)<br />    return &quot;NO IMAGE&quot;</pre>
+  </div>
   <div class="section">
     <h1>Appendix</h1>
     <h2>Reserved names </h2>

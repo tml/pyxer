@@ -204,7 +204,7 @@ class expose(controller):
             if not (k.startswith("pyxer.") or k in ("controller", "module")):
                 data[k] = v
         data.update(dict(request.params))
-        log.debug("Call func with params %r and urlvars %r", dict(request.params), dict(request.urlvars))
+        # log.debug("Call func with params %r and urlvars %r", dict(request.params), dict(request.urlvars))
         return self.func(**data)
 
 class Permission(object):
