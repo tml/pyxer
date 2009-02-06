@@ -529,6 +529,9 @@ class TemplateSoup(object):
                 # log.debug("Unhandled stream element: %r %r %r", kind, data, position)
                 self.addElement(kind, data, position)
 
+Template = TemplateSoup 
+HTMLTemplate = TemplateSoup
+
 def testing():
 
     # ts = TemplateSoup("#$x")

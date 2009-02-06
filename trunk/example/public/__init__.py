@@ -35,8 +35,8 @@ def index():
     c.samples = []
     for name in sorted(os.listdir(here)):
         try:
-            readme = os.path.join(here, name, "README.txt")
-            if os.path.isfile(os.path.join(here, name, "README.txt")):
+            readme = os.path.join(here, name, "README-GAE.txt")
+            if os.path.isfile(readme):
                 f = open(readme, "r")
                 c.samples.append((
                     f.readline().strip(),
