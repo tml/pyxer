@@ -3,7 +3,8 @@ CHANGELOG
 
 Version 0.6.3, 2008-XXX
 
-XXX
+- NEW: Added favicon.ico and robots.txt to example
+- UPD: Added some examples to the app.yaml template
 
 Version 0.6.2, 2008-02-06
 

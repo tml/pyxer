@@ -8,7 +8,13 @@ handlers:
 #  script: $PYTHON_LIB/google/appengine/ext/zipserve
 - url: /docs/(.*)
   static_files: docs/\1
-  upload: docs/(.*)
+  upload: docs/(.*)                                    
+- url: /favicon.ico
+  static_files: public/favicon.ico
+  upload: public/favicon.ico  
+- url: /robots.txt
+  static_files: public/robots.txt
+  upload: public/robots.txt  
 - url: .*
   script: paste-deploy.py
 
