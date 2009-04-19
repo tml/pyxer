@@ -28,7 +28,7 @@ setup(
     author = "Dirk Holtwick",
     author_email = "dirk.holtwick@gmail.com",
     url = "http://code.google.com/p/pyxer/",
-    download_url = "http://code.google.com/p/pyxer/",
+    download_url = "http://pypi.python.org/pypi/pyxer",
     keywords = "Framework, Google App Engine, GAE, appengine, Paster, Server, Templating, Sling, Jackrabbit, JCR",
 
     requires = [

@@ -1,12 +1,12 @@
 CHANGELOG
 =========
 
-Version 0.6.3, 2008-XXX
+Version 0.6.3, 2009-03-29
 
 - NEW: Added favicon.ico and robots.txt to example
 - UPD: Added some examples to the app.yaml template
 
-Version 0.6.2, 2008-02-06
+Version 0.6.2, 2009-02-06
 
 - NEW: Support for reCaptcha
 - NEW: New option "-U" which updates pyxer for the virtual environment
@@ -24,7 +24,7 @@ Version 0.6.2, 2008-02-06
 - FIX: url() dropped query data from URL
 - FIX: Beaker sessions now working again on GAE
 
-Version 0.6.1, 2008-01-08
+Version 0.6.1, 2009-01-08
 
 - UPD: Updated to latest SVN version of appmonkey
 - UPD: Modified app.yaml
