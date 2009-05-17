@@ -332,7 +332,10 @@ def read(s):
 #        log.debug("Using JSON module %r", __file__)
 
 try:
-    import simplejson
+    try:
+        from django.utils import simplejson
+    except:
+        import simplejson
     write = simplejson.dumps
     read = simplejson.loads
     log.debug("Using JSON module %r", simplejson)

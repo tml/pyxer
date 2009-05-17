@@ -15,7 +15,7 @@ from paste.config import ConfigMiddleware #, CONFIG
 from paste.exceptions.errormiddleware import ErrorMiddleware
 from paste.util.import_string import import_module
 
-import paste.deploy
+# import paste.deploy
 
 from pyxer.base import *
 
