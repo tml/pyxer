@@ -118,8 +118,20 @@ except ImportError:
 # Make WSGI application, wrapping sessions etc.
 def make_app(global_conf = {}, **app_conf):
 
-    #pprint.pprint(global_conf)
-    #pprint.pprint(app_conf)
+    import os, sys
+    
+    # Cleanup the Python path (mainly to circumvent the systems SetupTools)
+    sys.path = [path for path in sys.path if ("site-packages" not in path) and ('pyxer' not in path)]
+    
+    # Add our local packages folder to the path
+    import site
+    here = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)
+    site_lib = os.path.join(here, 'site-packages')
+    site.addsitedir(here)
+    site.addsitedir(site_lib)
+
+    # pprint.pprint(global_conf)
+    # log.info('\n'.join(sys.path))
 
     conf = AttrDict(pyxer = {
         "session": "",
@@ -128,8 +140,9 @@ def make_app(global_conf = {}, **app_conf):
         })
     root = os.getcwd()
     try:
-        import ConfigParser
+        import ConfigParser        
         filename = os.path.abspath(global_conf.get("__file__")) or os.path.abspath("pyxer.ini" )
+        # filename = os.path.abspath("pyxer.ini" )
         root = os.path.dirname(filename)
         cfile = ConfigParser.SafeConfigParser()
         cfile.read(filename)
@@ -145,8 +158,8 @@ def make_app(global_conf = {}, **app_conf):
     except:
         log.exception("Config file not found")
 
-    # Add current directory to sys path
-    site.addsitedir(root)
+    # Add current directory to sys path    
+    # site.addsitedir(root)
 
     # Here we expect all data
     base = os.path.join(root, "public")

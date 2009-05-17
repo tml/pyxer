@@ -269,18 +269,14 @@ def copy_python(src, dst, symlinks=False):
     if errors:
         raise shutil.Error, errors
 
-def install_package(package, here):
+def install_package(here, package):
     here = os.path.abspath(here)
     bin = os.path.join(here, '.hidden-bin')
     lib = os.path.join(here, 'site-packages')
-    try:
+    if not os.path.isdir(bin):
         os.makedirs(bin)
-    except:
-        pass
-    try:
+    if not os.path.isdir(lib):
         os.makedirs(lib)
-    except:
-        pass
     call_subprocess(
         ['easy_install', '-a', '-d', lib, '-s', bin, '-U', package],
         extra_env={'PYTHONPATH': lib})
