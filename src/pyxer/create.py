@@ -8,7 +8,7 @@ import logging
 import os.path
 import sys
 import shutil
-import pyxer.gae.monkey.boot as boot
+# import pyxer.gae.monkey.boot as boot
 import pyxer.utils as utils
 
 log = logging.getLogger(__name__)
