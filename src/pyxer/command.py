@@ -5,7 +5,7 @@
 #############################################
 
 from optparse import OptionParser
-from pyxer.utils import system, call_subprocess, find_root
+from pyxer.utils import system, call_subprocess, find_root, install_package
 from pyxer import VERSION_STR
 
 import logging
@@ -45,6 +45,7 @@ class OptParser(OptionParser):
 Commands:
   serve              Serves the project
   setup, create      Create a new project
+  install            Installs new Python package 
   upload, deploy     Upload project (only GAE)
   vm, open, activate Activate context for installs etc.
 
@@ -197,6 +198,11 @@ def command(engine = None):
     elif (command in ("setup", "create", "init")):
         import pyxer.create
         pyxer.create.create(opt, here)
+
+    # Install
+    elif (command in ("install")):
+        if len(args)==2:
+            install_package(args[1], os.getcwd())
 
     # Activate
     elif (command in ("open", "activate", "vm")):

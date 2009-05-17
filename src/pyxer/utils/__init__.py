@@ -17,7 +17,7 @@ try:
 except:
     subprocess = None
 
-iswin = (sys.platform=="win32")
+iswin = (sys.platform == "win32")
 
 class Dict(dict):
 
@@ -229,7 +229,7 @@ def call_script(cmd, root=None, cwd=None):
 
 call_bin = call_script
 
-def copy_python(src, dst, symlinks = False):
+def copy_python(src, dst, symlinks=False):
     " Copies just Python source files "
     import shutil
     names = os.listdir(src)
@@ -268,3 +268,20 @@ def copy_python(src, dst, symlinks = False):
         errors.extend((src, dst, str(why)))
     if errors:
         raise shutil.Error, errors
+
+def install_package(package, here):
+    here = os.path.abspath(here)
+    bin = os.path.join(here, '.hidden-bin')
+    lib = os.path.join(here, 'site-packages')
+    try:
+        os.makedirs(bin)
+    except:
+        pass
+    try:
+        os.makedirs(lib)
+    except:
+        pass
+    call_subprocess(
+        ['easy_install', '-a', '-d', lib, '-s', bin, '-U', package],
+        extra_env={'PYTHONPATH': lib})
+    

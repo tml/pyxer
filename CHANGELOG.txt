@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+Version 0.7.0, 2009-05-XX
+
+- NEW: Make Pyxer independent form virtualenv
+
 Version 0.6.3, 2009-03-29
 
 - NEW: Added favicon.ico and robots.txt to example
