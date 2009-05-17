@@ -202,7 +202,7 @@ def command(engine = None):
     # Install
     elif (command in ("install")):
         if len(args)==2:
-            install_package(args[1], os.getcwd())
+            install_package(os.getcwd(), args[1])
 
     # Activate
     elif (command in ("open", "activate", "vm")):

@@ -13,7 +13,7 @@ import pyxer.utils as utils
 
 log = logging.getLogger(__name__)
 
-from pyxer.utils import call_script, find_root
+from pyxer.utils import call_script, find_root, install_package
 
 INDEX_HTML = """
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -46,20 +46,91 @@ ENTRY_POINTS_TXT = """\
 main = pyxer.app:app_factory
 """
 
-'''
-def self_setup2(root = None):
-    if not root:
-        root = find_root()
-    # Get parent directory
-    dir = os.path.dirname(__file__) #Uses setuptools instead?
-    setup_py = os.path.join(dir, "setup.py")
-    log.debug("Pyxer %r in dir %r", setup_py, dir)
-    # Do setup
-    call_script(
-        ["python", setup_py, "install", "-f"],
-        cwd = os.path.join(dir, os.pardir),
-        root = root)
-'''
+APP_YAML = r"""
+application: __APP_NAME__
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+# *** BEGIN: EXAMPLE CONFIGURATIONS ***
+#
+#- url: /res/(.*)
+#  static_files: public/res/\1
+#  upload: public/res/(.*)
+#
+# *** To make the following work place file in ./res.zip ***
+#- url: /res/.*
+#  script: $PYTHON_LIB/google/appengine/ext/zipserve
+#
+#- url: /favicon.ico
+#  static_files: public/favicon.ico
+#  upload: public/favicon.ico  
+#
+#- url: /robots.txt
+#  static_files: public/robots.txt
+#  upload: public/robots.txt     
+#
+# *** END: EXAMPLE CONFIGURATIONS ***
+- url: .*
+  script: pyxer-app.py
+
+skip_files: |
+ ^(
+ ((utils|bin|cache|tests|include|Scripts|tmp)/.*)|
+ (.*/)?(
+ (.*\.exe)|
+ (.*\.bat)|
+ (.*\.pyd)|
+ (app\.yaml)|
+ (app\.yml)|
+ (index\.yaml)|
+ (index\.yml)|
+ (#.*#)|
+ (.*~)|
+ (.*\.py[co])|
+ (.*\.so)|
+ (.*\.a)|
+ (.*/RCS/.*)|
+ ([Ll]ib/encodings/.*)|
+ (Lib/[^/]+\.py)|
+ ([Ll]ib/.+?/[Ww]eb[Oo]b-.+?\.egg/.*)|
+ (\..*)|
+ ))$
+""".lstrip() 
+
+PYXERAPP_PY = r'''
+# -*- coding: UTF-8 -*-
+
+""" Pyxer on Google App Engine
+    http://www.pyxer.net
+""" 
+
+import os, sys
+
+# Cleanup the Python path (mainly to circumvent the systems SetupTools)
+sys.path = [path for path in sys.path if ("site-packages" not in path) and ('pyxer' not in path)]
+
+# Add our local packages folder to the path
+import site
+here = os.path.dirname(__file__)
+site_lib = os.path.join(here, 'site-packages')
+site.addsitedir(site_lib)
+
+# Import the stuff we need to begin serving
+from google.appengine.ext.webapp.util import run_wsgi_app
+from pyxer.app import make_app
+
+# The main function is important for GAE to know if the process can be kept
+def main():
+    conf = dict(__file__=os.path.abspath(os.path.join(__file__, os.pardir, 'pyxer.ini')))
+    run_wsgi_app(make_app(conf))
+
+# Initialize on first start
+if __name__ == "__main__":
+    main()
+'''.lstrip()
+
 
 def self_setup(root = None):
     " Set up Pyxer in the virtual environment "
@@ -72,9 +143,11 @@ def self_setup(root = None):
     here = os.path.dirname(__file__) 
     
     # Find site_packages folder
-    site_packages = os.path.join(root, 'lib', 'python2.5', 'site-packages')
+    site_packages = os.path.join(root, 'site-packages')
+    
+    # If the directory does not exist we need to install the basic stuff    
     if not os.path.isdir(site_packages):
-        site_packages = os.path.join(root, 'Lib', 'site-packages')
+        install_package(root, 'paste')
     
     # Remove old installation 
     pyxer_dir = os.path.join(site_packages, "pyxer")
@@ -92,14 +165,15 @@ def self_setup(root = None):
         os.makedirs(egg_dir)
     open(os.path.join(egg_dir, "entry_points.txt"), "w").write(ENTRY_POINTS_TXT)
 
-    # Copy paste-deploy.py
-    deploy_from = os.path.join(os.path.dirname(boot.__file__), 'paste-deploy.py')
-    deploy_to = os.path.join(root, 'paste-deploy.py')
-    log.info("Copy from %r to %r", deploy_from, deploy_to)
-    shutil.copyfile(deploy_from, deploy_to)
-        
+    # Create pyxer-app.py
+    pyxer_starter = os.path.join(root, 'pyxer-app.py')
+    log.info("Create %r", pyxer_starter)
+    open(pyxer_starter, "w").write(PYXERAPP_PY)
+            
 def create(opt, here):
 
+    import codecs
+    
     # Change to AppEngine module replacements
     # os.chdir(os.path.join(os.path.dirname(monkey.__file__), "monkey"))
 
@@ -109,51 +183,20 @@ def create(opt, here):
 
     # Create gae.ini
     app_name = []
-    path = os.path.join(here, "app.yaml")
-    if not os.path.exists(path):
-        name = raw_input("Name of project: ")
-        app_name = ["--app-name=" + name]
+    app_yaml_path = os.path.join(here, "app.yaml")
+    if not os.path.exists(app_yaml_path):
+        # name = raw_input("Name of project: ")
+        name = 'unnamed'
+        open(app_yaml_path, "w").write(APP_YAML.replace('__APP_NAME__', name).encode('ascii'))
 
     # Create public dir
     path = os.path.join(here, "public")
     if not os.path.exists(path):
         os.makedirs(path)
-        open(os.path.join(path, "index.html"), "w").write(INDEX_HTML)
-        open(os.path.join(path, "__init__.py"), "w").write(INIT_PY)
-
-    # Start appengine-boot.py
-    sys.argv = ["XXXDUMMYXXX",
-        "--paste-deploy",
-        "-v",
-        "--no-site-packages",
-        "--unzip-setuptools",
-        "--easy-install=webob",
-        # "--easy-install=beaker",
-        # "--easy-install=beaker==dev",
-        ] + app_name + [
-        # "--easy-install=pyxer",
-        # "--easy-install=beaker==dev",
-        here]
-    boot.main()
-
-    # Install appengine_monkey
-    #dir = os.path.dirname(pyxer.gae.monkey.__file__)
-    #log("")
-    #call_script(
-    #    ["python", "setup.py", "install", "-f"],
-    #    cwd=cwd)
+        codecs.open(os.path.join(path, "index.html"), "w", 'utf-8').write(INDEX_HTML.encode("utf-8"))
+        codecs.open(os.path.join(path, "__init__.py"), "w", 'utf-8').write(INIT_PY.encode("utf-8"))        
 
     # Install pyxer
     self_setup(here)
 
     print "Initialization completed!"
-
-    # Create Pylons project
-    #os.chdir(os.path.join(root, "src"))
-    #env = {"VIRTUAL_ENV": root}
-    #call_subprocess(["paster", "create", "-t", "pylons", name], extra_env=env)
-
-    # Setup.py develop
-    #os.chdir(os.path.join(root, "src", name))
-    #env = {"VIRTUAL_ENV": root}
-    #call_subprocess(["python", "setup.py", "develop"], extra_env=env)
