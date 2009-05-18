@@ -11,50 +11,6 @@ import sys
 from shutil import * 
 from pyxer.utils import find_root, call_script, call_subprocess
 
-_app_yaml = """
-application: %s
-version: 1
-runtime: python
-api_version: 1
-handlers:
-- url: /.*
-  script: gae.py
-- url: /admin/.*
-  script: $PYTHON_LIB/google/appengine/ext/admin
-  login: admin
-""".lstrip()
-
-_gae_py = """
-# -*- coding: UTF-8 -*-
-
-''' Pyxer on Google App Engine
-    http://www.pyxer.net
-''' 
-
-import os, sys
-
-# Cleanup the Python path (mainly to circumvent the systems SetupTools)
-sys.path = [path for path in sys.path if ("site-packages" not in path) and ('pyxer' not in path)]
-
-# Add our local packages folder to the path
-import site
-here = os.path.dirname(__file__)
-site_lib = os.path.join(here, 'site-packages')
-site.addsitedir(site_lib)
-
-# Import the stuff we need to begin serving
-from google.appengine.ext.webapp.util import run_wsgi_app
-from pyxer.app import make_app
-
-# The main function is important for GAE to know if the process can be kept
-def main():
-  run_wsgi_app(make_app())
-
-# Initialize on first start
-if __name__ == "__main__":
-  main()
-""".lstrip()
-
 def normalize_py_file(name):
     if name.lower().endswith(".pyc"):
         return name[: - 1]

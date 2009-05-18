@@ -77,7 +77,7 @@ handlers:
 
 skip_files: |
  ^(
- ((utils|bin|cache|tests|include|Scripts|tmp)/.*)|
+ ((bin|cache|tests|tmp)/.*)|
  (.*/)?(
  (.*\.exe)|
  (.*\.bat)|
@@ -91,11 +91,9 @@ skip_files: |
  (.*\.py[co])|
  (.*\.so)|
  (.*\.a)|
+ (.*\.dll)|
  (.*/RCS/.*)|
- ([Ll]ib/encodings/.*)|
- (Lib/[^/]+\.py)|
- ([Ll]ib/.+?/[Ww]eb[Oo]b-.+?\.egg/.*)|
- (\..*)|
+ (\..*)
  ))$
 """.lstrip() 
 
