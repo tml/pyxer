@@ -109,11 +109,6 @@ class PyxerApp(Router):
 
 # Sessions available?
 SessionMiddleware = None
-try:
-    from beaker.middleware import SessionMiddleware
-    log.debug("Beaker successfully loaded")
-except ImportError:
-    log.debug("Beaker NOT loaded")
 
 # Make WSGI application, wrapping sessions etc.
 def make_app(global_conf = {}, **app_conf):
@@ -121,7 +116,7 @@ def make_app(global_conf = {}, **app_conf):
     import os, sys
     
     # Cleanup the Python path (mainly to circumvent the systems SetupTools)
-    sys.path = [path for path in sys.path if ("site-packages" not in path) and ('pyxer' not in path)]
+    sys.path = [path for path in sys.path if ("site-packages" not in path) and ('pyxer' not in path) and ('/Extras/lib/python' not in path)]
     
     # Add our local packages folder to the path
     import site
@@ -129,10 +124,21 @@ def make_app(global_conf = {}, **app_conf):
     site_lib = os.path.join(here, 'site-packages')
     site.addsitedir(here)
     site.addsitedir(site_lib)
-
+    # import pkg_resources
+    # import setuptools
+    
+    # log.info(site.__file__)
     # pprint.pprint(global_conf)
-    # log.info('\n'.join(sys.path))
+    log.info('\n'.join(sys.path))
 
+    try:        
+        import beaker.middleware
+        global SessionMiddleware
+        SessionMiddleware = beaker.middleware.SessionMiddleware
+        log.debug("Beaker successfully loaded")
+    except ImportError:
+        log.exception("Beaker NOT loaded")
+        
     conf = AttrDict(pyxer = {
         "session": "",
         "debug": False,

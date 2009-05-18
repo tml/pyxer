@@ -278,6 +278,6 @@ def install_package(here, package):
     if not os.path.isdir(lib):
         os.makedirs(lib)
     call_subprocess(
-        ['easy_install', '-a', '-d', lib, '-s', bin, '-U', package],
+        ['easy_install-2.5', '-a', '-d', lib, '-s', bin, '-U', package],
         extra_env={'PYTHONPATH': lib})
     
