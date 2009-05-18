@@ -16,11 +16,10 @@ handlers:
   static_files: public/robots.txt
   upload: public/robots.txt  
 - url: .*
-  script: paste-deploy.py
+  script: pyxer-app.py
 
 skip_files: |
  ^(
- ((utils|bin|cache|tests|include|Scripts|tmp)/.*)|
  (.*/)?(
  (.*\.exe)|
  (.*\.bat)|
@@ -33,8 +32,5 @@ skip_files: |
  (.*~)|
  (.*\.py[co])|
  (.*/RCS/.*)|
- ([Ll]ib/encodings/.*)|
- (Lib/[^/]+\.py)|
- ([Ll]ib/.+?/[Ww]eb[Oo]b-.+?\.egg/.*)|
- (\..*)|
+ (\..*)
  ))$
