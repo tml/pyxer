@@ -355,7 +355,7 @@ If HTML comments start with "!" they are ignored for output:
 
 == Layout templates ==
 
-The implementation of layout templates is quite easy. Place the !py:layout command in the <html>tag and pass a Template object. For loading you can use the convenience function load().
+The implementation of layout templates is quite easy. Place the !py:layout command in the `<html>`tag and pass a Template object. For loading you can use the convenience function load().
 
 {{{
 <html py:layout="load('layout.html')">
