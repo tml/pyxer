@@ -123,7 +123,6 @@ template = template_default = template_stream
 
 def render_stream(template=None, **kw):
     template = template_stream(name=template)
-    kw.pop
     template.generate(Dict(c = c, h = Dict(
         url = url,
         redirect = redirect,
@@ -181,7 +180,7 @@ def render(result=None, render=None, **kw):
     elif isinstance(result, str):
         response.body = result
 
-    return  response.body
+    return response.body
 
 _render = render
 

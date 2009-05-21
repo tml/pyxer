@@ -22,7 +22,7 @@ structures and datas.
 
 setup(
     name = "pyxer",
-    version = "VERSION{0.7.0}VERSION"[8: - 8],
+    version = "VERSION{0.7.1}VERSION"[8: - 8],
     description = "Simple Python Framework and Templating for Paste, Google App Engine (GAE) and WSGI.",
     license = "MIT",
     author = "Dirk Holtwick",

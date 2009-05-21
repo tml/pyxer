@@ -71,6 +71,16 @@ handlers:
 #  static_files: public/robots.txt
 #  upload: public/robots.txt     
 #
+# *** Use this if you want restricted areas for admins ***
+#- url: /myamin/.*
+#  script: pyxer-app.py
+#  login: admin
+#
+# *** Use this if you want file types to become static ***
+#- url: /(.*\.js)
+#  static_files: public/\1
+#  upload: public/(.*\.js)
+#  
 # *** END: EXAMPLE CONFIGURATIONS ***
 - url: .*
   script: pyxer-app.py

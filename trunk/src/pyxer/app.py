@@ -129,7 +129,7 @@ def make_app(global_conf = {}, **app_conf):
     
     # log.info(site.__file__)
     # pprint.pprint(global_conf)
-    log.info('\n'.join(sys.path))
+    log.debug('\n'.join(sys.path))
 
     try:        
         import beaker.middleware

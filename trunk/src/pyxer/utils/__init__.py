@@ -269,7 +269,7 @@ def copy_python(src, dst, symlinks=False):
     if errors:
         raise shutil.Error, errors
 
-def install_package(here, package):
+def install_package(here, package, zip=False):
     here = os.path.abspath(here)
     bin = os.path.join(here, '.hidden-bin')
     lib = os.path.join(here, 'site-packages')
@@ -277,7 +277,10 @@ def install_package(here, package):
         os.makedirs(bin)
     if not os.path.isdir(lib):
         os.makedirs(lib)
+    command = ['easy_install-2.5', '-a', '-d', lib, '-s', bin, '-U', package]
+    if not zip:
+        command.insert(2, '-Z')
     call_subprocess(
-        ['easy_install-2.5', '-a', '-d', lib, '-s', bin, '-U', package],
+        command,
         extra_env={'PYTHONPATH': lib})
     
