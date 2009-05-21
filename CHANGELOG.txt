@@ -1,9 +1,15 @@
 CHANGELOG
 =========
 
-Version 0.7.0, 2009-05-XX
+Version 0.7.1, 2009-05-XX
 
-- NEW: Make Pyxer independent form virtualenv
+- NEW: Command 'zipinstall'
+- UPD: Full control over response object if controller return 'response' object
+
+Version 0.7.0, 2009-05-18
+
+- NEW: Make Pyxer independent form virtualenv and appengine monkey
+- NEW: Command 'install'
 
 Version 0.6.3, 2009-03-29
 

@@ -67,15 +67,17 @@ class Controller(Decorator):
         log.debug("Controller call %r (%r %r) = %r", self.func, a, kw, repr(result)[:40])
 
         # Ask render what to do with it
-        result = self.render(result, **self.kw)
-        log.debug("Render call %r (%r) = %r", self.render, self.kw, repr(result)[:40])
+        if result is not response:
+            result = self.render(result, **self.kw)
+            log.debug("Render call %r (%r) = %r", self.render, self.kw, repr(result)[:40])
+    
+            # Publish result        
+            if isinstance(result, unicode):
+                response.charset = 'utf8'
+                response.unicode_body = result
+            else:
+                response.body = result
 
-        # Publish result
-        if isinstance(result, unicode):
-            response.charset = 'utf8'
-            response.unicode_body = result
-        else:
-            response.body = result
         return response(request.environ, request.start_response)
 
     def render(self, result, **kw):

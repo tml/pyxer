@@ -1,6 +1,7 @@
 TODO
 ====
 
+- Automatic update of Pyxer installation
 - Introduce "lib" directory for Python modules like "base.py", "globals.py"
   or "helpers.py" like in Pylons
 - Let the user access the config file

@@ -44,10 +44,11 @@ class OptParser(OptionParser):
         print """
 Commands:
   serve              Serves the project
-  setup, create      Create a new project
-  install            Installs new Python package 
-  upload, deploy     Upload project (only GAE)
-  vm, open, activate Activate context for installs etc.
+  init               Create a new project
+  install            Install or update local Python package 
+  zipinstall         Install or update local Python ZIP package (slow on GAE)
+  update             Update local pyxer package
+  upload, deploy     Upload project (only GAE) 
 
 Daemon commands (only paster):
   start              Start
@@ -204,6 +205,11 @@ def command(engine = None):
         if len(args)==2:
             install_package(os.getcwd(), args[1])
 
+    # ZIP Install
+    elif (command in ("zipinstall")):
+        if len(args)==2:
+            install_package(os.getcwd(), args[1], zip=True)
+
     # Activate
     elif (command in ("open", "activate", "vm")):
 
@@ -247,7 +253,7 @@ def command(engine = None):
         engine.fix()
 
     # Setup Pyxer
-    elif command == "pyxer":        
+    elif command in ("pyxer", "update"):        
         import pyxer.create
         pyxer.create.self_setup()
         
