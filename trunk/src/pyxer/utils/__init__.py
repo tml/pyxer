@@ -283,4 +283,7 @@ def install_package(here, package, zip=False):
     call_subprocess(
         command,
         extra_env={'PYTHONPATH': lib})
-    
+
+def uid():
+    import uuid
+    return uuid.uuid4().hex

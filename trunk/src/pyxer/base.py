@@ -23,7 +23,7 @@ import urlparse
 GAE = "google.appengine" in sys.modules
 
 from pyxer.utils import Dict, AttrDict
-from pyxer.utils.jsonhelper import json
+from pyxer.utils.jsonhelper import json, json_decode, json_encode
 from pyxer.controller import \
     Controller, isController, c, g, h, config, \
     session, response, request, resp, req
