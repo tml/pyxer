@@ -1,5 +1,12 @@
+# -*- coding: UTF-8 -*-
+#############################################
+## (C)opyright by Dirk Holtwick, 2008      ##
+## All rights reserved                     ##
+#############################################
+
 import string
 import types
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -341,6 +348,9 @@ try:
     log.debug("Using JSON module %r", simplejson)
 except ImportError:
     log.debug("Using JSON module %r", __file__)
+
+json_decode = read
+json_encode = write
 
 def json(*a, **kw):
     if len(a) == 1:
