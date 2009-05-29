@@ -43,12 +43,13 @@ class OptParser(OptionParser):
         print
         print """
 Commands:
-  serve              Serves the project
   init               Create a new project
+  serve              Serves the project
+  push               Upload project to GAE 
+  push_empty         Upload empty project with version'0' to GAE
+  update             Update local pyxer package
   install            Install or update local Python package 
   zipinstall         Install or update local Python ZIP package (slow on GAE)
-  update             Update local pyxer package
-  upload, deploy     Upload project (only GAE) 
 
 Daemon commands (only paster):
   start              Start
@@ -67,7 +68,7 @@ def command(engine = None):
 
     parser = OptParser(
         # "usage: %prog [options] command",
-        "usage: pyxer [options] command",
+        "Usage: pyxer [options] command",
         description = _description,
         version = VERSION_STR,
         # epilog="Neu\n\r\n" + 20*"hallo ",
@@ -79,7 +80,7 @@ def command(engine = None):
         action = "store_false",
         dest = "verbose",
         default = True,
-        help = "don't print status messages to stdout")
+        help = "Do not print status messages to stdout")
     #parser.add_option(
     #    "-f",
     #    "--force",
@@ -93,13 +94,13 @@ def command(engine = None):
         action = "store_true",
         dest = "debug",
         default = False,
-        help = "activate debug logging")
+        help = "Activate debug logging")
     if not engine:
         parser.add_option(
             "--engine",
             dest = "engine",
             default = "",
-            help = "engine that will be used (wsgi, gae, paster)")
+            help = "Engine that will be used: gae (default), wsgi, paster")
     parser.add_option(
         "--port",
         dest = "port",
@@ -109,13 +110,13 @@ def command(engine = None):
         "--host",
         dest = "host",
         default = "0.0.0.0",
-        help = "serving on host")
+        help = "Serving on host")
     parser.add_option(
         "-r",
         "--reload",
         dest = "reload",
         action = "store_true",
-        help = "reload on changing files")
+        help = "Reload on changing files")
     #parser.add_option(
     #    "-u",
     #    "--update",
@@ -127,13 +128,13 @@ def command(engine = None):
         "--develop",
         dest = "develop",
         action = "store_true",
-        help = "update pyxer version in VM")
+        help = "Update projects Pyxer version")
     parser.add_option(
         "-c",
         "--clear",
         dest = "clear",
         action = "store_true",
-        help = "clear GAE datastore")
+        help = "Empty local GAE datastore")
     
     (opt, args) = parser.parse_args()
 
@@ -168,17 +169,17 @@ def command(engine = None):
 
     log.debug("Command %r for engine %r in directory %r", command, engine, here)
 
-    if opt.engine in ("gae", "google", "appengine", "googleappengine", "g"):
-        print "Google AppEngine"
-        opt.engine = "gae"
-        import pyxer.gae as engine
+    if opt.engine in ("wsgi", "w"):
+        print "Python WSGI"
+        # engine = None
     elif opt.engine in ("paster", "paste", "p"):
         print "Paster"
         opt.engine = "paster"
         import pyxer.paster as engine
     else:
-        print "Python WSGI"
-        engine = None
+        print "Google AppEngine"
+        opt.engine = "gae"
+        import pyxer.gae as engine
 
     # Update version
     if opt.develop and command not in ("setup", "create", "init", "pyxer"):
@@ -211,28 +212,28 @@ def command(engine = None):
             install_package(os.getcwd(), args[1], zip=True)
 
     # Activate
-    elif (command in ("open", "activate", "vm")):
-
-        root = find_root()
-        if not root:
-            print "No project found"
-        elif iswin:
-            # call_subprocess([os.path.join(root, "scripts", "activate.bat")])
-            system("start " + os.path.join(root, "scripts", "activate.bat"))
-        else:
-            print "IMPORTANT! Leave VM with command 'exit'."
-            call_subprocess(["bash", "--init-file", os.path.join(root, "bin", "activate")], raise_on_returncode = False)
+#    elif (command in ("open", "activate", "vm")):
+#
+#        root = find_root()
+#        if not root:
+#            print "No project found"
+#        elif iswin:
+#            # call_subprocess([os.path.join(root, "scripts", "activate.bat")])
+#            system("start " + os.path.join(root, "scripts", "activate.bat"))
+#        else:
+#            print "IMPORTANT! Leave VM with command 'exit'."
+#            call_subprocess(["bash", "--init-file", os.path.join(root, "bin", "activate")], raise_on_returncode = False)
             
     # Deactivate
-    elif (command == "close" or command == "deactivate"):
-
-        root = find_root()
-        if not root:
-            print "No project found"
-        elif iswin:
-            system(os.path.join(root, "scripts", "deactivate.bat"))
-        else:
-            pass
+#    elif (command == "close" or command == "deactivate"):
+#
+#        root = find_root()
+#        if not root:
+#            print "No project found"
+#        elif iswin:
+#            system(os.path.join(root, "scripts", "deactivate.bat"))
+#        else:
+#            pass
 
     # Daemon
     elif command == "start" and opt.engine == "paster":
@@ -241,16 +242,41 @@ def command(engine = None):
         engine.serve(opt, daemon = "stop")
     elif command == "status" and opt.engine == "paster":
         engine.serve(opt, daemon = "status")
-    elif (command == "reload" or command == "restart") and opt.engine == "paster":
+    elif (command in ("reload", "restart")) and opt.engine == "paster":
         engine.serve(opt, daemon = "restart")
 
     # GAE Upload
-    elif (command == "upload" or command == "deploy") and opt.engine == "gae":
+    elif (command in ("upload", "deploy", "push")) and opt.engine == "gae":
         engine.upload(opt)
+    # GAE empty
+    elif (command in ("push_empty")) and opt.engine == "gae":
+        if len(args)==2:
+            name =  args[1]
+            import tempfile
+            tmpdir = tempfile.mkdtemp()
+            print "Empty project", name , "created at", tmpdir
+            tmpfle = os.path.join(tmpdir, 'app.yaml')
+            open(tmpfle, 'w').write("""
+application: %s
+version: 0
+runtime: python
+api_version: 1
 
+handlers:
+- url: /
+  static_dir: empty            
+            """.strip() % name)
+            engine.upload(opt, root=tmpdir)
+            os.remove(tmpfle)
+            os.rmdir(tmpdir)
+            print
+            print "ATTENTION: Go to GAE dasboard/versions and switch to version '0' to turn off your project"
+        else:
+            print '*** Project name needed as last argument'
+            
     # GAE fix
-    elif (command == "fix" or command == "fixup") and opt.engine == "gae":
-        engine.fix()
+    #elif (command == "fix" or command == "fixup") and opt.engine == "gae":
+    #    engine.fix()
 
     # Setup Pyxer
     elif command in ("pyxer", "update"):        
