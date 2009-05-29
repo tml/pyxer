@@ -19,8 +19,6 @@ Install Pyxer using easy_install from [http://pypi.python.org/pypi/setuptools Se
 $ easy_install pyxer  
 }}}
 
-All required packages ( webob, html5lib, beaker) should be installed automatically if needed.
-
 If you want to use Google App Engine you have to install it separately.
 
 = Quick tutorial =
