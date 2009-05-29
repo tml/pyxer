@@ -1,6 +1,4 @@
 #labels Featured
-#FirePython and Pyxer
-
 = FirePython on Pyxer =
 
 If you don't know that great tool hurry up and have a look ;)
@@ -53,7 +51,9 @@ def main():
     # FirePython Middleware
     app = firepython.middleware.FirePythonWSGI(app)
 
+    # Also show logging at DEBUG level
     logging.getLogger().setLevel(logging.DEBUG)
+
     run_wsgi_app(app)
 
 # Initialize on first start
