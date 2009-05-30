@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-Version 0.7.1, 2009-05-XX
+Version 0.7.1, 2009-05-30
 
 - NEW: Command 'zipinstall'; Install packages as ZIP. This is usually not a
        good idea because of performance issues on GAE but sometimes useful to
@@ -20,6 +20,7 @@ Version 0.7.1, 2009-05-XX
 - UPD: Default engine is now GAE
 - UPD: Updated default app.yaml to not upload *.so, *.dll and _speedup* because
        otherwise simplejson would not work if accidentialy installed in site-packages
+- UPD: Default expiration time added to app.yaml
 - FIX: pyxer-app.py always did reinitialize the WSGI app
 
 Version 0.7.0, 2009-05-18

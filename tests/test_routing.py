@@ -9,7 +9,7 @@ class PyxerRoutingTestCase(unittest.TestCase):
         self.assertEqual(a.strip(), b.strip())
 
     def testRouting(self):
-       pyxer.routing.testing()
+        pyxer.routing.testing()
 
 def buildTestSuite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)
