@@ -51,6 +51,7 @@ application: __APP_NAME__
 version: 1
 runtime: python
 api_version: 1
+default_expiration: "1d"
 
 handlers:
 # *** BEGIN: EXAMPLE CONFIGURATIONS ***

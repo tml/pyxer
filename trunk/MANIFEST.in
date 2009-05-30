@@ -8,4 +8,5 @@ exclude example/public/sling/*
 exclude example/public/test/*
 exclude misc/*
 exclude docs/*
+exclude docs/style/*
 
