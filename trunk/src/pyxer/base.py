@@ -22,6 +22,14 @@ import urlparse
 
 GAE = "google.appengine" in sys.modules
 
+# On stage
+if GAE:
+    STAGE = os.environ.get('SERVER_SOFTWARE', '').startswith('Google Apphosting')
+else:
+    STAGE = True
+    
+stage = STAGE
+
 from pyxer.utils import Dict, AttrDict
 from pyxer.utils.jsonhelper import json, json_decode, json_encode
 from pyxer.controller import \
@@ -127,6 +135,7 @@ def render_stream(template=None, **kw):
         url = url,
         redirect = redirect,
         strftime = helpers.strftime,
+        stage=STAGE,        
         ), load = template.load))
     return template.render(**kw)
 

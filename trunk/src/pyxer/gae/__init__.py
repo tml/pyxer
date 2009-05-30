@@ -11,6 +11,8 @@ import sys
 from shutil import * 
 from pyxer.utils import find_root, call_script, call_subprocess
 
+ERROR = "\n*** ERROR OCCURED! Please use the Google AppEngine tools directly"
+
 def normalize_py_file(name):
     if name.lower().endswith(".pyc"):
         return name[: - 1]
@@ -45,13 +47,15 @@ def serve(opt):
             import dev_appserver
         
         # cal_
-        call_subprocess([
+        if call_subprocess([
             sys.executable,
             normalize_py_file(dev_appserver.__file__) ] + 
             options + [     
             root
-            ])
-        
+            ]):
+
+            print ERROR
+                    
         #sys.path = dev_appserver.EXTRA_PATHS + sys.path    
         #script_path = os.path.join(dev_appserver.DIR_PATH, dev_appserver.DEV_APPSERVER_PATH)
         #import google.appengine.tools.dev_appserver_main as gmain
@@ -60,15 +64,17 @@ def serve(opt):
     
     elif sys.platform == "darwin":
 
-        call_subprocess([
+        if call_subprocess([
             "dev_appserver.py"] + 
             options + [            
             root
-            ])
+            ]):
+
+            print ERROR
     
     else:
         
-        print "Please launch Google App Engine directly"
+        print ERROR
     
     # execfile(script_path, globals())
 
@@ -89,13 +95,15 @@ def upload(opt, root=None):
             sys.path.append(r"C:\Programme\Google\google_appengine")
             import appcfg
         
-        call_subprocess([
+        if call_subprocess([
             sys.executable,
             normalize_py_file(appcfg.__file__) ] + 
             options + [     
             "update",
             root
-            ])
+            ]):
+            
+            print ERROR
         
         #sys.path = dev_appserver.EXTRA_PATHS + sys.path    
         #script_path = os.path.join(dev_appserver.DIR_PATH, dev_appserver.DEV_APPSERVER_PATH)
@@ -105,13 +113,15 @@ def upload(opt, root=None):
     
     elif sys.platform == "darwin":
         
-        call_subprocess([
+        if call_subprocess([
             "appcfg.py"] + 
             options + [
             "update",
             root
-            ])
+            ]):
+
+            print ERROR
     
     else:
         
-        print "Please launch Google AppEngine directly"
+        print ERROR

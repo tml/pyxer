@@ -121,7 +121,6 @@ def call_subprocess(
     show_stdout=True,
     filter_stdout=None,
     cwd=None,
-    raise_on_returncode=True,
     extra_env=None):
 
     if type(command) not  in (types.ListType, types.TupleType):
@@ -153,10 +152,9 @@ def call_subprocess(
             # shell = True,
             cwd=cwd,
             env=env)
-    except Exception, e:
-        if raise_on_returncode:
-            print ("Error %s while executing command %s" % (e, cmd_desc))
-            raise
+    except Exception:
+        log.exception("Error while executing command %r", cmd_desc)
+        return -1
     all_output = []
     if stdout is not None:
         stdout = proc.stdout
@@ -176,22 +174,9 @@ def call_subprocess(
     else:
         proc.communicate()
     proc.wait()
-    if proc.returncode:
-        if raise_on_returncode:
-            if all_output:
-                print ('Complete output from command %s:' % cmd_desc)
-                print ('\n'.join(all_output) + '\n----------------------------------------')
-            raise OSError(
-                "Command %s failed with error code %s"
-                % (cmd_desc, proc.returncode))
-        else:
-            print (
-                "Command %s had error code %s"
-                % (cmd_desc, proc.returncode))
-    #for k, v in env.items():
-    #    print k,v
-    if env:
-        os.environ = env
+    #if env:
+    #    os.environ = env
+    return proc.returncode
 
 def call_virtual(cmd, root=None, cwd=None):
     if not root:
