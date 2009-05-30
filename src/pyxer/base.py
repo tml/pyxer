@@ -86,22 +86,26 @@ def abort(code = 404):
     # .exeception for Python 2.3 compatibility
     raise exc.HTTPNotFound().exception
 
-class StreamTemplateManager:
+_template_cache = {}
 
-    cache = {}
+class StreamTemplateManager:
 
     def __init__(self, root):
         self.root = root
 
     def load(self, path):
+        global _template_cache
         import pyxer.template as pyxer_template
-        pyxer_template = reload(pyxer_template)
+        if not stage:
+            pyxer_template = reload(pyxer_template)
         path = os.path.abspath(os.path.join(self.root, path))
         # Test if it is in cache and return if found
         mtime = os.path.getmtime(path)
-        if 0 and self.cache.has_key(path):
-            template, last = self.cache.get(path)
+        if stage and _template_cache.has_key(path):
+            log.debug("Template fetching from cache")
+            template, last = _template_cache.get(path)
             if mtime <= last:
+                log.debug("Template fetched from cache")
                 return template
             else:
                 log.debug("Found a newer file than the one in the cache for %r", path)
@@ -110,7 +114,7 @@ class StreamTemplateManager:
         template = pyxer_template.TemplateSoup(
             file(path, "r").read())
         template.load = self.load
-        self.cache[path] = (template, mtime)
+        _template_cache[path] = (template, mtime)
         return template
 
 def template_stream(name = None):

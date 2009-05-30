@@ -9,12 +9,9 @@ handlers:
 - url: /docs/(.*)
   static_files: docs/\1
   upload: docs/(.*)                                    
-- url: /favicon.ico
-  static_files: public/favicon.ico
-  upload: public/favicon.ico  
-- url: /robots.txt
-  static_files: public/robots.txt
-  upload: public/robots.txt  
+- url: /(.*\.(js|css|png|jpg|gif|ico))
+  static_files: public/\1
+  upload: public/(.*\.(js|css|png|jpg|gif|ico))
 - url: .*
   script: pyxer-app.py
 
@@ -22,6 +19,8 @@ skip_files: |
  ^(
  (.*/)?(
  (.*\.exe)|
+ (.*\.so)|
+ (.*\.so)|
  (.*\.bat)|
  (.*\.pyd)|
  (app\.yaml)|

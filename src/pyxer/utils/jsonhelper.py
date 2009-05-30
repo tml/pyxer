@@ -340,9 +340,9 @@ def read(s):
 
 try:
     try:
-        from django.utils import simplejson
-    except:
         import simplejson
+    except:
+        from django.utils import simplejson
     write = simplejson.dumps
     read = simplejson.loads
     log.debug("Using JSON module %r", simplejson)
