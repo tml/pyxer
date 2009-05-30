@@ -20,9 +20,6 @@ Templating
 - <script><!-- comments do not escape the right way
 - <!--! has to be stripped
 
-Marketing
-- Create a video with a simple coding session like "Wiki in 10 minutes" :)
-
 Future
 - Full integration into Eclipse/PyDev
 - Windows/Mac/Linux native tool placed in the Systray/Menu/Dock

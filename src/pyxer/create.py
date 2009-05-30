@@ -132,7 +132,12 @@ from pyxer.app import make_app
 # The main function is important for GAE to know if the process can be kept
 def main():
     conf = dict(__file__=os.path.abspath(os.path.join(__file__, os.pardir, 'pyxer.ini')))
-    run_wsgi_app(make_app(conf))
+    app = make_app(conf)
+    
+    # Put your custom middleware here e.g.
+    # app = MyCoolWSGIMiddleware(app)
+    
+    run_wsgi_app(app)
 
 # Initialize on first start
 if __name__ == "__main__":
@@ -177,8 +182,9 @@ def self_setup(root = None):
 
     # Create pyxer-app.py
     pyxer_starter = os.path.join(root, 'pyxer-app.py')
-    log.info("Create %r", pyxer_starter)
-    open(pyxer_starter, "w").write(PYXERAPP_PY)
+    if not os.path.isfile(pyxer_starter):
+        log.info("Create %r", pyxer_starter)
+        open(pyxer_starter, "w").write(PYXERAPP_PY)
             
 def create(opt, here):
 

@@ -28,16 +28,22 @@ def wrap_helpers(localdict):
 wrap_helpers(locals())
 '''
 
-try:
-    import pytz
-except:
-    pytz = None
-    
+import logging
+  
+# Global cache for timezones
 _tz_cache = {}
     
+# Timezone corrected time formatting
 def strftime(value, fmt, tzname=None):
+    try:
+        import pytz
+        logging.info("'pytz' module is not installed")
+    except:
+        pytz = None
+        
     global _tz_cache
-    if isinstance(tzname, basestring):
+    
+    if pytz and isinstance(tzname, basestring):
         if tzname not in _tz_cache.keys():
             _tz_cache[tzname] = pytz.timezone(tzname)
         tz = _tz_cache[tzname]

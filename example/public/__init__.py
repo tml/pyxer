@@ -10,6 +10,7 @@ import sys
 import os
 import logging
 import pyxer
+import pprint
 
 log = logging.getLogger(__name__)
 here = os.path.dirname(__file__)
@@ -32,7 +33,9 @@ def index():
     c.ispaster = not c.isgae
     c.pyxerversion = pyxer.__version__
     c.modules = sys.modules
+    c.platform = sys.platform
     c.samples = []
+    c.env = pprint.pformat(os.environ)
     for name in sorted(os.listdir(here)):
         try:
             readme = os.path.join(here, name, "README-GAE.txt")

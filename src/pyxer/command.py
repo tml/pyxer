@@ -279,7 +279,7 @@ handlers:
     #    engine.fix()
 
     # Setup Pyxer
-    elif command in ("pyxer", "update"):        
+    elif command in ("pyxer", "update", "up"):        
         import pyxer.create
         pyxer.create.self_setup()
         

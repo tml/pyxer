@@ -13,8 +13,8 @@ except ImportError:
 
 long_description = """
 Yet another framework with a new very simple programming concept.
-Offers also an own templating language mostly compatible to Genshi.
-The command line tool makes creating GAE projects as easy as possible.
+Offers also an own templating language mostly compatible with Genshi.
+The command line tool makes creating Google AppEngine projects as easy as possible.
 Projects may also be used with Paster or other WSGI frameworks.
 Also provides an interface to Apache Sling to access JCR/ Jackrabbit
 structures and datas.
@@ -32,8 +32,8 @@ setup(
     keywords = "Framework, Google App Engine, GAE, appengine, Paster, Server, Templating, Sling, Jackrabbit, JCR",
 
     requires = [
-        "webob",
-        "paste",
+        # "webob",
+        # "paste",
         ],
 
     package_dir = {
