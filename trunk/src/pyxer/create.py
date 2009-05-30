@@ -100,6 +100,8 @@ skip_files: |
  (.*~)|
  (.*\.py[co])|
  (.*\.so)|
+ (.*\.dll)|
+ (_speedup.*)|
  (.*\.a)|
  (.*\.dll)|
  (.*/RCS/.*)|
@@ -129,14 +131,21 @@ site.addsitedir(site_lib)
 from google.appengine.ext.webapp.util import run_wsgi_app
 from pyxer.app import make_app
 
-# The main function is important for GAE to know if the process can be kept
-def main():
+# Set up the WSGI app
+def setup_app():
     conf = dict(__file__=os.path.abspath(os.path.join(__file__, os.pardir, 'pyxer.ini')))
     app = make_app(conf)
     
     # Put your custom middleware here e.g.
     # app = MyCoolWSGIMiddleware(app)
     
+    return app
+
+# WSGI app remains global
+app = setup_app()
+    
+# The main function is important for GAE to know if the process can be kept in memory
+def main():
     run_wsgi_app(app)
 
 # Initialize on first start
@@ -145,7 +154,7 @@ if __name__ == "__main__":
 '''.lstrip()
 
 
-def self_setup(root = None):
+def self_setup(opt, root = None):
     " Set up Pyxer in the virtual environment "
     
     # Find VM
@@ -182,7 +191,7 @@ def self_setup(root = None):
 
     # Create pyxer-app.py
     pyxer_starter = os.path.join(root, 'pyxer-app.py')
-    if not os.path.isfile(pyxer_starter):
+    if opt.force or (not os.path.isfile(pyxer_starter)):
         log.info("Create %r", pyxer_starter)
         open(pyxer_starter, "w").write(PYXERAPP_PY)
             
@@ -213,6 +222,6 @@ def create(opt, here):
         codecs.open(os.path.join(path, "__init__.py"), "w", 'utf-8').write(INIT_PY.encode("utf-8"))        
 
     # Install pyxer
-    self_setup(here)
+    self_setup(opt, here)
 
     print "Initialization completed!"

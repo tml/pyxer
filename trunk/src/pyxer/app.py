@@ -37,6 +37,8 @@ log = logging.getLogger(__name__)
 # XXX Needed?
 # sys.path = [os.getcwd()] + sys.path
 
+_counter = 0
+
 # The WSGI application
 class PyxerApp(Router):
 
@@ -47,6 +49,10 @@ class PyxerApp(Router):
     def __call__(self, environ, start_response):
 
         try:
+
+            global _counter
+            _counter += 1
+            log.debug("Processing pyxer call number %d", _counter)
 
             path = environ["PATH_INFO"]
 
@@ -185,7 +191,8 @@ def make_app(global_conf = {}, **app_conf):
     app = ConfigMiddleware(app, conf.copy())
 
     # app = CgitbMiddleware(app)
-    app = ErrorMiddleware(app, debug = True)
+    if not stage:
+        app = ErrorMiddleware(app, debug = True)
 
     #static = PyxerStatic(base)
     #app = Cascade([app, static])

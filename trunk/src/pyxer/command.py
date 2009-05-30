@@ -135,7 +135,12 @@ def command(engine = None):
         dest = "clear",
         action = "store_true",
         help = "Empty local GAE datastore")
-    
+    parser.add_option(
+        "-f",
+        "--force",
+        dest = "force",
+        action = "store_true",
+        help = "Force updates; overwrites pyxer-app.py")    
     (opt, args) = parser.parse_args()
 
     showlog(opt.debug)
@@ -184,7 +189,7 @@ def command(engine = None):
     # Update version
     if opt.develop and command not in ("setup", "create", "init", "pyxer"):
         import pyxer.create
-        pyxer.create.self_setup()
+        pyxer.create.self_setup(opt)
 
     # Serve
     if command == "serve":
@@ -281,7 +286,7 @@ handlers:
     # Setup Pyxer
     elif command in ("pyxer", "update", "up"):        
         import pyxer.create
-        pyxer.create.self_setup()
+        pyxer.create.self_setup(opt)
         
     else:
         parser.print_help()
