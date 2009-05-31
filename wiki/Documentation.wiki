@@ -80,7 +80,9 @@ This works just like a static server. To use a controller put the file `__init__
 def index():
     return "Hello World"
 }}}
+
 == Controllers ==
+
 Controller, templates and static files are placed in the same directory (usually public). First Pyxer looks for a matching controller. A controller is defined in the `__init__.py` file and decorated by using @controller which is defined in pyxer.base.
 
 {{{
@@ -127,7 +129,7 @@ def index():
     c.title = "Hello World"
 }}}
 
-By default a Genshi like templating language is used and output is specified as xhtml-strict. You may want to change that for certain documents e.g. to render a plain text:
+By default a [http://genshi.edgewall.org/wiki/Documentation/xml-templates.html Genshi like templating language] is used and output is specified as xhtml-strict. You may want to change that for certain documents e.g. to render a plain text:
 
 {{{
 from pyxer.base import *
@@ -207,17 +209,17 @@ def index():
 
 == Deployment ==
 
-To publish your project to GAE you may also use the Pyxer command line tool. First check if yourapp.yaml file contains the right informations like the project name and version infos. Then just do like this:
+To publish your project to GAE you may also use the Pyxer command line tool. First check if the `app.yaml` file contains the right informations like the project name and version infos. Then just do like this:
 
 {{{
-$ xgae upload
+$ pyxer push
 }}}
 
 = Routing =
 
 The routing in Pyxer is based on some conventions by default but can be extended in a very flexible and easy way. By default all public project data is expected to be found in the folder public. If you just put static content there it will behave like you expect it from a normal webserver.
 
-To add controllers to it, start by creating the !__init!__.py file. This makes the folder become a Python package and Pyxer routing will at first evaluate this one before looking for static content.
+To add controllers to it, start by creating the `__init__.py` file. This makes the folder become a Python package and Pyxer routing will at first evaluate this one before looking for static content.
 
 == Default behaviour ==
 
@@ -272,9 +274,9 @@ To add your own ...
 router.add("content-{name}", "content")
 }}}
 
-This matches all URL starting with content- while the rest will be saved in req.urlvars as key called name. For example the URL /content-myentry will result in a call of the controller contentwhere req.urlvars!["name"]=="myentry".
+This matches all URL starting with content- while the rest will be saved in req.urlvars as key called name. For example the URL `/content-myentry` will result in a call of the controller contentwhere `req.urlvars["name"]=="myentry"`.
 
-For more complicated routes you may also use the add_re method, which offers more flexibility. Here is an example that matches the rest of the path after "content/" and passes the value to the controller via req.urlvars!["path"]:
+For more complicated routes you may also use the add_re method, which offers more flexibility. Here is an example that matches the rest of the path after "content/" and passes the value to the controller via `req.urlvars["path"]`:
 
 {{{
 router.add_re("^content/(?P<path>.*?)$",
@@ -306,6 +308,10 @@ If you use redirect it will call the url helper too so that relative parts will 
 = Templating =
 
 Pyxer offers yet another templating language that is very close to[http://genshi.edgewall.org/ Genshi] and [http://pypi.python.org/pypi/kid Kid]. Beause Genshi did not work with Google App Engine when ''Pyxer'' was started, the new templating tools have been implemented.
+
+For more syntax information have a look here: http://genshi.edgewall.org/wiki/Documentation/xml-templates.html
+
+The following sections describe the general use and the little differences to Genshi.
 
 == Variables and expressions ==
 
@@ -377,11 +383,11 @@ In the template file you can then access the original template stream with the g
 
 }}}
 
-XPath:
+*XPath Selectors*
 
 XPath is supported like it is in Genshi.
 
-CSS Selectors:
+*CSS Selectors*
 
 CSS Selectors ending with  * (notice the space) return just the inner texts and elements of the matched pattern.
 
