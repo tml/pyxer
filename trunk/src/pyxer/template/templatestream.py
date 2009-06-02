@@ -117,7 +117,11 @@ class PyxerStream(Stream):
             if isinstance(value, list) or isinstance(value, Stream):
                 self.events += list(value)
                 return
-            if not isinstance(value, unicode):
+            if value is True:
+                value = '1'
+            elif value is False:
+                value = '0'
+            elif not isinstance(value, unicode):
                 value = unicode(str(value), 'utf8')
             self.events.append((TEXT, value, (None, 0, 0)))
         except Exception, e:
