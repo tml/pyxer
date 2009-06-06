@@ -1,4 +1,6 @@
+#summary FirePython on Pyxer
 #labels Featured
+
 = FirePython on Pyxer =
 
 If you don't know that great tool hurry up and have a look ;)
