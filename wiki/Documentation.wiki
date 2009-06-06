@@ -1,9 +1,9 @@
 #summary Pyxer Python Framework Documentation
 #labels Featured
 
-= Pyxer Python Framework =
+<wiki:toc max_depth="2" />
 
-= Introduction =
+= Introduction 'Pyxer Python Framework' =
 
 The Pyxer Server is a very simple [http://www.python.org/ Python] Web Framework that aims to makes starting a new project as easy as it can be. It still works respecting the MVC concept but the files can be mixed in one directory. For a high end solution you should maybe consider using [http://pylonshq.com/ Pylons],[http://www.djangoproject.com/ Django], [http://turbogears.org/ TurboGears] and similar.
 
