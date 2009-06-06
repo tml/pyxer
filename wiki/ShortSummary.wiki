@@ -1,5 +1,6 @@
 #summary One-sentence summary of this page.
 #labels Featured
+#sidebar TableOfContents
 
 = Introduction =
 
@@ -93,5 +94,3 @@ template 'test.html':
 passing values to the template. There are more of these e.g. for
 session handling or request data. See the documentation for more
 details.
-
-
