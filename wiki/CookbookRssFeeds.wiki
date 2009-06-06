@@ -1,4 +1,5 @@
 #summary Cookbook: RSS Feeds
+#sidebar TableOfContents
 
 = RSS Feeds =
 
