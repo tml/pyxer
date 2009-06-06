@@ -7,8 +7,6 @@ from pyxer.utils import Dict, AttrDict
 import re
 import sys
 
-sys.path.insert(0, "C:\work\html5lib")
-
 _data = """<!DOCTYPE html>
 <html>
  <head>
@@ -33,6 +31,47 @@ _sample_end = """
 </body>
 </html>
 """
+
+_xml = """
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>
+            Twittori / $c.screen_name
+        </title>
+        <link>
+            http://www.twittori.com/$c.screen_name
+        </link>
+        <atom:link type="application/rss+xml" rel="self" href="http://www.twittori.com/$c.screen_name"/>
+        <description>
+            Twittori updates from XXX.
+        </description>
+        <language>
+            en-us
+        </language>
+        <ttl>
+            40
+        </ttl>
+        <item py:for="m in c.messages">
+            <title py:content='m.text'>
+               Titel 
+            </title>
+            <description py:content='m.text'>
+                Description
+            </description>
+            <pubDate py:content='m.created'>
+                Tue, 26 May 2009 17:00:39 +0000
+            </pubDate>
+            <guid py:content='m.url'>
+                http://twitter.com/Volker_Beck/statuses/1925454291
+            </guid>
+            <link py:content='m.url'>
+                http://twitter.com/Volker_Beck/statuses/1925454291
+            </link>
+        </item>
+    </channel>
+</rss>
+""".lstrip()
 
 class PyxerTemplateTestCase(unittest.TestCase):
 
@@ -90,7 +129,18 @@ class PyxerTemplateTestCase(unittest.TestCase):
             'A <span py:for="x in v">$x</span> Z',
             "A <span>1</span><span>2</span><span>3</span> Z",
             c)
-        
+
+    def testXML(self):
+        t = Template(_xml, xml=True, debug=False)
+        t.generate(Dict(
+            c=Dict(
+                screen_name='Test',
+                messages=[])),
+            encoding="ascii")
+        r = t.render('xml', doctype=None)
+        self.assert_(r.startswith('<?xml'))
+        self.assert_('Twittori / Test' in r)
+
 def buildTestSuite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)
 
