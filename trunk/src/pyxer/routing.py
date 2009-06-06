@@ -112,6 +112,7 @@ class RouteObject(object):
             vars = {}):
         if module and controller:
             raise Exception("Route to module and controller the same time is not allowed")
+        # log.debug("Template for routing %r", template)
         self.template = re.compile(template) #template_to_regex
         self.module = module
         self.controller = controller
@@ -139,14 +140,18 @@ class Router(object):
         # Set first module
         self.set_module(module)
 
+        # This should only apply to the firt router ever
+        if self.module and hasattr(self.module, "router"):
+            self.routes = self.module.router.routes
+
         # Default routings
         if use_default:
             # /
             self.add_default("^$",
                 controller = "index",
                 name = "_action_index")
-            # /demo, /demo.html
-            self.add_default("^(?P<controller>[^\/\.]+?)(\.html?)?$",
+            # /demo, /demo.html, /demo.htm, /demo.xml
+            self.add_default("^(?P<controller>[^\/\.]+?)(\.html?|\.xml)?$",
                 name = "_action")
             # /demo/
             self.add_default("^(?P<module>[^\/\.]+?)\/",
@@ -230,7 +235,7 @@ class Router(object):
         # Search
         for route in self.routes + self.routes_default:
             match = route.template.match(path)
-            # print "  ?", route, match
+            # log.debug("Try to match %r %r", route, match)
             if match:
                 urlvars = {}
                 urlvars.update(route.vars)

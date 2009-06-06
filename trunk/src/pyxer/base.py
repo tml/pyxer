@@ -77,11 +77,11 @@ def redirect(location=None, permanent=False):
     if location is None:
         location = req.environ["PATH_INFO"]
     if permanent:
-        raise exc.HTTPMovedPermanently(location = url(location)).exception
+        raise exc.HTTPMovedPermanently(location=url(location)).exception
     else:
-        raise exc.HTTPSeeOther(location = url(location)).exception
+        raise exc.HTTPSeeOther(location=url(location)).exception
 
-def abort(code = 404):
+def abort(code=404):
     " Abort with error "
     # .exeception for Python 2.3 compatibility
     raise exc.HTTPNotFound().exception
@@ -115,13 +115,13 @@ class StreamTemplateManager:
         log.debug("Loading template %r in StreamTemplateManager", path)
         data = file(path, "r").read().lstrip()
         template = pyxer_template.TemplateSoup(
-            data, 
+            data,
             xml=data.startswith('<?xml'))
         template.load = self.load
         _template_cache[path] = (template, mtime)
         return template
 
-def template_stream(name = None):
+def template_stream(name=None):
     " Get the template "
     # XXX What to do with dirname? Scenarios?
     # XXX What to do with absolute url /like/this?
@@ -139,18 +139,25 @@ template = template_default = template_stream
 
 def render_stream(template=None, **kw):
     template = template_stream(name=template)
-    template.generate(Dict(c = c, h = Dict(
-        url = url,
-        redirect = redirect,
-        strftime = helpers.strftime,
-        stage=STAGE,        
-        ), load = template.load))
+    template.generate(Dict(c=c, h=Dict(
+        url=url,
+        redirect=redirect,
+        strftime=helpers.strftime,
+        stage=STAGE,
+        ), load=template.load))
     return template.render(**kw)
 
 render_default = render_stream
 
-def render_json():
+def render_json(**kw):
     " Render output as JSON object "
+    if 'ext' in kw:
+        if kw['ext']:
+            
+            # XXX We need to implement output by extension e.g.
+            # file names ending on .json, .yaml, .xml, .rss, .atom
+            pass
+        
     response.headers['Content-Type'] = 'application/json'
     result = json(request.result)
     # log.debug("JSON: %r", result)
@@ -203,7 +210,7 @@ _render = render
 
 class controller(Controller):
 
-    def render(self, result, render = None, **kw):
+    def render(self, result, render=None, **kw):
         
         if response.body:
             log.debug("Render: Body is already present")
