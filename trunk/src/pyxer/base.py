@@ -86,6 +86,8 @@ def abort(code = 404):
     # .exeception for Python 2.3 compatibility
     raise exc.HTTPNotFound().exception
 
+notfound = abort
+
 _template_cache = {}
 
 class StreamTemplateManager:
@@ -111,8 +113,10 @@ class StreamTemplateManager:
                 log.debug("Found a newer file than the one in the cache for %r", path)
         # Load the template
         log.debug("Loading template %r in StreamTemplateManager", path)
+        data = file(path, "r").read().lstrip()
         template = pyxer_template.TemplateSoup(
-            file(path, "r").read())
+            data, 
+            xml=data.startswith('<?xml'))
         template.load = self.load
         _template_cache[path] = (template, mtime)
         return template

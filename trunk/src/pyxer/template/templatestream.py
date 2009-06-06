@@ -155,10 +155,11 @@ class TemplateSoup(object):
     Yet another templating system based on BeautyfulSoup
     """
 
-    def __init__(self, source, html5 = False, strict = True, debug = False):
+    def __init__(self, source, html5 = False, strict = True, debug = False, xml=False):
         self.strict = strict
         self.html5 = html5
         self.debug = debug
+        self.xml = False
         self.code = None
         self.bytecode = None
         self.sourcecode = u""
@@ -184,7 +185,10 @@ class TemplateSoup(object):
             parser = html5lib.HTMLParser(tree = html5lib.treebuilders.getTreeBuilder("beautifulsoup"))
             self.soup = parser.parse(StringIO.StringIO(self.source))
         else:
-            self.soup = HTML(self.source)
+            if self.xml:
+                self.soup = XML(self.source)
+            else:
+                self.soup = HTML(self.source)
         return self.soup
 
     def generateCode(self):
@@ -289,8 +293,11 @@ class TemplateSoup(object):
         self.stream = stream
         return stream
 
-    def render(self, method="html", encoding = "utf8", doctype="html", strip_whitespace=True, **kw):
-        if self.stream:
+    def render(self, method="html", encoding = "utf8", doctype=None, strip_whitespace=True, **kw):
+        method = method.lower()
+        if (doctype is None) and (method != 'xml'):
+            doctype = 'html'
+        if self.stream:            
             return self.stream.render(method,
                 strip_whitespace=strip_whitespace,
                 doctype=doctype,
