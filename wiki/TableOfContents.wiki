@@ -1,5 +1,7 @@
-#summary One-sentence summary of this page.
+#summary Table of contents
+#sidebar TableOfContents
 
   * [Documentation Documentation]
-
-<wiki:toc max_depth="2" />
+  * Cookbook
+    * [FirePython FirePython]   
+    * [CookbookRssFeeds RSS Feeds]
