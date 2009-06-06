@@ -5,3 +5,5 @@
   * Cookbook
     * [FirePython FirePython]   
     * [CookbookRssFeeds RSS Feeds]
+
+  * [ShortSummary Short Summary of Pyxer]
