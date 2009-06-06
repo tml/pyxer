@@ -1,4 +1,6 @@
+#summary Pyxer Python Framework Documentation
 #labels Featured
+
 = Pyxer Python Framework =
 
 = Introduction =
