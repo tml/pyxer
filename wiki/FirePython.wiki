@@ -1,5 +1,6 @@
 #summary FirePython on Pyxer
 #labels Featured
+#sidebar TableOfContents
 
 = FirePython on Pyxer =
 
