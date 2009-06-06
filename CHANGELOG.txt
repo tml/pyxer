@@ -5,6 +5,8 @@ Version 0.7.2, 2009-06-xx
 
 - NEW: Boolean values in templates will be shown as '0' and '1'
 - NEW: XML template and rendering support
+- FIX: XML is not served if a controller with the same name is present
+- FIX: Routing for Router object on 'public.__init__' did not work as expected
 
 Version 0.7.1, 2009-05-30
 

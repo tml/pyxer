@@ -40,11 +40,11 @@ log = logging.getLogger(__name__)
 _counter = 0
 
 # The WSGI application
-class PyxerApp(Router):
+class PyxerApp:
 
-    def __init__(self, base = "public"):
-        Router.__init__(self, base)
+    def __init__(self, base = "public"):        
         self.base = base
+        self.router = Router(base)
 
     def __call__(self, environ, start_response):
 
@@ -63,7 +63,7 @@ class PyxerApp(Router):
                 path = path[len(prefix):]
 
             log.debug("Try matching %r", path)
-            obj, vars = self.match(path)
+            obj, vars = self.router.match(path)
             log.debug("For %r found %r with %r", path, obj, vars)
 
             # No matching
