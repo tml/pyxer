@@ -272,3 +272,11 @@ def install_package(here, package, zip=False):
 def uid():
     import uuid
     return uuid.uuid4().hex
+
+def iso2datetime(isostring):
+    import datetime
+    import re
+    RX_ISOTIME = re.compile("^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)(\.\d+)?")
+    m = RX_ISOTIME.search(isostring)
+    if m:
+        return datetime.datetime(*[(int(v.lstrip('.'))) for v in m.groups() if v is not None])
