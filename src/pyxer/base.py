@@ -199,7 +199,7 @@ def render(result=None, render=None, **kw):
 
     # Publish result
     if isinstance(result, unicode):
-        response.charset = 'utf8'
+        response.charset = 'utf-8'
         response.unicode_body = result
     elif isinstance(result, str):
         response.body = result

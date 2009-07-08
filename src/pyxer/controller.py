@@ -73,7 +73,7 @@ class Controller(Decorator):
     
             # Publish result        
             if isinstance(result, unicode):
-                response.charset = 'utf8'
+                response.charset = 'utf-8'
                 response.unicode_body = result
             else:
                 response.body = result
