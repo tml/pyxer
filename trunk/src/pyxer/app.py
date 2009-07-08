@@ -42,7 +42,7 @@ _counter = 0
 # The WSGI application
 class PyxerApp:
 
-    def __init__(self, base = "public"):        
+    def __init__(self, base="public"):        
         self.base = base
         self.router = Router(base)
 
@@ -96,7 +96,7 @@ class PyxerApp:
             # and path
             request.template_url = None
             if name is not None:            
-                tpath =  os.path.join(vars["pyxer.path"], name + ".html")
+                tpath = os.path.join(vars["pyxer.path"], name + ".html")
                 if os.path.isfile(tpath):
                     request.template_url = tpath
                 
@@ -117,7 +117,7 @@ class PyxerApp:
 SessionMiddleware = None
 
 # Make WSGI application, wrapping sessions etc.
-def make_app(global_conf = {}, **app_conf):
+def make_app(global_conf={}, **app_conf):
 
     import os, sys
     
@@ -145,7 +145,7 @@ def make_app(global_conf = {}, **app_conf):
     except ImportError:
         log.exception("Beaker NOT loaded")
         
-    conf = AttrDict(pyxer = {
+    conf = AttrDict(pyxer={
         "session": "",
         "debug": False,
         "root": "public",
@@ -153,7 +153,7 @@ def make_app(global_conf = {}, **app_conf):
     root = os.getcwd()
     try:
         import ConfigParser        
-        filename = os.path.abspath(global_conf.get("__file__")) or os.path.abspath("pyxer.ini" )
+        filename = os.path.abspath(global_conf.get("__file__")) or os.path.abspath("pyxer.ini")
         # filename = os.path.abspath("pyxer.ini" )
         root = os.path.dirname(filename)
         cfile = ConfigParser.SafeConfigParser()
@@ -183,16 +183,20 @@ def make_app(global_conf = {}, **app_conf):
         log.debug("Beaker sessions")
         if "google.appengine" in sys.modules:
             # server = SessionMiddleware(server, type='ext:google', table_name="beaker_session", cookie_expires=False)
-            app = SessionMiddleware(app, type = 'ext:google', table_name = 'PyxerSession')
+            app = SessionMiddleware(app, 
+                type='ext:google', 
+                table_name='PyxerSession')
         else:
-            app = SessionMiddleware(app, type = 'dbm', data_dir =  os.path.join(root, 'cache'))
+            app = SessionMiddleware(app, 
+                type='dbm', 
+                data_dir=os.path.join(root, 'cache'))
 
     app = RegistryManager(app)
     app = ConfigMiddleware(app, conf.copy())
 
     # app = CgitbMiddleware(app)
     if not stage:
-        app = ErrorMiddleware(app, debug = True)
+        app = ErrorMiddleware(app, debug=True)
 
     #static = PyxerStatic(base)
     #app = Cascade([app, static])
@@ -204,7 +208,7 @@ def app_factory(global_config, **local_conf):
     return make_app(global_config)
 
 # Serve with Python on board WSGI
-def serve(opt = {}):
+def serve(opt={}):
     print "Serving on http://%s:%s" % (opt.host, opt.port)
     from wsgiref.simple_server import make_server
     server = make_server(opt.host, int(opt.port), make_app())
